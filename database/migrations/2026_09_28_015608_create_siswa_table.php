@@ -10,14 +10,12 @@ return new class extends Migration
     {
         Schema::create('siswa', function (Blueprint $table) {
             $table->integer('id_siswa')->autoIncrement();
-            $table->unsignedBigInteger('id_user')->nullable();
-            $table->string('nisn', 20)->unique();
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+            $table->string('nis', 20)->unique();
             $table->string('nama_siswa', 100);
             $table->string('kelas', 20);
             $table->enum('jenis_kelamin', ['L', 'P']);
             $table->timestamps();
-
-            $table->foreign('id_user')->references('id_user')->on('user')->onDelete('cascade');
         });
     }
 

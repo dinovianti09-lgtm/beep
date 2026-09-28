@@ -6,20 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('rapor_siswa', function (Blueprint $table) {
-            $table->id();
+            $table->integer('id_rapor_siswa')->autoIncrement();
+            $table->date('tgl_cetak');
+            $table->string('file_pdf')->nullable();
+            $table->integer('id_siswa');
+            $table->integer('id_rapor');
             $table->timestamps();
+
+            $table->foreign('id_siswa')->references('id_siswa')->on('siswa')->onDelete('cascade');
+            $table->foreign('id_rapor')->references('id_rapor')->on('rapor')->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('rapor_siswa');

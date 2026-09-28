@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('mapel', function (Blueprint $table) {
             $table->integer('id_mapel')->autoIncrement();
             $table->string('nama_mapel', 100);
+            $table->integer('kkm')->default(75);
             $table->timestamps();
         });
     }

@@ -10,12 +10,10 @@ return new class extends Migration
     {
         Schema::create('guru', function (Blueprint $table) {
             $table->integer('id_guru')->autoIncrement();
-            $table->unsignedBigInteger('id_user')->nullable();
-            $table->string('nip', 30)->nullable()->unique();
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+            $table->string('nip', 30)->unique()->nullable();
             $table->string('nama_guru', 100);
             $table->timestamps();
-
-            $table->foreign('id_user')->references('id_user')->on('user')->onDelete('cascade');
         });
     }
 
