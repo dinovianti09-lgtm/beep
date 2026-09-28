@@ -2,91 +2,89 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Siswa;
+use App\Models\Guru;
 use Illuminate\Http\Request;
 
-class SiswaController extends Controller
+class GuruController extends Controller
 {
     public function index()
     {
-        $siswa = Siswa::all();
+        $guru = Guru::all();
         return response()->json([
             'status' => 'success',
-            'data' => $siswa
+            'data' => $guru
         ], 200);
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'nisn' => 'required|unique:siswa,nisn',
-            'nama_siswa' => 'required',
-            'kelas' => 'required',
-            'jenis_kelamin' => 'required|in:L,P',
+            'nama_guru' => 'required',
+            'nip' => 'nullable|unique:guru,nip',
         ]);
 
-        $siswa = Siswa::create($request->all());
+        $guru = Guru::create($request->all());
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Data siswa berhasil ditambahkan',
-            'data' => $siswa
+            'message' => 'Data guru berhasil ditambahkan',
+            'data' => $guru
         ], 201);
     }
 
     public function show($id)
     {
-        $siswa = Siswa::find($id);
+        $guru = Guru::find($id);
 
-        if (!$siswa) {
+        if (!$guru) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Data siswa tidak ditemukan'
+                'message' => 'Data guru tidak ditemukan'
             ], 404);
         }
 
         return response()->json([
             'status' => 'success',
-            'data' => $siswa
+            'data' => $guru
         ], 200);
     }
 
     public function update(Request $request, $id)
     {
-        $siswa = Siswa::find($id);
+        $guru = Guru::find($id);
 
-        if (!$siswa) {
+        if (!$guru) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Data siswa tidak ditemukan'
+                'message' => 'Data guru tidak ditemukan'
             ], 404);
         }
 
-        $siswa->update($request->all());
+        $guru->update($request->all());
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Data siswa berhasil diperbarui',
-            'data' => $siswa
+            'message' => 'Data guru berhasil diperbarui',
+            'data' => $guru
         ], 200);
     }
 
     public function destroy($id)
     {
-        $siswa = Siswa::find($id);
+        $guru = Guru::find($id);
 
-        if (!$siswa) {
+        if (!$guru) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Data siswa tidak ditemukan'
+                'message' => 'Data guru tidak ditemukan'
             ], 404);
         }
 
-        $siswa->delete();
+        $guru->delete();
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Data siswa berhasil dihapus'
+            'message' => 'Data guru berhasil dihapus'
         ], 200);
     }
 }
