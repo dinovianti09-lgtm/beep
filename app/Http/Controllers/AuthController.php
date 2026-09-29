@@ -3,40 +3,37 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function showLoginForm()
     {
-        $request->validate([
-            'username' => 'required',
-            'password' => 'required',
-        ]);
-
-        $user = User::where('username', $request->username)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Username atau password salah'
-            ], 401);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Login berhasil',
-            'data' => $user
-        ], 200);
+        return view('auth.login');
     }
 
-    public function logout()
+    public function login(Request $request)
     {
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Berhasil logout'
-        ], 200);
+        $credentials = $request->validate([
+            'username' => ['required'],
+            'password' => ['required'],
+        ]);
+
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->intended('/dashboard');
+        }
+
+        return back()->withErrors([
+            'username' => 'Username atau password salah.',
+        ]);
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/login');
     }
 }

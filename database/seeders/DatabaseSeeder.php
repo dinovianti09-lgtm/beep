@@ -23,21 +23,21 @@ class DatabaseSeeder extends Seeder
         DB::table('users')->insert([
             [
                 'username'   => 'admin',
-                'password'   => Hash::make('password'),
+                'password'   => Hash::make('123456'), // <-- Ganti di sini
                 'role'       => 'admin',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'username'   => 'guru',
-                'password'   => Hash::make('password'),
+                'password'   => Hash::make('guru123'), // <-- Ganti di sini
                 'role'       => 'guru',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'username'   => 'siswa',
-                'password'   => Hash::make('password'),
+                'password'   => Hash::make('siswa123'), // <-- Ganti di sini
                 'role'       => 'siswa',
                 'created_at' => now(),
                 'updated_at' => now(),
