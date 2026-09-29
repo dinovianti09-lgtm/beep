@@ -6,22 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('siswas', function (Blueprint $table) {
-            $table->id();
+        Schema::create('rapor', function (Blueprint $table) {
+            $table->integer('id_rapor')->autoIncrement();
+            $table->enum('semester', ['1', '2', 'Ganjil', 'Genap']);
+            $table->string('tahun_ajaran', 20);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('siswas');
+        Schema::dropIfExists('rapor');
     }
 };
