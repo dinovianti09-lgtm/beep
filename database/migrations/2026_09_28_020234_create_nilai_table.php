@@ -9,20 +9,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('nilai', function (Blueprint $table) {
-            $table->integer('id_nilai')->autoIncrement();
-            $table->integer('id_siswa');
-            $table->integer('id_mapel');
-            $table->integer('id_rapor');
-            $table->decimal('nilai_harian', 5, 2)->default(0.00);
-            $table->decimal('nilai_uts', 5, 2)->default(0.00);
-            $table->decimal('nilai_uas', 5, 2)->default(0.00);
-            $table->decimal('nilai_akhir', 5, 2)->default(0.00);
-            $table->string('predikat', 5)->nullable();
+            $table->id('id_nilai');
+            $table->foreignId('id_siswa')->constrained('siswa', 'id_siswa')->onDelete('cascade');
+            $table->foreignId('id_guru')->constrained('guru', 'id_guru')->onDelete('cascade');
+            $table->foreignId('id_mapel')->constrained('mapel', 'id_mapel')->onDelete('cascade');
+            $table->enum('semester', ['Ganjil', 'Genap']);
+            $table->decimal('nilai_harian', 5, 2)->nullable();
+            $table->decimal('nilai_uts', 5, 2)->nullable();
+            $table->decimal('nilai_uas', 5, 2)->nullable();
+            $table->decimal('nilai_akhir', 5, 2)->nullable();
+            $table->string('predikat')->nullable();
             $table->timestamps();
-
-            $table->foreign('id_siswa')->references('id_siswa')->on('siswa')->onDelete('cascade');
-            $table->foreign('id_mapel')->references('id_mapel')->on('mapel')->onDelete('cascade');
-            $table->foreign('id_rapor')->references('id_rapor')->on('rapor')->onDelete('cascade');
         });
     }
 

@@ -9,11 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('siswa', function (Blueprint $table) {
-            $table->integer('id_siswa')->autoIncrement();
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
-            $table->string('nis', 20)->unique();
-            $table->string('nama_siswa', 100);
-            $table->string('kelas', 20);
+            $table->id('id_siswa');
+            $table->foreignId('id_user')->constrained('users')->onDelete('cascade');
+            $table->string('nisn')->unique();
+            $table->string('nama_siswa');
+            $table->string('kelas');
             $table->enum('jenis_kelamin', ['L', 'P']);
             $table->timestamps();
         });

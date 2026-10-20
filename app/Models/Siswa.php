@@ -1,92 +1,38 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Models;
 
-use App\Models\Siswa;
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\Nilai;
+use App\Models\RaporSiswa;
 
-class SiswaController extends Controller
+class Siswa extends Model
 {
-    public function index()
+    protected $table = 'siswa';
+
+    protected $primaryKey = 'id_siswa';
+
+    protected $fillable = [
+        'user_id',
+        'nis',
+        'nama_siswa',
+        'kelas',
+        'jenis_kelamin',
+    ];
+
+    public function user()
     {
-        $siswa = Siswa::all();
-        return response()->json([
-            'status' => 'success',
-            'data' => $siswa
-        ], 200);
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function store(Request $request)
+    public function nilai()
     {
-        $request->validate([
-            'nisn' => 'required|unique:siswa,nisn',
-            'nama_siswa' => 'required',
-            'kelas' => 'required',
-            'jenis_kelamin' => 'required|in:L,P',
-        ]);
-
-        $siswa = Siswa::create($request->all());
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data siswa berhasil ditambahkan',
-            'data' => $siswa
-        ], 201);
+        return $this->hasMany(Nilai::class, 'id_siswa', 'id_siswa');
     }
 
-    public function show($id)
+    public function raporSiswa()
     {
-        $siswa = Siswa::find($id);
-
-        if (!$siswa) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Data siswa tidak ditemukan'
-            ], 404);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'data' => $siswa
-        ], 200);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $siswa = Siswa::find($id);
-
-        if (!$siswa) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Data siswa tidak ditemukan'
-            ], 404);
-        }
-
-        $siswa->update($request->all());
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data siswa berhasil diperbarui',
-            'data' => $siswa
-        ], 200);
-    }
-
-    public function destroy($id)
-    {
-        $siswa = Siswa::find($id);
-
-        if (!$siswa) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Data siswa tidak ditemukan'
-            ], 404);
-        }
-
-        $siswa->delete();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data siswa berhasil dihapus'
-        ], 200);
+        return $this->hasMany(RaporSiswa::class, 'id_siswa', 'id_siswa');
     }
 }
