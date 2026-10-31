@@ -4,15 +4,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Siswa;
+use App\Models\Guru;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SiswaApiController extends Controller
 {
     /**
-     * Menampilkan daftar siswa sesuai hak akses pengguna.
+     * Membuat query siswa sesuai hak akses pengguna.
      */
-    public function index(Request $request): JsonResponse
+    private function querySesuaiAkses(Request $request): Builder|JsonResponse
     {
         $user = $request->user();
         $role = strtolower(trim((string) $user->role));
@@ -27,16 +29,60 @@ class SiswaApiController extends Controller
                 'jenis_kelamin',
             ]);
 
-        // Admin dan guru dapat melihat daftar siswa.
-        // Siswa hanya dapat melihat data miliknya sendiri.
+        // Admin dapat melihat semua siswa.
+        if ($role === 'admin') {
+            return $query;
+        }
+
+        // Siswa hanya dapat melihat datanya sendiri.
         if ($role === 'siswa') {
-            $query->where('user_id', $user->id);
-        } elseif (!in_array($role, ['admin', 'guru'], true)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Kamu tidak memiliki akses.',
-                'data' => null,
-            ], 403);
+            return $query->where('user_id', $user->id);
+        }
+
+        // Guru hanya dapat melihat siswa dari kelas yang diajar.
+        if ($role === 'guru') {
+            $guru = Guru::with('kelasDiajar')
+                ->where('user_id', $user->id)
+                ->first();
+
+            if (!$guru) {
+                return $query->whereRaw('1 = 0');
+            }
+
+            $daftarKelas = $guru->kelasDiajar
+                ->pluck('nama_kelas')
+                ->filter()
+                ->map(fn ($kelas) => mb_strtolower(trim($kelas)))
+                ->unique()
+                ->values()
+                ->all();
+
+            if (empty($daftarKelas)) {
+                return $query->whereRaw('1 = 0');
+            }
+
+            return $query->whereIn(
+                \DB::raw('LOWER(TRIM(kelas))'),
+                $daftarKelas
+            );
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Kamu tidak memiliki akses.',
+            'data' => null,
+        ], 403);
+    }
+
+    /**
+     * Menampilkan daftar siswa sesuai hak akses.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $query = $this->querySesuaiAkses($request);
+
+        if ($query instanceof JsonResponse) {
+            return $query;
         }
 
         $siswaList = $query
@@ -52,32 +98,14 @@ class SiswaApiController extends Controller
     }
 
     /**
-     * Menampilkan detail siswa berdasarkan ID.
+     * Menampilkan detail siswa berdasarkan ID sesuai hak akses.
      */
     public function show(Request $request, string $id): JsonResponse
     {
-        $user = $request->user();
-        $role = strtolower(trim((string) $user->role));
+        $query = $this->querySesuaiAkses($request);
 
-        $query = Siswa::query()
-            ->select([
-                'id_siswa',
-                'user_id',
-                'nis',
-                'nama_siswa',
-                'kelas',
-                'jenis_kelamin',
-            ]);
-
-        // Siswa hanya dapat membuka detail dirinya sendiri.
-        if ($role === 'siswa') {
-            $query->where('user_id', $user->id);
-        } elseif (!in_array($role, ['admin', 'guru'], true)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Kamu tidak memiliki akses.',
-                'data' => null,
-            ], 403);
+        if ($query instanceof JsonResponse) {
+            return $query;
         }
 
         $siswa = $query->find($id);
