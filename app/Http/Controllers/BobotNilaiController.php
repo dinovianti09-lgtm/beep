@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BobotNilai;
 use App\Models\Guru;
 use App\Models\Mapel;
+use App\Models\Nilai;
 use App\Models\Rapor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -93,7 +94,7 @@ class BobotNilaiController extends Controller
     }
 
     /**
-     * Menyimpan pengaturan bobot.
+     * Menyimpan bobot dan menghitung ulang nilai yang terdampak.
      */
     public function update(Request $request)
     {
@@ -113,12 +114,14 @@ class BobotNilaiController extends Controller
 
         if ($totalBobot !== 100) {
             throw ValidationException::withMessages([
-                'bobot_harian' => 'Total bobot Harian, UTS, dan UAS harus tepat 100%.',
+                'bobot_harian' =>
+                    'Total bobot Harian, UTS, dan UAS harus tepat 100%.',
             ]);
         }
 
         DB::transaction(function () use ($validated, $mapel) {
-            BobotNilai::updateOrCreate(
+            // 1. Simpan bobot terbaru untuk mapel dan periode terpilih.
+            $bobot = BobotNilai::updateOrCreate(
                 [
                     'id_mapel' => $mapel->id_mapel,
                     'id_rapor' => $validated['id_rapor'],
@@ -129,12 +132,53 @@ class BobotNilaiController extends Controller
                     'bobot_uas' => $validated['bobot_uas'],
                 ]
             );
+
+            // 2. Ambil nilai yang terdampak saja.
+            $daftarNilai = Nilai::where(
+                'id_mapel',
+                $mapel->id_mapel
+            )
+                ->where('id_rapor', $validated['id_rapor'])
+                ->get();
+
+            // 3. Hitung ulang nilai akhir dan predikat.
+            foreach ($daftarNilai as $nilai) {
+                $nilaiAkhir = (
+                    ((float) $nilai->nilai_harian
+                        * (int) $bobot->bobot_harian)
+                    + ((float) $nilai->nilai_uts
+                        * (int) $bobot->bobot_uts)
+                    + ((float) $nilai->nilai_uas
+                        * (int) $bobot->bobot_uas)
+                ) / 100;
+
+                $nilaiAkhir = round($nilaiAkhir, 2);
+
+                if ($nilaiAkhir >= 90) {
+                    $predikat = 'A';
+                } elseif ($nilaiAkhir >= 80) {
+                    $predikat = 'B';
+                } elseif ($nilaiAkhir >= 70) {
+                    $predikat = 'C';
+                } else {
+                    $predikat = 'D';
+                }
+
+                $nilai->nilai_akhir = $nilaiAkhir;
+                $nilai->predikat = $predikat;
+                $nilai->save();
+            }
         });
 
         return redirect()
             ->route('guru.bobot-nilai.index', [
                 'id_rapor' => $validated['id_rapor'],
             ])
-            ->with('success', 'Pengaturan bobot nilai berhasil disimpan.');
+            ->with(
+                'success',
+                'Pengaturan bobot berhasil disimpan dan '
+                . 'nilai akhir serta predikat yang terdampak '
+                . 'berhasil dihitung ulang.'
+            );
     }
 }
