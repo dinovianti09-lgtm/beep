@@ -7,6 +7,7 @@ use App\Models\Guru;
 use App\Models\Mapel;
 use App\Models\Siswa;
 use App\Models\Rapor;
+use App\Models\BobotNilai;
 use Illuminate\Http\Request;
 
 class RekapController extends Controller
@@ -118,6 +119,47 @@ class RekapController extends Controller
     }
 
     /**
+     * Menghitung nilai akhir berdasarkan bobot mapel dan periode rapor.
+     * Jika bobot belum diatur, gunakan bobot bawaan 30/30/40.
+     */
+    private function hitungNilaiAkhir(
+        float $harian,
+        float $uts,
+        float $uas,
+        int $idMapel,
+        int $idRapor
+    ): array {
+        $bobot = BobotNilai::where('id_mapel', $idMapel)
+            ->where('id_rapor', $idRapor)
+            ->first();
+
+        $bobotHarian = (float) ($bobot->bobot_harian ?? 30);
+        $bobotUts = (float) ($bobot->bobot_uts ?? 30);
+        $bobotUas = (float) ($bobot->bobot_uas ?? 40);
+
+        $nilaiAkhir = (
+            ($harian * $bobotHarian / 100)
+            + ($uts * $bobotUts / 100)
+            + ($uas * $bobotUas / 100)
+        );
+
+        if ($nilaiAkhir >= 90) {
+            $predikat = 'A';
+        } elseif ($nilaiAkhir >= 80) {
+            $predikat = 'B';
+        } elseif ($nilaiAkhir >= 70) {
+            $predikat = 'C';
+        } else {
+            $predikat = 'D';
+        }
+
+        return [
+            'nilai_akhir' => round($nilaiAkhir, 2),
+            'predikat' => $predikat,
+        ];
+    }
+
+    /**
      * REKAP NILAI GURU
      */
     public function index(Request $request)
@@ -198,7 +240,6 @@ class RekapController extends Controller
             ) {
                 $this->siswaDiKelasGuru($query, $namaKelasDiajar);
 
-                // Jika kelas dipilih, hanya tampilkan kelas tersebut.
                 if ($kelasTerpilih !== null) {
                     $query->whereRaw(
                         "REPLACE(TRIM(kelas), '-', ' ') = ?",
@@ -206,7 +247,7 @@ class RekapController extends Controller
                     );
                 }
 
-                // PENCARIAN NAMA SISWA ATAU NIS.
+                // Pencarian nama siswa atau NIS.
                 if ($search !== '') {
                     $query->where(function ($searchQuery) use ($search) {
                         $searchQuery
@@ -370,24 +411,18 @@ class RekapController extends Controller
                 ->withInput();
         }
 
-        // Perhitungan nilai akhir: Harian 30%, UTS 30%, UAS 40%.
         $nilaiHarian = (float) $validated['nilai_harian'];
         $nilaiUts = (float) $validated['nilai_uts'];
         $nilaiUas = (float) $validated['nilai_uas'];
 
-        $nilaiAkhir = ($nilaiHarian * 0.30)
-            + ($nilaiUts * 0.30)
-            + ($nilaiUas * 0.40);
-
-        if ($nilaiAkhir >= 90) {
-            $predikat = 'A';
-        } elseif ($nilaiAkhir >= 80) {
-            $predikat = 'B';
-        } elseif ($nilaiAkhir >= 70) {
-            $predikat = 'C';
-        } else {
-            $predikat = 'D';
-        }
+        // Gunakan bobot untuk mapel dan periode rapor yang dipilih.
+        $hasilPerhitungan = $this->hitungNilaiAkhir(
+            $nilaiHarian,
+            $nilaiUts,
+            $nilaiUas,
+            (int) $mapel->id_mapel,
+            (int) $validated['id_rapor']
+        );
 
         // Tabel nilai tidak memiliki kolom id_guru.
         $nilai->update([
@@ -397,8 +432,8 @@ class RekapController extends Controller
             'nilai_harian' => $nilaiHarian,
             'nilai_uts' => $nilaiUts,
             'nilai_uas' => $nilaiUas,
-            'nilai_akhir' => round($nilaiAkhir, 2),
-            'predikat' => $predikat,
+            'nilai_akhir' => $hasilPerhitungan['nilai_akhir'],
+            'predikat' => $hasilPerhitungan['predikat'],
             'semester' => (int) $validated['semester'],
         ]);
 

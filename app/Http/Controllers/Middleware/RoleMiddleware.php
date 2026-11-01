@@ -1,4 +1,3 @@
-$kode = @'
 <?php
 
 namespace App\Http\Middleware;
@@ -30,6 +29,7 @@ class RoleMiddleware
         $role = strtolower(trim((string) $user->role));
         $status = strtolower(trim((string) $user->status));
 
+        // Tolak akun guru/siswa yang sedang nonaktif.
         if (
             in_array($role, ['guru', 'siswa'], true) &&
             $status !== 'aktif'
@@ -38,22 +38,33 @@ class RoleMiddleware
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect()
-                ->route('login')
-                ->withErrors([
-                    'username' => 'Akun kamu sedang nonaktif. Silakan hubungi Admin sekolah.',
-                ]);
+            return redirect()->route('login')->withErrors([
+                'username' => 'Akun kamu sedang nonaktif. Silakan hubungi Admin sekolah.',
+            ]);
         }
 
-        if (!in_array($role, $roles, true)) {
+        // Pastikan role pengguna sesuai dengan akses halaman.
+        $allowedRoles = array_map(
+            fn ($item) => strtolower(trim((string) $item)),
+            $roles
+        );
+
+        if (!in_array($role, $allowedRoles, true)) {
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        }
+
+        // Wajib ganti password sebelum membuka halaman lain.
+        if (
+            in_array($role, ['guru', 'siswa'], true) &&
+            $user->must_change_password &&
+            !in_array($request->route()->getName(), [
+                'password.force-change',
+                'password.force-change.process',
+            ], true)
+        ) {
+            return redirect()->route('password.force-change');
         }
 
         return $next($request);
     }
 }
-'@
-
-Set-Content -Path .\app\Http\Middleware\RoleMiddleware.php -Value $kode -Encoding utf8
-
-Get-Content .\app\Http\Middleware\RoleMiddleware.php

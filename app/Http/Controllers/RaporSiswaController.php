@@ -9,26 +9,60 @@ use App\Models\Nilai;
 use App\Models\Kelas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class RaporSiswaController extends Controller
 {
+    /*
+    |--------------------------------------------------------------------------
+    | DAFTAR RAPOR SISWA
+    |--------------------------------------------------------------------------
+    */
+
     public function index(Request $request)
     {
+        // Ambil semua periode rapor.
         $periodeList = Rapor::orderByDesc('id_rapor')->get();
 
-        $idRapor = $request->input('id_rapor');
+        // Default menampilkan semua semester.
+        $idRaporTerpilih = trim(
+            (string) $request->input('id_rapor', 'all')
+        );
 
-        if ($idRapor) {
-            $periode = Rapor::find($idRapor);
+        $periode = null;
+
+        if ($idRaporTerpilih === '' || $idRaporTerpilih === 'all') {
+            $idRaporTerpilih = 'all';
+
+            // Semua periode digunakan.
+            $periodeTerpilihList = $periodeList;
+        } else {
+            // Jika memilih periode tertentu, ambil periode tersebut.
+            $periode = Rapor::where(
+                'id_rapor',
+                $idRaporTerpilih
+            )->first();
 
             if (!$periode) {
                 return redirect()
                     ->route('admin.rapor_siswa.index')
                     ->with('error', 'Periode rapor tidak ditemukan.');
             }
-        } else {
-            $periode = $periodeList->first();
+
+            $periodeTerpilihList = collect([$periode]);
         }
+
+        // ID periode yang akan ditampilkan.
+        $periodeIds = $periodeTerpilihList
+            ->pluck('id_rapor')
+            ->all();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DATA KELAS DAN FILTER
+        |--------------------------------------------------------------------------
+        */
 
         $kelasList = Kelas::orderBy('tingkat')
             ->orderBy('jurusan')
@@ -42,19 +76,29 @@ class RaporSiswaController extends Controller
             ->pluck('jurusan');
 
         $tingkatList = Kelas::whereNotNull('tingkat')
+            ->where('tingkat', '!=', '')
             ->distinct()
             ->orderBy('tingkat')
             ->pluck('tingkat');
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | DATA RAPOR SISWA
+        |--------------------------------------------------------------------------
+        */
+
         $raporSiswaList = collect();
 
-        if ($periode) {
+        if (!empty($periodeIds)) {
+
             $query = Siswa::query()->with([
-                'raporSiswa' => function ($q) use ($periode) {
-                    $q->where('id_rapor', $periode->id_rapor);
+                'raporSiswa' => function ($q) use ($periodeIds) {
+                    $q->whereIn('id_rapor', $periodeIds);
                 },
             ]);
 
+            // Pencarian nama siswa atau NIS.
             if ($request->filled('search')) {
                 $search = trim($request->search);
 
@@ -64,16 +108,19 @@ class RaporSiswaController extends Controller
                 });
             }
 
+            // Filter kelas.
             if ($request->filled('kelas')) {
                 $query->where('kelas', $request->kelas);
             }
 
+            // Filter jurusan dan tingkat.
             if (
-                $request->filled('jurusan')
-                || $request->filled('tingkat')
+                $request->filled('jurusan') ||
+                $request->filled('tingkat')
             ) {
                 $query->whereIn('kelas', function ($sub) use ($request) {
-                    $sub->select('nama_kelas')->from('kelas');
+                    $sub->select('nama_kelas')
+                        ->from('kelas');
 
                     if ($request->filled('jurusan')) {
                         $sub->where('jurusan', $request->jurusan);
@@ -85,132 +132,239 @@ class RaporSiswaController extends Controller
                 });
             }
 
-            $semuaSiswa = $query->orderBy('nama_siswa')->get();
+            $semuaSiswa = $query
+                ->orderBy('nama_siswa')
+                ->get();
 
-            foreach ($semuaSiswa as $siswa) {
-                $dataRapor = $siswa->raporSiswa->first();
 
-                $nilaiSiswa = Nilai::where(
-                    'id_siswa',
-                    $siswa->id_siswa
-                )
-                    ->where('id_rapor', $periode->id_rapor)
-                    ->get(['id_mapel']);
+            /*
+            |--------------------------------------------------------------------------
+            | AMBIL NILAI SEMUA PERIODE SEKALIGUS
+            |--------------------------------------------------------------------------
+            */
 
-                $jumlahNilai = $nilaiSiswa->count();
+            $nilaiBySiswaPeriode = Nilai::whereIn(
+                'id_rapor',
+                $periodeIds
+            )
+                ->get()
+                ->groupBy(function ($nilai) {
+                    return $nilai->id_siswa . '_' . $nilai->id_rapor;
+                });
 
-                // Mencari data kelas siswa.
-                $kelasSiswa = Kelas::where(
-                    'nama_kelas',
-                    $siswa->kelas
-                )->first();
 
-                $mapelWajib = collect();
+            /*
+            |--------------------------------------------------------------------------
+            | CACHE DATA KELAS
+            |--------------------------------------------------------------------------
+            */
 
-                if ($kelasSiswa) {
-                    $mapelWajib = DB::table('mapel_kelas')
-                        ->where('jurusan', $kelasSiswa->jurusan)
-                        ->where('tingkat', $kelasSiswa->tingkat)
-                        ->pluck('id_mapel')
-                        ->unique()
-                        ->values();
+            $kelasByNama = $kelasList->keyBy(function ($kelas) {
+                return strtolower(str_replace(
+                    '-',
+                    ' ',
+                    trim((string) $kelas->nama_kelas)
+                ));
+            });
+
+            $mapelWajibCache = [];
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | PROSES SETIAP PERIODE DAN SISWA
+            |--------------------------------------------------------------------------
+            */
+
+            foreach ($periodeTerpilihList as $periodeItem) {
+
+                foreach ($semuaSiswa as $siswa) {
+
+                    // Cari data rapor siswa pada periode ini.
+                    $dataRapor = $siswa->raporSiswa->firstWhere(
+                        'id_rapor',
+                        $periodeItem->id_rapor
+                    );
+
+                    // Ambil nilai siswa pada periode ini.
+                    $keyNilai = $siswa->id_siswa .
+                        '_' . $periodeItem->id_rapor;
+
+                    $nilaiSiswa = $nilaiBySiswaPeriode->get(
+                        $keyNilai,
+                        collect()
+                    );
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | CARI KELAS SISWA
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $namaKelasSiswa = strtolower(str_replace(
+                        '-',
+                        ' ',
+                        trim((string) $siswa->kelas)
+                    ));
+
+                    $kelasSiswa = $kelasByNama->get($namaKelasSiswa);
+
+                    $mapelWajib = collect();
+
+                    if ($kelasSiswa) {
+
+                        $cacheKey = strtoupper(trim(
+                            (string) $kelasSiswa->jurusan
+                        )) . '|' . strtoupper(trim(
+                            (string) $kelasSiswa->tingkat
+                        ));
+
+                        if (!array_key_exists($cacheKey, $mapelWajibCache)) {
+
+                            $mapelWajibCache[$cacheKey] = DB::table('mapel_kelas')
+                                ->where('jurusan', $kelasSiswa->jurusan)
+                                ->where('tingkat', $kelasSiswa->tingkat)
+                                ->pluck('id_mapel')
+                                ->unique()
+                                ->values();
+                        }
+
+                        $mapelWajib = $mapelWajibCache[$cacheKey];
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | HITUNG KELENGKAPAN NILAI
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $jumlahMapelWajib = $mapelWajib->count();
+
+                    $jumlahNilaiLengkap = 0;
+
+                    foreach ($mapelWajib as $idMapel) {
+
+                        $nilai = $nilaiSiswa->firstWhere(
+                            'id_mapel',
+                            $idMapel
+                        );
+
+                        if (
+                            $nilai &&
+                            is_numeric($nilai->nilai_harian) &&
+                            is_numeric($nilai->nilai_uts) &&
+                            is_numeric($nilai->nilai_uas) &&
+                            is_numeric($nilai->nilai_akhir)
+                        ) {
+                            $jumlahNilaiLengkap++;
+                        }
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | STATUS RAPOR
+                    |--------------------------------------------------------------------------
+                    */
+
+                    if ($jumlahMapelWajib === 0) {
+                        $statusRapor = 'Daftar Mapel Belum Diatur';
+                    } elseif ($jumlahNilaiLengkap === 0) {
+                        $statusRapor = 'Belum Ada Nilai Lengkap';
+                    } elseif ($jumlahNilaiLengkap < $jumlahMapelWajib) {
+                        $statusRapor = 'Rapor Belum Lengkap';
+                    } else {
+                        $statusRapor = 'Rapor Lengkap';
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | MASUKKAN DATA KE DAFTAR
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $raporSiswaList->push((object) [
+
+                        'id_rapor_siswa' => $dataRapor?->id_rapor_siswa,
+
+                        'siswa' => $siswa,
+
+                        'rapor' => $periodeItem,
+
+                        'tgl_cetak' => $dataRapor?->tgl_cetak,
+
+                        'jumlah_nilai' => $nilaiSiswa->count(),
+
+                        'jumlah_mapel_wajib' => $jumlahMapelWajib,
+
+                        'jumlah_mapel_terisi' => $jumlahNilaiLengkap,
+
+                        'jumlah_mapel_kurang' => max(
+                            0,
+                            $jumlahMapelWajib - $jumlahNilaiLengkap
+                        ),
+
+                        'status_rapor' => $statusRapor,
+                    ]);
                 }
-
-                $idMapelSudahDinilai = $nilaiSiswa
-                    ->pluck('id_mapel')
-                    ->unique();
-
-                $jumlahMapelWajib = $mapelWajib->count();
-
-                $jumlahMapelTerisi = $mapelWajib
-                    ->intersect($idMapelSudahDinilai)
-                    ->count();
-
-                $jumlahMapelKurang = max(
-                    0,
-                    $jumlahMapelWajib - $jumlahMapelTerisi
-                );
-
-                if ($jumlahNilai === 0) {
-                    $statusRapor = 'Belum Ada Nilai';
-                } elseif ($jumlahMapelWajib === 0) {
-                    $statusRapor = 'Daftar Mapel Belum Diatur';
-                } elseif ($jumlahMapelKurang > 0) {
-                    $statusRapor = 'Rapor Belum Lengkap';
-                } else {
-                    $statusRapor = 'Rapor Lengkap';
-                }
-
-                $raporSiswaList->push((object) [
-                    'id_rapor_siswa' => $dataRapor?->id_rapor_siswa,
-                    'siswa' => $siswa,
-                    'rapor' => $periode,
-                    'tgl_cetak' => $dataRapor?->tgl_cetak,
-                    'jumlah_nilai' => $jumlahNilai,
-                    'jumlah_mapel_wajib' => $jumlahMapelWajib,
-                    'jumlah_mapel_terisi' => $jumlahMapelTerisi,
-                    'jumlah_mapel_kurang' => $jumlahMapelKurang,
-                    'status_rapor' => $statusRapor,
-                ]);
             }
         }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PAGINATION 10 DATA PER HALAMAN
+        |--------------------------------------------------------------------------
+        |
+        | Data sudah dihitung terlebih dahulu karena daftar ini merupakan
+        | gabungan siswa dan periode rapor, bukan satu query tabel biasa.
+        |
+        */
+
+        $totalData = $raporSiswaList->count();
+
+        $perPage = 10;
+
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+
+        $raporSiswaList = new LengthAwarePaginator(
+            $raporSiswaList
+                ->forPage($currentPage, $perPage)
+                ->values(),
+            $totalData,
+            $perPage,
+            $currentPage,
+            [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]
+        );
+
 
         return view('admin.rapor_siswa.index', compact(
             'raporSiswaList',
             'periodeList',
             'periode',
+            'idRaporTerpilih',
             'kelasList',
             'jurusanList',
             'tingkatList'
         ));
     }
 
-    public function create()
-    {
-        $siswaList = Siswa::orderBy('nama_siswa')->get();
-        $raporList = Rapor::orderByDesc('id_rapor')->get();
 
-        return view(
-            'admin.rapor_siswa.create',
-            compact('siswaList', 'raporList')
-        );
-    }
-
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'id_siswa' => 'required|exists:siswa,id_siswa',
-            'id_rapor' => 'required|exists:rapor,id_rapor',
-            'tgl_cetak' => 'required|date',
-            'file_pdf' => 'nullable|string|max:255',
-        ]);
-
-        $sudahAda = RaporSiswa::where(
-            'id_siswa',
-            $validated['id_siswa']
-        )
-            ->where('id_rapor', $validated['id_rapor'])
-            ->exists();
-
-        if ($sudahAda) {
-            return redirect()
-                ->route('admin.rapor_siswa.index')
-                ->with(
-                    'error',
-                    'Rapor siswa untuk periode tersebut sudah tersedia.'
-                );
-        }
-
-        RaporSiswa::create($validated);
-
-        return redirect()
-            ->route('admin.rapor_siswa.index')
-            ->with('success', 'Data rapor siswa berhasil ditambahkan.');
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | DETAIL RAPOR SISWA
+    |--------------------------------------------------------------------------
+    */
 
     public function show($id)
     {
-        // Mengambil data rapor, siswa, dan periode.
+        // Ambil data rapor, siswa, dan periode.
         $raporSiswa = RaporSiswa::with(['siswa', 'rapor'])
             ->where('id_rapor_siswa', $id)
             ->firstOrFail();
@@ -218,27 +372,63 @@ class RaporSiswaController extends Controller
         $siswa = $raporSiswa->siswa;
         $rapor = $raporSiswa->rapor;
 
-        // Mengambil nilai siswa pada periode rapor yang dipilih.
+        // Ambil nilai berdasarkan siswa dan periode.
         $nilais = Nilai::with('mapel')
             ->where('id_siswa', $raporSiswa->id_siswa)
             ->where('id_rapor', $raporSiswa->id_rapor)
-            ->orderBy('id_nilai')
+            ->orderByDesc('id_nilai')
             ->get();
 
-        // Mengambil data kehadiran pada periode rapor yang sama.
+        // Ambil data kehadiran.
         $kehadiran = DB::table('kehadiran_siswa')
             ->where('id_siswa', $raporSiswa->id_siswa)
             ->where('id_rapor', $raporSiswa->id_rapor)
             ->first();
 
-        // Mengambil data ekstrakurikuler pada periode yang sama.
+        // Ambil data ekstrakurikuler.
         $ekstrakurikulerList = DB::table('ekstrakurikuler_siswa')
             ->where('id_siswa', $raporSiswa->id_siswa)
             ->where('id_rapor', $raporSiswa->id_rapor)
             ->orderBy('id_ekstrakurikuler_siswa')
             ->get();
 
-        // Mengirim data ke halaman detail rapor Admin.
+        // Cocokkan kelas siswa dengan tabel kelas.
+        $namaKelasSiswa = strtolower(
+            str_replace('-', ' ', trim($siswa->kelas ?? ''))
+        );
+
+        $kelasSiswa = Kelas::whereRaw(
+            "LOWER(REPLACE(TRIM(nama_kelas), '-', ' ')) = ?",
+            [$namaKelasSiswa]
+        )->first();
+
+        // Ambil nama dan NIP wali kelas.
+        $waliKelas = null;
+        $nipWaliKelas = null;
+
+        if ($kelasSiswa && !empty($kelasSiswa->wali_kelas)) {
+
+            $namaWaliKelas = trim($kelasSiswa->wali_kelas);
+
+            $guruWaliKelas = DB::table('guru')
+                ->whereRaw(
+                    'TRIM(nama_guru) = ?',
+                    [$namaWaliKelas]
+                )
+                ->first();
+
+            if ($guruWaliKelas) {
+                $waliKelas = $guruWaliKelas->nama_guru;
+                $nipWaliKelas = $guruWaliKelas->nip;
+            } else {
+                $waliKelas = $namaWaliKelas;
+            }
+        }
+
+        // Data kepala sekolah.
+        $kepalaSekolah = 'Ahmad Fadilah';
+        $nipKepalaSekolah = null;
+
         return view(
             'admin.rapor_siswa.show',
             compact(
@@ -247,15 +437,28 @@ class RaporSiswaController extends Controller
                 'rapor',
                 'nilais',
                 'kehadiran',
-                'ekstrakurikulerList'
+                'ekstrakurikulerList',
+                'waliKelas',
+                'nipWaliKelas',
+                'kepalaSekolah',
+                'nipKepalaSekolah'
             )
         );
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | HAPUS RAPOR SISWA
+    |--------------------------------------------------------------------------
+    */
+
     public function destroy($id)
     {
-        $raporSiswa = RaporSiswa::where('id_rapor_siswa', $id)
-            ->firstOrFail();
+        $raporSiswa = RaporSiswa::where(
+            'id_rapor_siswa',
+            $id
+        )->firstOrFail();
 
         $raporSiswa->delete();
 

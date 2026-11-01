@@ -27,24 +27,33 @@ class SiswaController extends Controller
     {
         $kelasList = Kelas::orderBy('nama_kelas')->get();
 
+        $search = trim((string) $request->query('search', ''));
+        $kelasTerpilih = trim((string) $request->query('kelas', ''));
+
         $query = Siswa::with('user')
             ->orderBy('nama_siswa');
 
-        if ($request->filled('kelas')) {
-            $query->where('kelas', $request->kelas);
+        // FILTER KELAS
+        if ($kelasTerpilih !== '') {
+            $query->where('kelas', $kelasTerpilih);
         }
 
-        if ($request->filled('search')) {
-            $search = trim($request->search);
-
+        // PENCARIAN NAMA, NIS, ATAU KELAS
+        if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->where('nama_siswa', 'like', "%{$search}%")
-                    ->orWhere('nis', 'like', "%{$search}%");
+                    ->orWhere('nis', 'like', "%{$search}%")
+                    ->orWhere('kelas', 'like', "%{$search}%");
             });
         }
 
-        $siswaList = $query->get();
+        // PAGINATION 10 SISWA PER HALAMAN
+        // Parameter pencarian dan filter tetap dibawa saat pindah halaman.
+        $siswaList = $query
+            ->paginate(10)
+            ->withQueryString();
 
+        // MENENTUKAN STATUS AKUN SISWA
         foreach ($siswaList as $siswa) {
             $user = $siswa->user;
 
@@ -62,7 +71,8 @@ class SiswaController extends Controller
         return view('admin.siswa.index', [
             'siswaList' => $siswaList,
             'kelasList' => $kelasList,
-            'kelasTerpilih' => $request->kelas,
+            'kelasTerpilih' => $kelasTerpilih,
+            'search' => $search,
         ]);
     }
 
@@ -72,7 +82,8 @@ class SiswaController extends Controller
 
     public function export(Request $request)
     {
-        $query = Siswa::query()->orderBy('nama_siswa');
+        $query = Siswa::query()
+            ->orderBy('nama_siswa');
 
         if ($request->filled('kelas')) {
             $query->where('kelas', $request->kelas);
@@ -83,10 +94,13 @@ class SiswaController extends Controller
 
             $query->where(function ($q) use ($search) {
                 $q->where('nama_siswa', 'like', "%{$search}%")
-                    ->orWhere('nis', 'like', "%{$search}%");
+                    ->orWhere('nis', 'like', "%{$search}%")
+                    ->orWhere('kelas', 'like', "%{$search}%");
             });
         }
 
+        // Export tetap mengambil seluruh hasil filter,
+        // bukan hanya 10 data pada halaman aktif.
         $siswaList = $query->get();
 
         $data = $siswaList->map(function ($siswa) {

@@ -3,30 +3,68 @@
 namespace App\Http\Controllers;
 
 use App\Models\Rapor;
-use App\Models\Siswa;
 use App\Models\Nilai;
-use App\Models\Kelas;
+use App\Models\RaporSiswa;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
+use Illuminate\Validation\Rule;
 
 class RaporController extends Controller
 {
+    /*
+    |--------------------------------------------------------------------------
+    | DAFTAR PERIODE RAPOR
+    |--------------------------------------------------------------------------
+    */
+
     public function index()
     {
-        $rapors = Rapor::orderBy('id_rapor', 'desc')->get();
+        $rapors = Rapor::orderBy('id_rapor', 'desc')
+            ->paginate(10);
 
         return view('admin.rapor.index', compact('rapors'));
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | FORM TAMBAH PERIODE RAPOR
+    |--------------------------------------------------------------------------
+    */
 
     public function create()
     {
         return view('admin.rapor.create');
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | SIMPAN PERIODE RAPOR
+    |--------------------------------------------------------------------------
+    */
+
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'semester' => 'required|in:Ganjil,Genap',
-            'tahun_ajaran' => 'required|string|max:20',
+            'semester' => [
+                'required',
+                'in:Ganjil,Genap',
+                Rule::unique('rapor', 'semester')
+                    ->where(function ($query) use ($request) {
+                        return $query->where(
+                            'tahun_ajaran',
+                            $request->tahun_ajaran
+                        );
+                    }),
+            ],
+            'tahun_ajaran' => [
+                'required',
+                'string',
+                'max:20',
+            ],
+        ], [
+            'semester.unique' =>
+                'Periode semester dan tahun ajaran tersebut sudah tersedia.',
         ]);
 
         Rapor::create($validated);
@@ -36,6 +74,12 @@ class RaporController extends Controller
             ->with('success', 'Periode rapor berhasil ditambahkan.');
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | FORM EDIT PERIODE RAPOR
+    |--------------------------------------------------------------------------
+    */
+
     public function edit($id)
     {
         $rapor = Rapor::where('id_rapor', $id)->firstOrFail();
@@ -43,14 +87,38 @@ class RaporController extends Controller
         return view('admin.rapor.edit', compact('rapor'));
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE PERIODE RAPOR
+    |--------------------------------------------------------------------------
+    */
+
     public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'semester' => 'required|in:Ganjil,Genap',
-            'tahun_ajaran' => 'required|string|max:20',
-        ]);
-
         $rapor = Rapor::where('id_rapor', $id)->firstOrFail();
+
+        $validated = $request->validate([
+            'semester' => [
+                'required',
+                'in:Ganjil,Genap',
+                Rule::unique('rapor', 'semester')
+                    ->where(function ($query) use ($request) {
+                        return $query->where(
+                            'tahun_ajaran',
+                            $request->tahun_ajaran
+                        );
+                    })
+                    ->ignore($rapor->id_rapor, 'id_rapor'),
+            ],
+            'tahun_ajaran' => [
+                'required',
+                'string',
+                'max:20',
+            ],
+        ], [
+            'semester.unique' =>
+                'Periode semester dan tahun ajaran tersebut sudah digunakan.',
+        ]);
 
         $rapor->update($validated);
 
@@ -59,111 +127,93 @@ class RaporController extends Controller
             ->with('success', 'Periode rapor berhasil diperbarui.');
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | HAPUS PERIODE RAPOR
+    |--------------------------------------------------------------------------
+    */
+
     public function destroy($id)
     {
-        $rapor = Rapor::where('id_rapor', $id)->firstOrFail();
+        try {
+            $hasil = DB::transaction(function () use ($id) {
 
-        $rapor->delete();
+                $rapor = Rapor::where('id_rapor', $id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-        return redirect()
-            ->route('admin.rapor.index')
-            ->with('success', 'Periode rapor berhasil dihapus.');
-    }
+                $idRapor = $rapor->id_rapor;
 
-    // LIHAT RAPOR
-    public function showRapor(Request $request, $id)
-    {
-        $rapor = Rapor::where('id_rapor', $id)->firstOrFail();
+                // Periksa data nilai.
+                $adaNilai = Nilai::where(
+                    'id_rapor',
+                    $idRapor
+                )->exists();
 
-        // Daftar kelas dari data siswa.
-        $kelasList = Siswa::whereNotNull('kelas')
-            ->where('kelas', '!=', '')
-            ->select('kelas')
-            ->distinct()
-            ->orderBy('kelas')
-            ->pluck('kelas');
+                // Periksa data rapor siswa.
+                $adaRaporSiswa = RaporSiswa::where(
+                    'id_rapor',
+                    $idRapor
+                )->exists();
 
-        $siswaList = collect();
+                // Periksa pengaturan bobot nilai.
+                $adaBobot = DB::table('bobot_nilai')
+                    ->where('id_rapor', $idRapor)
+                    ->exists();
 
-        // Wali kelas.
-        $waliKelas = null;
+                // Periksa data kehadiran.
+                $adaKehadiran = DB::table('kehadiran_siswa')
+                    ->where('id_rapor', $idRapor)
+                    ->exists();
 
-        // Kalau kelas sudah dipilih.
-        if ($request->filled('kelas')) {
-            $siswaList = Siswa::where('kelas', $request->kelas)
-                ->orderBy('nama_siswa')
-                ->get();
+                // Periksa data ekstrakurikuler.
+                $adaEkstrakurikuler = DB::table('ekstrakurikuler_siswa')
+                    ->where('id_rapor', $idRapor)
+                    ->exists();
 
-            // Samakan tanda hubung dan spasi untuk pencarian wali kelas.
-            $namaKelas = strtolower(
-                str_replace('-', ' ', trim($request->kelas))
-            );
+                /*
+                 * PERIODE TIDAK BOLEH DIHAPUS
+                 * JIKA MASIH MEMILIKI DATA TERKAIT.
+                 */
+                if (
+                    $adaNilai ||
+                    $adaRaporSiswa ||
+                    $adaBobot ||
+                    $adaKehadiran ||
+                    $adaEkstrakurikuler
+                ) {
+                    return false;
+                }
 
-            $waliKelas = Kelas::whereRaw(
-                "LOWER(REPLACE(TRIM(nama_kelas), '-', ' ')) = ?",
-                [$namaKelas]
-            )->value('wali_kelas');
-        }
+                // Hapus periode jika tidak memiliki data terkait.
+                $rapor->delete();
 
-        $siswa = null;
-        $nilaiList = collect();
+                return true;
+            });
 
-        $kelasTerpilih = $request->kelas;
-
-        // Nilai awal jika belum ada siswa yang dipilih.
-        $jumlahMapel = 0;
-        $rataRataRapor = null;
-
-        // Kalau siswa dipilih.
-        if ($request->filled('id_siswa')) {
-            $query = Siswa::where('id_siswa', $request->id_siswa);
-
-            if ($request->filled('kelas')) {
-                $query->where('kelas', $request->kelas);
+            if (!$hasil) {
+                return redirect()
+                    ->route('admin.rapor.index')
+                    ->with(
+                        'error',
+                        'Periode rapor tidak dapat dihapus karena masih digunakan oleh data Nilai, Rapor Siswa, Bobot Nilai, Kehadiran, atau Ekstrakurikuler.'
+                    );
             }
 
-            $siswa = $query->first();
+            return redirect()
+                ->route('admin.rapor.index')
+                ->with(
+                    'success',
+                    'Periode rapor berhasil dihapus.'
+                );
 
-            if ($siswa) {
-                // Ambil nilai siswa hanya untuk periode rapor terpilih.
-                $nilaiList = Nilai::with('mapel')
-                    ->where('id_rapor', $rapor->id_rapor)
-                    ->where('id_siswa', $siswa->id_siswa)
-                    ->orderBy('id_nilai')
-                    ->get();
-
-                // Hanya nilai akhir yang sudah terisi yang dihitung.
-                $nilaiTerisi = $nilaiList->filter(function ($nilai) {
-                    return $nilai->nilai_akhir !== null
-                        && $nilai->nilai_akhir !== ''
-                        && is_numeric($nilai->nilai_akhir);
-                });
-
-                // Jumlah mata pelajaran yang mempunyai nilai akhir.
-                $jumlahMapel = $nilaiTerisi->count();
-
-                // Rata-rata nilai akhir semua mata pelajaran.
-                $rataRataRapor = $jumlahMapel > 0
-                    ? round(
-                        $nilaiTerisi->avg(function ($nilai) {
-                            return (float) $nilai->nilai_akhir;
-                        }),
-                        2
-                    )
-                    : null;
-            }
+        } catch (QueryException $e) {
+            return redirect()
+                ->route('admin.rapor.index')
+                ->with(
+                    'error',
+                    'Periode rapor tidak dapat dihapus karena masih terhubung dengan data akademik lainnya.'
+                );
         }
-
-        return view('admin.rapor.show', compact(
-            'rapor',
-            'kelasList',
-            'siswaList',
-            'siswa',
-            'nilaiList',
-            'kelasTerpilih',
-            'waliKelas',
-            'jumlahMapel',
-            'rataRataRapor'
-        ));
     }
 }

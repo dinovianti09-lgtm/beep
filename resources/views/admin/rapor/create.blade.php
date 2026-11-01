@@ -1,48 +1,265 @@
 @extends('layouts.admin')
 
-@section('title', 'Tambah Periode Rapor - Sistem Akademik')
+@section('title', 'Tambah Periode Rapor - Sistem Akademik Mini')
 
 @section('page-title', 'Tambah Periode Rapor')
 
-@section('page-subtitle', 'Tambahkan periode rapor baru')
+@section('page-subtitle', 'Tambahkan periode rapor baru.')
 
 @section('content')
 
-<div class="max-w-3xl">
+<style>
+    .rp-page {
+        color: #293F57;
+    }
 
-    {{-- HEADER --}}
-    <div class="mb-6">
-        <div class="flex items-center gap-3">
-            <div class="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center">
-                <span class="text-xl">📄</span>
-            </div>
+    .rp-hero {
+        background: linear-gradient(115deg, #C3E0F4 0%, #E3F0FA 58%, #F8FAFC 100%);
+        border: 1px solid #BDD6EE;
+        border-radius: 17px;
+    }
 
-            <div>
-                <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white">
-                    Periode Rapor Baru
-                </h2>
+    .rp-card {
+        background: #FFFFFF;
+        border: 1px solid #D5E1ED;
+        border-radius: 15px;
+        overflow: hidden;
+    }
 
-                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                    Isi data periode rapor yang akan digunakan.
-                </p>
-            </div>
+    .rp-muted {
+        color: #526982;
+    }
+
+    .rp-label {
+        display: block;
+        margin-bottom: 9px;
+        color: #293F57;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .rp-required {
+        color: #DC5555;
+    }
+
+    .rp-input {
+        width: 100%;
+        border: 1px solid #D5E1ED;
+        border-radius: 10px;
+        background: #F8FAFC;
+        color: #293F57;
+        padding: 12px 15px;
+        font-size: 13px;
+        outline: none;
+        transition: .2s ease;
+    }
+
+    .rp-input:focus {
+        border-color: #3478BD;
+        background: #FFFFFF;
+        box-shadow: 0 0 0 3px rgba(52, 120, 189, .12);
+    }
+
+    .rp-input::placeholder {
+        color: #94A3B8;
+    }
+
+    .rp-primary-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: #3478BD;
+        color: #FFFFFF;
+        border-radius: 10px;
+        padding: 12px 21px;
+        font-size: 13px;
+        font-weight: 700;
+        transition: .2s ease;
+    }
+
+    .rp-primary-btn:hover {
+        background: #285F96;
+        transform: translateY(-1px);
+    }
+
+    .rp-secondary-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 1px solid #D5E1ED;
+        background: #FFFFFF;
+        color: #526982;
+        border-radius: 10px;
+        padding: 12px 21px;
+        font-size: 13px;
+        font-weight: 700;
+        transition: .2s ease;
+    }
+
+    .rp-secondary-btn:hover {
+        background: #F1F6FB;
+        border-color: #BDD6EE;
+    }
+
+    .rp-info {
+        background: #EAF4FF;
+        border: 1px solid #D5E5F5;
+        border-radius: 12px;
+        color: #3478BD;
+    }
+
+    .rp-error {
+        background: #FEF2F2;
+        border: 1px solid #FECACA;
+        color: #B91C1C;
+        border-radius: 12px;
+    }
+
+    /* DARK MODE */
+
+    .dark .rp-page {
+        color: #E4ECF6;
+    }
+
+    .dark .rp-hero {
+        background: linear-gradient(115deg, #243E59 0%, #1C3049 58%, #17283D 100%);
+        border-color: #354962;
+    }
+
+    .dark .rp-card {
+        background: #192438;
+        border-color: #354962;
+    }
+
+    .dark .rp-muted {
+        color: #A7B8CC;
+    }
+
+    .dark .rp-label {
+        color: #E4ECF6;
+    }
+
+    .dark .rp-input {
+        background: #1C3049;
+        border-color: #3A5068;
+        color: #E4ECF6;
+    }
+
+    .dark .rp-input:focus {
+        background: #243E59;
+        border-color: #6CA7DE;
+        box-shadow: 0 0 0 3px rgba(108, 167, 222, .12);
+    }
+
+    .dark .rp-input::placeholder {
+        color: #8295AB;
+    }
+
+    .dark .rp-input option {
+        background: #192438;
+        color: #E4ECF6;
+    }
+
+    .dark .rp-secondary-btn {
+        background: #24364D;
+        border-color: #3A5068;
+        color: #D3DFEC;
+    }
+
+    .dark .rp-secondary-btn:hover {
+        background: #304966;
+        border-color: #527393;
+    }
+
+    .dark .rp-info {
+        background: #243E59;
+        border-color: #3A5876;
+        color: #A9D2F5;
+    }
+
+    .dark .rp-error {
+        background: #3B2028;
+        border-color: #693541;
+        color: #FCA5A5;
+    }
+</style>
+
+<div class="rp-page p-6 lg:p-8">
+
+    {{-- HERO HEADER --}}
+    <div class="rp-hero mb-7 flex items-center gap-4 p-6 lg:p-7">
+
+        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-white/60 bg-white/70 text-[#3478BD] shadow-sm dark:border-slate-500/20 dark:bg-slate-800/40 dark:text-blue-300">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                width="27"
+                height="27"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <path d="M14 2v6h6"/>
+                <path d="M8 13h8"/>
+                <path d="M8 17h8"/>
+                <path d="M8 9h2"/>
+            </svg>
+
         </div>
+
+        <div>
+            <p class="mb-1 text-xs font-bold uppercase tracking-wider text-[#3478BD] dark:text-blue-300">
+                Manajemen Akademik
+            </p>
+
+            <h2 class="text-xl font-extrabold text-[#293F57] dark:text-white lg:text-2xl">
+                Tambah Periode Rapor
+            </h2>
+
+            <p class="mt-1 text-xs text-[#526982] dark:text-slate-300 sm:text-sm">
+                Tambahkan semester dan tahun ajaran baru ke dalam sistem.
+            </p>
+        </div>
+
     </div>
 
 
     {{-- FORM CARD --}}
-    <div class="bg-white dark:bg-slate-800 rounded-[1.5rem] border border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-900/5 overflow-hidden">
+    <div class="rp-card">
 
         {{-- CARD HEADER --}}
-        <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-700 bg-gradient-to-r from-blue-50/70 to-indigo-50/70 dark:from-slate-800 dark:to-slate-800">
+        <div class="flex items-center gap-3 border-b border-[#D5E1ED] px-6 py-5 dark:border-[#354962]">
 
-            <h3 class="font-bold text-slate-800 dark:text-white">
-                Form Tambah Periode Rapor
-            </h3>
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EAF4FF] text-[#3478BD] dark:bg-[#263E59] dark:text-blue-300">
 
-            <p class="text-xs text-slate-400 mt-1">
-                Lengkapi semester dan tahun ajaran.
-            </p>
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M12 5v14"/>
+                    <path d="M5 12h14"/>
+                </svg>
+
+            </div>
+
+            <div>
+                <h3 class="text-sm font-extrabold text-[#293F57] dark:text-white">
+                    Form Periode Rapor
+                </h3>
+
+                <p class="mt-1 text-xs rp-muted">
+                    Lengkapi informasi periode rapor yang akan ditambahkan.
+                </p>
+            </div>
 
         </div>
 
@@ -52,23 +269,21 @@
 
             @csrf
 
-            <div class="p-6 sm:p-8 space-y-6">
+            <div class="space-y-6 p-6 sm:p-8">
 
                 {{-- SEMESTER --}}
                 <div>
-                    <label
-                        for="semester"
-                        class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
-                    >
+
+                    <label for="semester" class="rp-label">
                         Semester
-                        <span class="text-red-500">*</span>
+                        <span class="rp-required">*</span>
                     </label>
 
                     <select
                         id="semester"
                         name="semester"
                         required
-                        class="w-full border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-3 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white text-sm focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500"
+                        class="rp-input"
                     >
 
                         <option value="">
@@ -92,21 +307,24 @@
                     </select>
 
                     @error('semester')
-                        <p class="text-sm text-red-500 mt-2">
+                        <p class="mt-2 text-xs font-medium text-red-500">
                             {{ $message }}
                         </p>
                     @enderror
+
+                    <p class="mt-2 text-xs rp-muted">
+                        Pilih semester Ganjil atau Genap.
+                    </p>
+
                 </div>
 
 
                 {{-- TAHUN AJARAN --}}
                 <div>
-                    <label
-                        for="tahun_ajaran"
-                        class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
-                    >
+
+                    <label for="tahun_ajaran" class="rp-label">
                         Tahun Ajaran
-                        <span class="text-red-500">*</span>
+                        <span class="rp-required">*</span>
                     </label>
 
                     <input
@@ -117,38 +335,50 @@
                         placeholder="Contoh: 2026/2027"
                         required
                         maxlength="20"
-                        class="w-full border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-3 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500"
+                        class="rp-input"
                     >
 
-                    <p class="text-xs text-slate-400 mt-2">
-                        Contoh format: 2026/2027
+                    <p class="mt-2 text-xs rp-muted">
+                        Gunakan format tahun ajaran, contoh: 2026/2027.
                     </p>
 
                     @error('tahun_ajaran')
-                        <p class="text-sm text-red-500 mt-2">
+                        <p class="mt-2 text-xs font-medium text-red-500">
                             {{ $message }}
                         </p>
                     @enderror
+
                 </div>
 
 
-                {{-- ERROR --}}
+                {{-- ERROR VALIDASI --}}
                 @if ($errors->any())
 
-                    <div class="rounded-2xl bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900 p-4">
+                    <div class="rp-error p-4">
 
-                        <p class="font-semibold text-red-700 dark:text-red-300 mb-2">
-                            Data belum bisa disimpan:
-                        </p>
+                        <div class="mb-2 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 8v4"/>
+                                <path d="M12 16h.01"/>
+                            </svg>
 
-                        <ul class="list-disc list-inside text-sm text-red-600 dark:text-red-400 space-y-1">
+                            <p class="text-sm font-bold">
+                                Data belum bisa disimpan
+                            </p>
+                        </div>
 
+                        <ul class="list-inside list-disc space-y-1 text-xs">
                             @foreach ($errors->all() as $error)
-                                <li>
-                                    {{ $error }}
-                                </li>
+                                <li>{{ $error }}</li>
                             @endforeach
-
                         </ul>
 
                     </div>
@@ -158,21 +388,45 @@
             </div>
 
 
-            {{-- BUTTON --}}
-            <div class="px-6 sm:px-8 py-5 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row justify-end gap-3">
+            {{-- BUTTON FOOTER --}}
+            <div class="flex flex-col justify-end gap-3 border-t border-[#D5E1ED] bg-[#F8FAFC] px-6 py-5 dark:border-[#354962] dark:bg-[#17283D] sm:flex-row sm:px-8">
 
                 <a
                     href="{{ route('admin.rapor.index') }}"
-                    class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+                    class="rp-secondary-btn"
                 >
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="m15 18-6-6 6-6"/>
+                    </svg>
+
                     Batal
                 </a>
 
                 <button
                     type="submit"
-                    class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-semibold shadow-lg shadow-blue-900/10 hover:-translate-y-0.5 transition"
+                    class="rp-primary-btn"
                 >
-                    <span>✓</span>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M12 5v14"/>
+                        <path d="M5 12h14"/>
+                    </svg>
+
                     Simpan Periode
                 </button>
 
@@ -183,20 +437,33 @@
     </div>
 
 
-    {{-- INFO --}}
-    <div class="flex gap-3 px-5 py-4 mt-6 rounded-2xl bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900">
+    {{-- INFORMATION --}}
+    <div class="rp-info mt-6 flex items-start gap-3 p-5">
 
-        <div class="text-blue-600 dark:text-blue-400 text-lg">
-            💡
+        <div class="mt-0.5 shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                width="21"
+                height="21"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4"/>
+                <path d="M12 8h.01"/>
+            </svg>
         </div>
 
         <div>
-            <p class="text-sm font-semibold text-blue-800 dark:text-blue-300">
+            <p class="text-sm font-extrabold">
                 Informasi
             </p>
 
-            <p class="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                Periode rapor ini nantinya dapat digunakan saat menambahkan nilai siswa.
+            <p class="mt-1 text-xs leading-relaxed opacity-90">
+                Periode rapor yang ditambahkan akan digunakan sebagai acuan
+                saat Guru menginput nilai siswa dan saat sistem menyusun rapor.
             </p>
         </div>
 
@@ -204,11 +471,9 @@
 
 
     {{-- FOOTER --}}
-    <div class="text-center pt-5">
-        <p class="text-xs text-slate-400">
-            © {{ date('Y') }} Sistem Akademik Mini
-        </p>
-    </div>
+    <p class="mt-7 text-center text-xs text-[#8A9DB1] dark:text-slate-500">
+        © {{ date('Y') }} Sistem Akademik Mini
+    </p>
 
 </div>
 

@@ -37,8 +37,18 @@ class GuruController extends Controller
             });
         }
 
-        $guruList = $guruQuery->get();
+        /*
+         * PAGINATION
+         * Maksimal 10 guru setiap halaman.
+         * Kata kunci pencarian tetap dibawa saat pindah halaman.
+         */
+        $guruList = $guruQuery
+            ->paginate(10)
+            ->withQueryString();
 
+        /*
+         * STATUS AKUN GURU
+         */
         foreach ($guruList as $guru) {
             $user = $guru->user;
 
@@ -53,7 +63,9 @@ class GuruController extends Controller
             }
         }
 
-        // Menentukan guru yang menjadi wali kelas.
+        /*
+         * MENENTUKAN GURU YANG MENJADI WALI KELAS
+         */
         $waliKelasMap = Kelas::whereNotNull('wali_kelas')
             ->where('wali_kelas', '!=', '')
             ->get(['id', 'nama_kelas', 'wali_kelas'])

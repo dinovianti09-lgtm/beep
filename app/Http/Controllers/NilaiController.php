@@ -9,6 +9,7 @@ use App\Models\Rapor;
 use App\Models\RaporSiswa;
 use App\Models\Guru;
 use App\Models\Kelas;
+use App\Models\BobotNilai;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -41,7 +42,7 @@ class NilaiController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | HAK AKSES ADMIN
+    | DATA NILAI ADMIN
     |--------------------------------------------------------------------------
     */
 
@@ -59,7 +60,9 @@ class NilaiController extends Controller
         $semesterTerpilih = $request->get('semester');
         $mapelTerpilih = $request->get('mapel');
 
-        $nilaiList = $this->queryNilaiAdmin($request)->get();
+        $nilaiList = $this->queryNilaiAdmin($request)
+            ->paginate(10)
+            ->withQueryString();
 
         return view('admin.nilai.index', compact(
             'kelasList',
@@ -195,7 +198,7 @@ class NilaiController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | CEK APAKAH SISWA TERMASUK KELAS YANG DIAJAR GURU
+    | CEK KELAS SISWA
     |--------------------------------------------------------------------------
     */
 
@@ -534,7 +537,6 @@ class NilaiController extends Controller
                 continue;
             }
 
-            // Cari siswa berdasarkan NIS.
             $siswa = Siswa::where('nis', $nis)->first();
 
             if (!$siswa) {
@@ -544,7 +546,6 @@ class NilaiController extends Controller
                 continue;
             }
 
-            // Pastikan nama siswa sesuai dengan NIS.
             if (
                 strtolower(trim((string) $siswa->nama_siswa)) !==
                 strtolower(trim($namaSiswa))
@@ -555,7 +556,6 @@ class NilaiController extends Controller
                 continue;
             }
 
-            // Pastikan kelas pada Excel cocok dengan kelas siswa.
             $kelasExcel = strtolower(str_replace(
                 '-',
                 ' ',
@@ -576,7 +576,6 @@ class NilaiController extends Controller
                 continue;
             }
 
-            // Pastikan siswa berasal dari kelas yang diajar Guru.
             if (!$this->siswaTermasukKelasGuru(
                 $siswa,
                 $namaKelasDiajar
@@ -588,7 +587,6 @@ class NilaiController extends Controller
                 continue;
             }
 
-            // Pastikan mapel Excel sesuai dengan mapel Guru.
             $namaMapelExcel = strtolower(trim($namaMapel));
             $namaMapelGuru = strtolower(trim($guruMapel->nama_mapel));
 
@@ -599,7 +597,6 @@ class NilaiController extends Controller
                 continue;
             }
 
-            // Cari periode rapor yang sesuai.
             $rapor = Rapor::where(
                 'tahun_ajaran',
                 $tahunAjaran
@@ -616,7 +613,6 @@ class NilaiController extends Controller
                 continue;
             }
 
-            // Cegah nilai ganda.
             $nilaiSudahAda = Nilai::where(
                 'id_siswa',
                 $siswa->id_siswa
@@ -648,10 +644,8 @@ class NilaiController extends Controller
 
             try {
                 DB::transaction(function () use ($dataNilai) {
-                    // Simpan nilai.
                     Nilai::create($dataNilai);
 
-                    // Buat rapor siswa jika belum ada.
                     RaporSiswa::firstOrCreate(
                         [
                             'id_siswa' => $dataNilai['id_siswa'],
@@ -753,7 +747,17 @@ class NilaiController extends Controller
                 ->get();
         }
 
+        // Ambil daftar periode rapor.
         $raporList = Rapor::orderByDesc('id_rapor')->get();
+
+        // BARU: Ambil bobot sesuai mapel guru dan periode rapor.
+        $bobotList = BobotNilai::where(
+            'id_mapel',
+            $mapel->id_mapel
+        )
+            ->whereIn('id_rapor', $raporList->pluck('id_rapor'))
+            ->get()
+            ->keyBy('id_rapor');
 
         $kelasTerpilih = $request->get(
             'id_kelas',
@@ -766,7 +770,8 @@ class NilaiController extends Controller
             'guru',
             'mapel',
             'kelasDiajar',
-            'kelasTerpilih'
+            'kelasTerpilih',
+            'bobotList'
         ));
     }
 
@@ -796,7 +801,7 @@ class NilaiController extends Controller
         if (empty($guru->mapel_diampu)) {
             return back()
                 ->withErrors([
-                    'guru' => 'Mapel yang diampu belum ditentukan oleh Admin.',
+                    'guru' => 'Mapel yang diampu belum ditentukan.',
                 ])
                 ->withInput();
         }
@@ -912,13 +917,12 @@ class NilaiController extends Controller
 
         $validated['id_mapel'] = $mapel->id_mapel;
 
+        // Hitung nilai menggunakan bobot mapel dan periode rapor.
         $this->hitungNilaiAkhir($validated);
 
-        // Simpan nilai dan rapor siswa dalam satu transaksi.
         DB::transaction(function () use ($validated) {
             Nilai::create($validated);
 
-            // Tidak membuat rapor baru jika sudah tersedia.
             RaporSiswa::firstOrCreate(
                 [
                     'id_siswa' => $validated['id_siswa'],
@@ -933,7 +937,10 @@ class NilaiController extends Controller
 
         return redirect()
             ->route('guru.rekap.index')
-            ->with('success', 'Nilai berhasil ditambahkan dan rapor siswa dipastikan tersedia.');
+            ->with(
+                'success',
+                'Nilai berhasil ditambahkan dan rapor siswa dipastikan tersedia.'
+            );
     }
 
     /*
@@ -959,7 +966,7 @@ class NilaiController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | HITUNG NILAI AKHIR DAN PREDIKAT
+    | HITUNG NILAI AKHIR BERDASARKAN BOBOT
     |--------------------------------------------------------------------------
     */
 
@@ -969,9 +976,27 @@ class NilaiController extends Controller
         $uts = (float) $validated['nilai_uts'];
         $uas = (float) $validated['nilai_uas'];
 
-        $nilaiAkhir = ($harian * 0.30)
-            + ($uts * 0.30)
-            + ($uas * 0.40);
+        $idMapel = $validated['id_mapel'] ?? null;
+        $idRapor = $validated['id_rapor'] ?? null;
+
+        $bobot = null;
+
+        if ($idMapel !== null && $idRapor !== null) {
+            $bobot = BobotNilai::where('id_mapel', $idMapel)
+                ->where('id_rapor', $idRapor)
+                ->first();
+        }
+
+        // Bobot standar jika belum ada pengaturan khusus.
+        $bobotHarian = (float) ($bobot->bobot_harian ?? 30);
+        $bobotUts = (float) ($bobot->bobot_uts ?? 30);
+        $bobotUas = (float) ($bobot->bobot_uas ?? 40);
+
+        $nilaiAkhir = (
+            ($harian * $bobotHarian / 100)
+            + ($uts * $bobotUts / 100)
+            + ($uas * $bobotUas / 100)
+        );
 
         $validated['nilai_akhir'] = round($nilaiAkhir, 2);
 

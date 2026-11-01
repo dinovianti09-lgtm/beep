@@ -16,11 +16,11 @@ class KelasController extends Controller
      */
     public function index(Request $request)
     {
+        $search = trim((string) $request->query('search', ''));
+
         $query = Kelas::query();
 
-        if ($request->filled('search')) {
-            $search = trim($request->search);
-
+        if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->where('nama_kelas', 'like', '%' . $search . '%')
                     ->orWhere('tingkat', 'like', '%' . $search . '%')
@@ -29,13 +29,19 @@ class KelasController extends Controller
             });
         }
 
+        // Pagination: maksimal 10 kelas per halaman.
+        // Kata kunci pencarian tetap dibawa saat berpindah halaman.
         $kelasList = $query
             ->orderBy('tingkat')
             ->orderBy('jurusan')
             ->orderBy('nama_kelas')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('admin.kelas.index', compact('kelasList'));
+        return view('admin.kelas.index', compact(
+            'kelasList',
+            'search'
+        ));
     }
 
     /**
@@ -65,9 +71,20 @@ class KelasController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'tingkat' => ['required', Rule::in(['X', 'XI', 'XII'])],
-            'jurusan' => ['required', Rule::in(['RPL', 'DKV', 'BR'])],
-            'nomor_kelas' => ['required', 'integer', 'min:1', 'max:20'],
+            'tingkat' => [
+                'required',
+                Rule::in(['X', 'XI', 'XII'])
+            ],
+            'jurusan' => [
+                'required',
+                Rule::in(['RPL', 'DKV', 'BR'])
+            ],
+            'nomor_kelas' => [
+                'required',
+                'integer',
+                'min:1',
+                'max:20'
+            ],
             'wali_kelas' => [
                 'nullable',
                 'string',
@@ -109,7 +126,10 @@ class KelasController extends Controller
 
         return redirect()
             ->route('admin.kelas.index')
-            ->with('success', 'Data kelas ' . $namaKelas . ' berhasil ditambahkan.');
+            ->with(
+                'success',
+                'Data kelas ' . $namaKelas . ' berhasil ditambahkan.'
+            );
     }
 
     /**
@@ -153,7 +173,7 @@ class KelasController extends Controller
          * Penyesuaian data lama:
          * Jika kelas masih menyimpan jurusan BRP,
          * tampilkan pilihan BR pada form edit.
-         * Perubahan di database dilakukan saat form disimpan.
+         * Perubahan database dilakukan saat form disimpan.
          */
         if ($kelas->jurusan === 'BRP') {
             $kelas->jurusan = 'BR';
@@ -173,9 +193,20 @@ class KelasController extends Controller
         $kelas = Kelas::findOrFail($id);
 
         $validated = $request->validate([
-            'tingkat' => ['required', Rule::in(['X', 'XI', 'XII'])],
-            'jurusan' => ['required', Rule::in(['RPL', 'DKV', 'BR'])],
-            'nomor_kelas' => ['required', 'integer', 'min:1', 'max:20'],
+            'tingkat' => [
+                'required',
+                Rule::in(['X', 'XI', 'XII'])
+            ],
+            'jurusan' => [
+                'required',
+                Rule::in(['RPL', 'DKV', 'BR'])
+            ],
+            'nomor_kelas' => [
+                'required',
+                'integer',
+                'min:1',
+                'max:20'
+            ],
             'wali_kelas' => [
                 'nullable',
                 'string',
@@ -212,7 +243,11 @@ class KelasController extends Controller
                 ]);
         }
 
-        DB::transaction(function () use ($kelas, $validated, $namaKelasBaru) {
+        DB::transaction(function () use (
+            $kelas,
+            $validated,
+            $namaKelasBaru
+        ) {
             $namaKelasLama = $kelas->nama_kelas;
 
             // Menjaga hubungan siswa ketika nama kelas berubah.

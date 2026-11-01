@@ -8,10 +8,125 @@ use App\Models\Rapor;
 use App\Models\RaporSiswa;
 use App\Models\Kelas;
 use App\Models\MapelKelas;
+use App\Models\KehadiranSiswa;
+use App\Models\EkstrakurikulerSiswa;
 use Illuminate\Support\Facades\Auth;
 
 class SiswaNilaiController extends Controller
 {
+    /**
+     * Mengambil data siswa berdasarkan akun yang login.
+     */
+    private function getSiswaLogin()
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return null;
+        }
+
+        return Siswa::where('user_id', $user->id)->first();
+    }
+
+    /**
+     * Mencari kelas siswa dengan nama kelas yang dinormalisasi.
+     */
+    private function getKelasSiswa($siswa)
+    {
+        $namaKelas = trim(
+            str_replace('-', ' ', $siswa->kelas ?? '')
+        );
+
+        return Kelas::whereRaw(
+            "LOWER(TRIM(REPLACE(nama_kelas, '-', ' '))) = ?",
+            [strtolower($namaKelas)]
+        )->first();
+    }
+
+    /**
+     * Mengambil tingkat dan jurusan dari data kelas.
+     */
+    private function getInfoKelas($siswa, $kelas = null)
+    {
+        $namaKelas = trim(
+            str_replace('-', ' ', $siswa->kelas ?? '')
+        );
+
+        $bagianKelas = preg_split('/\s+/', $namaKelas);
+
+        return [
+            'tingkat' => $kelas->tingkat
+                ?? ($bagianKelas[0] ?? null),
+
+            'jurusan' => $kelas->jurusan
+                ?? ($bagianKelas[1] ?? null),
+        ];
+    }
+
+    /**
+     * Mengambil mapel wajib berdasarkan tingkat dan jurusan.
+     */
+    private function getMapelWajib($tingkat, $jurusan)
+    {
+        if (!$tingkat || !$jurusan) {
+            return collect();
+        }
+
+        return MapelKelas::with('mapel')
+            ->whereRaw('LOWER(TRIM(jurusan)) = ?', [
+                strtolower(trim($jurusan)),
+            ])
+            ->whereRaw('LOWER(TRIM(tingkat)) = ?', [
+                strtolower(trim($tingkat)),
+            ])
+            ->get()
+            ->pluck('mapel')
+            ->filter()
+            ->unique('id_mapel')
+            ->values();
+    }
+
+    /**
+     * Nilai dianggap lengkap jika semua komponen tersedia.
+     */
+    private function nilaiLengkap($nilai)
+    {
+        if (!$nilai) {
+            return false;
+        }
+
+        return is_numeric($nilai->nilai_harian)
+            && is_numeric($nilai->nilai_uts)
+            && is_numeric($nilai->nilai_uas)
+            && is_numeric($nilai->nilai_akhir);
+    }
+
+    /**
+     * Memilih periode rapor yang diminta.
+     */
+    private function getPeriode($semesterList)
+    {
+        $semesterDipilih = request('semester');
+
+        $periodeAktif = $semesterList->first(
+            fn ($rapor) =>
+                (string) $rapor->id_rapor
+                === (string) $semesterDipilih
+        );
+
+        if (!$periodeAktif) {
+            $periodeAktif = $semesterList->first();
+        }
+
+        return [
+            'semesterDipilih' => $periodeAktif
+                ? (string) $periodeAktif->id_rapor
+                : null,
+
+            'periodeAktif' => $periodeAktif,
+        ];
+    }
+
     /**
      * Menampilkan nilai siswa, termasuk mapel yang belum diinput.
      */
@@ -23,108 +138,87 @@ class SiswaNilaiController extends Controller
             return redirect()->route('login');
         }
 
-        $siswa = Siswa::where('user_id', $user->id)->first();
+        $siswa = $this->getSiswaLogin();
 
         if (!$siswa) {
             return redirect()
                 ->route('siswa.dashboard')
-                ->with('error', 'Data siswa belum terhubung dengan akun ini.');
+                ->with(
+                    'error',
+                    'Data siswa belum terhubung dengan akun ini.'
+                );
         }
 
-        // Ambil seluruh periode rapor.
         $semesterList = Rapor::orderByDesc('id_rapor')->get();
 
-        $semesterDipilih = request('semester');
+        $pilihanPeriode = $this->getPeriode($semesterList);
 
-        $periodeTersedia = $semesterList->contains(
-            fn ($rapor) =>
-                (string) $rapor->id_rapor === (string) $semesterDipilih
+        $semesterDipilih = $pilihanPeriode['semesterDipilih'];
+        $periodeAktif = $pilihanPeriode['periodeAktif'];
+
+        // Gunakan data kelas yang sama seperti halaman transkrip.
+        $kelas = $this->getKelasSiswa($siswa);
+
+        $infoKelas = $this->getInfoKelas($siswa, $kelas);
+
+        $pengaturanMapel = $this->getMapelWajib(
+            $infoKelas['tingkat'],
+            $infoKelas['jurusan']
         );
 
-        if (!$periodeTersedia) {
-            $semesterDipilih = $semesterList->isNotEmpty()
-                ? (string) $semesterList->first()->id_rapor
-                : null;
-        }
-
-        $periodeAktif = $semesterDipilih !== null
-            ? $semesterList->first(
-                fn ($rapor) =>
-                    (string) $rapor->id_rapor === (string) $semesterDipilih
-            )
-            : null;
-
-        // Ambil jurusan dan tingkat dari nama kelas siswa.
-        $bagianKelas = preg_split(
-            '/\s+/',
-            trim(str_replace('-', ' ', $siswa->kelas ?? ''))
-        );
-
-        $tingkat = $bagianKelas[0] ?? null;
-        $jurusan = $bagianKelas[1] ?? null;
-
-        // Ambil mapel wajib berdasarkan jurusan dan tingkat.
-        $pengaturanMapel = collect();
-
-        if ($tingkat && $jurusan) {
-            $pengaturanMapel = MapelKelas::with('mapel')
-                ->whereRaw('LOWER(TRIM(jurusan)) = ?', [
-                    strtolower($jurusan)
-                ])
-                ->whereRaw('LOWER(TRIM(tingkat)) = ?', [
-                    strtolower($tingkat)
-                ])
-                ->get()
-                ->pluck('mapel')
-                ->filter()
-                ->unique('id_mapel')
-                ->values();
-        }
-
-        // Ambil nilai pada periode yang dipilih.
+        // Ambil nilai milik siswa yang login dan periode terpilih.
         $nilaiPeriode = collect();
 
-        if ($semesterDipilih !== null) {
+        if ($periodeAktif) {
             $nilaiPeriode = Nilai::with(['mapel', 'rapor'])
                 ->where('id_siswa', $siswa->id_siswa)
-                ->where('id_rapor', $semesterDipilih)
+                ->where('id_rapor', $periodeAktif->id_rapor)
                 ->get()
                 ->keyBy('id_mapel');
         }
 
-        // Gabungkan mapel wajib dengan nilai yang tersedia.
-        $nilais = $pengaturanMapel->map(function ($mapel) use (
-            $nilaiPeriode,
-            $periodeAktif
-        ) {
-            $nilai = $nilaiPeriode->get($mapel->id_mapel);
+        // Gabungkan semua mapel wajib dengan nilai yang tersedia.
+        $nilais = $pengaturanMapel->map(
+            function ($mapel) use ($nilaiPeriode, $periodeAktif) {
+                $nilai = $nilaiPeriode->get($mapel->id_mapel);
 
-            return (object) [
-                'mapel' => $mapel,
-                'rapor' => $periodeAktif,
-                'nilai_harian' => $nilai?->nilai_harian,
-                'nilai_uts' => $nilai?->nilai_uts,
-                'nilai_uas' => $nilai?->nilai_uas,
-                'nilai_akhir' => $nilai?->nilai_akhir,
-                'predikat' => $nilai?->predikat,
-                'status_nilai' => $nilai
-                    ? 'Sudah diinput'
-                    : 'Belum diinput',
-            ];
-        });
+                if (!$nilai) {
+                    $statusNilai = 'Belum diinput';
+                } elseif (!$this->nilaiLengkap($nilai)) {
+                    $statusNilai = 'Belum lengkap';
+                } else {
+                    $statusNilai = 'Lengkap';
+                }
 
-        // Statistik nilai yang tersedia.
+                return (object) [
+                    'mapel' => $mapel,
+                    'rapor' => $periodeAktif,
+                    'nilai_harian' => $nilai?->nilai_harian,
+                    'nilai_uts' => $nilai?->nilai_uts,
+                    'nilai_uas' => $nilai?->nilai_uas,
+                    'nilai_akhir' => $nilai?->nilai_akhir,
+                    'predikat' => $nilai?->predikat,
+                    'status_nilai' => $statusNilai,
+                ];
+            }
+        );
+
+        // Statistik hanya menggunakan nilai yang komponennya lengkap.
         $nilaiTerisi = $nilais->filter(
-            fn ($item) =>
-                $item->nilai_akhir !== null &&
-                $item->nilai_akhir !== '' &&
-                is_numeric($item->nilai_akhir)
+            function ($item) {
+                return is_numeric($item->nilai_harian)
+                    && is_numeric($item->nilai_uts)
+                    && is_numeric($item->nilai_uas)
+                    && is_numeric($item->nilai_akhir);
+            }
         );
 
         $totalNilaiTerisi = $nilaiTerisi->count();
 
         $nilaiTerbaik = $nilaiTerisi->isNotEmpty()
-            ? $nilaiTerisi->max('nilai_akhir')
+            ? $nilaiTerisi->max(
+                fn ($item) => (float) $item->nilai_akhir
+            )
             : null;
 
         return view('siswa.nilai.index', compact(
@@ -139,8 +233,7 @@ class SiswaNilaiController extends Controller
     }
 
     /**
-     * Menampilkan rapor siswa untuk periode tertentu,
-     * termasuk mapel yang belum memiliki nilai.
+     * Menampilkan rapor siswa untuk periode tertentu.
      */
     public function transkrip()
     {
@@ -150,77 +243,36 @@ class SiswaNilaiController extends Controller
             return redirect()->route('login');
         }
 
-        $siswa = Siswa::where('user_id', $user->id)->first();
+        $siswa = $this->getSiswaLogin();
 
         if (!$siswa) {
             return redirect()
                 ->route('siswa.dashboard')
-                ->with('error', 'Data siswa belum terhubung dengan akun ini.');
+                ->with(
+                    'error',
+                    'Data siswa belum terhubung dengan akun ini.'
+                );
         }
 
-        // Cari data kelas siswa.
-        $namaKelasSiswa = trim(
-            str_replace('-', ' ', $siswa->kelas ?? '')
-        );
-
-        $kelas = Kelas::whereRaw(
-            "LOWER(TRIM(REPLACE(nama_kelas, '-', ' '))) = ?",
-            [strtolower($namaKelasSiswa)]
-        )->first();
+        $kelas = $this->getKelasSiswa($siswa);
 
         $waliKelas = $kelas->wali_kelas ?? '-';
 
-        // Ambil semua periode rapor, meskipun belum ada nilai.
         $semesterList = Rapor::orderByDesc('id_rapor')->get();
 
-        $semesterDipilih = request('semester');
+        $pilihanPeriode = $this->getPeriode($semesterList);
 
-        $periodeTersedia = $semesterList->contains(
-            fn ($item) =>
-                (string) $item->id_rapor === (string) $semesterDipilih
+        $semesterDipilih = $pilihanPeriode['semesterDipilih'];
+        $rapor = $pilihanPeriode['periodeAktif'];
+
+        $infoKelas = $this->getInfoKelas($siswa, $kelas);
+
+        $mapelWajib = $this->getMapelWajib(
+            $infoKelas['tingkat'],
+            $infoKelas['jurusan']
         );
 
-        if (!$periodeTersedia) {
-            $semesterDipilih = $semesterList->isNotEmpty()
-                ? (string) $semesterList->first()->id_rapor
-                : null;
-        }
-
-        $rapor = $semesterDipilih !== null
-            ? $semesterList->first(
-                fn ($item) =>
-                    (string) $item->id_rapor === (string) $semesterDipilih
-            )
-            : null;
-
-        // Ambil tingkat dan jurusan kelas.
-        $bagianKelas = preg_split(
-            '/\s+/',
-            trim($namaKelasSiswa)
-        );
-
-        $tingkat = $kelas->tingkat ?? ($bagianKelas[0] ?? null);
-        $jurusan = $kelas->jurusan ?? ($bagianKelas[1] ?? null);
-
-        // Ambil seluruh mapel wajib kelas siswa.
-        $mapelWajib = collect();
-
-        if ($tingkat && $jurusan) {
-            $mapelWajib = MapelKelas::with('mapel')
-                ->whereRaw('LOWER(TRIM(jurusan)) = ?', [
-                    strtolower(trim($jurusan))
-                ])
-                ->whereRaw('LOWER(TRIM(tingkat)) = ?', [
-                    strtolower(trim($tingkat))
-                ])
-                ->get()
-                ->pluck('mapel')
-                ->filter()
-                ->unique('id_mapel')
-                ->values();
-        }
-
-        // Ambil nilai sesuai siswa dan periode yang dipilih.
+        // Pastikan nilai hanya milik siswa dan periode yang dipilih.
         $nilaiPeriode = collect();
 
         if ($rapor) {
@@ -231,10 +283,17 @@ class SiswaNilaiController extends Controller
                 ->keyBy('id_mapel');
         }
 
-        // Gabungkan mapel wajib dengan nilai yang tersedia.
         $nilais = $mapelWajib->map(
             function ($mapel) use ($nilaiPeriode, $rapor) {
                 $nilai = $nilaiPeriode->get($mapel->id_mapel);
+
+                if (!$nilai) {
+                    $statusNilai = 'Belum diinput';
+                } elseif (!$this->nilaiLengkap($nilai)) {
+                    $statusNilai = 'Belum lengkap';
+                } else {
+                    $statusNilai = 'Lengkap';
+                }
 
                 return (object) [
                     'mapel' => $mapel,
@@ -244,9 +303,7 @@ class SiswaNilaiController extends Controller
                     'nilai_uas' => $nilai?->nilai_uas,
                     'nilai_akhir' => $nilai?->nilai_akhir,
                     'predikat' => $nilai?->predikat,
-                    'status_nilai' => $nilai
-                        ? 'Sudah diinput'
-                        : 'Belum diinput',
+                    'status_nilai' => $statusNilai,
                 ];
             }
         );
@@ -254,13 +311,36 @@ class SiswaNilaiController extends Controller
         // Ambil data cetak rapor jika tersedia.
         $raporSiswa = null;
 
+        // Variabel default agar view tetap aman jika belum ada periode.
+        $kehadiran = null;
+        $ekstrakurikulerList = collect();
+
         if ($rapor) {
+            $idSiswa = $siswa->id_siswa;
+            $idRapor = $rapor->id_rapor;
+
             $raporSiswa = RaporSiswa::where(
                 'id_siswa',
-                $siswa->id_siswa
+                $idSiswa
             )
-                ->where('id_rapor', $rapor->id_rapor)
+                ->where('id_rapor', $idRapor)
                 ->first();
+
+            // Ambil kehadiran sesuai siswa dan periode rapor terpilih.
+            $kehadiran = KehadiranSiswa::where(
+                'id_siswa',
+                $idSiswa
+            )
+                ->where('id_rapor', $idRapor)
+                ->first();
+
+            // Ambil semua ekstrakurikuler siswa untuk periode tersebut.
+            $ekstrakurikulerList = EkstrakurikulerSiswa::where(
+                'id_siswa',
+                $idSiswa
+            )
+                ->where('id_rapor', $idRapor)
+                ->get();
         }
 
         return view('siswa.transkrip', compact(
@@ -270,7 +350,9 @@ class SiswaNilaiController extends Controller
             'raporSiswa',
             'semesterList',
             'semesterDipilih',
-            'waliKelas'
+            'waliKelas',
+            'kehadiran',
+            'ekstrakurikulerList'
         ));
     }
 }

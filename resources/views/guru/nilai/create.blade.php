@@ -1,4 +1,5 @@
-﻿@extends('layouts.guru')
+﻿
+@extends('layouts.guru')
 
 @section('title', 'Input Nilai - Sistem Akademik')
 @section('page-title', 'Input Nilai')
@@ -178,10 +179,20 @@
                                 $nomorSemester = in_array($semesterRapor, ['ganjil', '1'], true)
                                     ? '1'
                                     : (in_array($semesterRapor, ['genap', '2'], true) ? '2' : '');
+
+                                // Bobot berdasarkan mapel guru dan periode rapor.
+                                $bobot = $bobotList->get($rapor->id_rapor);
+
+                                $bobotHarian = $bobot->bobot_harian ?? 30;
+                                $bobotUts = $bobot->bobot_uts ?? 30;
+                                $bobotUas = $bobot->bobot_uas ?? 40;
                             @endphp
 
                             <option value="{{ $rapor->id_rapor }}"
                                     data-semester="{{ $nomorSemester }}"
+                                    data-bobot-harian="{{ $bobotHarian }}"
+                                    data-bobot-uts="{{ $bobotUts }}"
+                                    data-bobot-uas="{{ $bobotUas }}"
                                 {{ (string) old('id_rapor') === (string) $rapor->id_rapor ? 'selected' : '' }}>
                                 {{ $rapor->semester }} — {{ $rapor->tahun_ajaran }}
                             </option>
@@ -243,8 +254,8 @@
                     </div>
                 </div>
 
-                <p class="mt-3 text-xs text-slate-500 dark:text-slate-400">
-                    Nilai akhir dihitung otomatis: Harian 30%, UTS 30%, dan UAS 40%.
+                <p id="info-bobot" class="mt-3 text-xs text-slate-500 dark:text-slate-400" aria-live="polite">
+                    Pilih periode rapor untuk melihat bobot perhitungan nilai akhir.
                 </p>
             </div>
 
@@ -273,6 +284,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const semesterSelect = document.getElementById('semester');
     const raporSelect = document.getElementById('id_rapor');
     const pesanRapor = document.getElementById('pesan-rapor');
+    const infoBobot = document.getElementById('info-bobot');
 
     if (!kelasSelect || !siswaSelect || !semesterSelect || !raporSelect) {
         return;
@@ -280,6 +292,45 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const siswaOptions = Array.from(siswaSelect.options).slice(1);
     const raporOptions = Array.from(raporSelect.options).slice(1);
+
+    function formatBobot(nilai) {
+        const angka = Number(nilai);
+
+        if (!Number.isFinite(angka)) {
+            return '0';
+        }
+
+        return angka.toLocaleString('id-ID', {
+            maximumFractionDigits: 2
+        });
+    }
+
+    function updateInfoBobot() {
+        const optionTerpilih = raporSelect.options[raporSelect.selectedIndex];
+
+        if (
+            !optionTerpilih ||
+            !optionTerpilih.value ||
+            raporSelect.disabled
+        ) {
+            infoBobot.textContent =
+                'Pilih periode rapor untuk melihat bobot perhitungan nilai akhir.';
+            return;
+        }
+
+        const harian = optionTerpilih.dataset.bobotHarian ?? '30';
+        const uts = optionTerpilih.dataset.bobotUts ?? '30';
+        const uas = optionTerpilih.dataset.bobotUas ?? '40';
+
+        infoBobot.textContent =
+            'Nilai akhir dihitung otomatis: Harian ' +
+            formatBobot(harian) +
+            '%, UTS ' +
+            formatBobot(uts) +
+            '%, dan UAS ' +
+            formatBobot(uas) +
+            '%.';
+    }
 
     function filterSiswa() {
         const kelasId = kelasSelect.value;
@@ -340,6 +391,7 @@ document.addEventListener('DOMContentLoaded', function () {
             raporSelect.value = '';
             raporSelect.options[0].textContent = 'Pilih semester terlebih dahulu';
             pesanRapor.textContent = 'Pilih semester terlebih dahulu untuk membuka periode rapor.';
+            updateInfoBobot();
             return;
         }
 
@@ -353,6 +405,7 @@ document.addEventListener('DOMContentLoaded', function () {
             raporSelect.value = '';
             raporSelect.options[0].textContent = 'Periode rapor belum tersedia';
             pesanRapor.textContent = 'Belum ada periode rapor untuk semester ini. Hubungi Admin.';
+            updateInfoBobot();
             return;
         }
 
@@ -365,6 +418,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         pesanRapor.textContent = 'Pilih periode rapor yang sesuai dengan semester.';
+        updateInfoBobot();
     }
 
     // Pemberitahuan jika pengguna mencoba membuka dropdown yang masih terkunci.
@@ -400,9 +454,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
     kelasSelect.addEventListener('change', filterSiswa);
     semesterSelect.addEventListener('change', filterRapor);
+    raporSelect.addEventListener('change', updateInfoBobot);
 
     filterSiswa();
     filterRapor();
+
+    // Pulihkan pilihan periode setelah validasi gagal jika masih cocok.
+    const raporLama = @json((string) old('id_rapor', ''));
+    const semesterLama = @json((string) old('semester', ''));
+
+    if (semesterLama !== '') {
+        semesterSelect.value = semesterLama;
+        filterRapor();
+
+        if (raporLama !== '') {
+            const raporCocok = raporOptions.find(function (option) {
+                return option.value === raporLama &&
+                    option.dataset.semester === semesterLama;
+            });
+
+            if (raporCocok) {
+                raporSelect.value = raporLama;
+            }
+        }
+
+        updateInfoBobot();
+    }
 });
 </script>
 

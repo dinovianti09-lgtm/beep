@@ -4,700 +4,1626 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#EAF3FA">
 
     <title>Daftar Akun - Sistem Akademik Mini</title>
 
-    <script>
-        tailwind = {
-            config: {
-                darkMode: 'class'
-            }
-        }
-    </script>
-
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet"
     >
 
     <script>
-        if (localStorage.getItem('theme') === 'dark') {
-            document.documentElement.classList.add('dark');
-        }
+        (() => {
+            try {
+                const theme =
+                    localStorage.getItem('admin-theme') ||
+                    localStorage.getItem('theme');
+
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (error) {}
+        })();
     </script>
 
     <style>
+        /* =========================================
+           1. MODE TERANG
+           ========================================= */
+
+        :root {
+            color-scheme: light;
+
+            --primary: #3478BD;
+            --primary-hover: #285F96;
+            --primary-soft: #E3F0FA;
+
+            --page: #EAF3FA;
+            --surface: #FFFFFF;
+            --surface-soft: #F5F9FD;
+
+            --left-panel: #DCECF8;
+            --left-panel-end: #EAF3FA;
+
+            --text: #293F57;
+            --heading: #203B57;
+            --muted: #526982;
+
+            --border: #D5E1ED;
+            --border-focus: #78AFE0;
+
+            --input-bg: #F7FAFD;
+
+            --success-bg: #E9F8F0;
+            --success-border: #B8E5CC;
+            --success-text: #21744B;
+
+            --error-bg: #FEF0F0;
+            --error-border: #F2C5C5;
+            --error-text: #B93838;
+
+            --shadow: 0 22px 65px rgba(48, 91, 130, 0.12);
+        }
+
+
+        /* =========================================
+           2. MODE GELAP
+           ========================================= */
+
+        html.dark {
+            color-scheme: dark;
+
+            --primary: #3478BD;
+            --primary-hover: #5B99D2;
+            --primary-soft: #243E59;
+
+            --page: #17283D;
+            --surface: #1C3049;
+            --surface-soft: #243E59;
+
+            --left-panel: #203B57;
+            --left-panel-end: #243E59;
+
+            --text: #E6EEF7;
+            --heading: #F0F6FC;
+            --muted: #B6C8DA;
+
+            --border: #354962;
+            --border-focus: #78AFE0;
+
+            --input-bg: #243E59;
+
+            --success-bg: rgba(22, 101, 52, 0.22);
+            --success-border: #276346;
+            --success-text: #86D8A9;
+
+            --error-bg: rgba(127, 29, 29, 0.22);
+            --error-border: #773A43;
+            --error-text: #F2A0A0;
+
+            --shadow: 0 22px 65px rgba(0, 0, 0, 0.25);
+        }
+
+
+        /* =========================================
+           3. DASAR
+           ========================================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-        }
+            min-height: 100vh;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--page);
+            color: var(--text);
 
-        body,
-        .register-card,
-        .input-field,
-        .select-field,
-        .logo-box,
-        .brand-title,
-        .brand-subtitle,
-        .main-title,
-        .description-text,
-        .label-text,
-        .helper-text,
-        .link-text,
-        .back-link,
-        .footer-text,
-        .theme-button {
             transition:
-                background-color 0.3s ease,
-                color 0.3s ease,
-                border-color 0.3s ease,
-                box-shadow 0.3s ease;
+                background .3s ease,
+                color .3s ease;
         }
 
-        .background-light {
-            background-color: #f8fafc;
+        a {
+            color: inherit;
+            text-decoration: none;
         }
 
-        .blob-blue {
-            background-color: rgba(191, 219, 254, 0.4);
+        button,
+        input,
+        select {
+            font-family: inherit;
         }
 
-        .blob-indigo {
-            background-color: rgba(199, 210, 254, 0.4);
-        }
-
-        .blob-light {
-            background-color: rgba(219, 234, 254, 0.5);
-        }
-
-        .theme-button {
+        button {
             cursor: pointer;
         }
 
-        html.dark body {
-            background-color: #020617;
-            color: #e2e8f0;
+        .hidden {
+            display: none !important;
         }
 
-        html.dark .background-light {
-            background-color: #020617;
+
+        /* =========================================
+           4. BACKGROUND
+           ========================================= */
+
+        .page-background {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 10% 12%,
+                    rgba(120, 175, 224, .16),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 85%,
+                    rgba(52, 120, 189, .08),
+                    transparent 32%
+                ),
+                var(--page);
         }
 
-        html.dark .blob-blue {
-            background-color: rgba(30, 64, 175, 0.18);
+        html.dark .page-background {
+            background:
+                radial-gradient(
+                    circle at 10% 12%,
+                    rgba(52, 120, 189, .12),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 85%,
+                    rgba(52, 120, 189, .08),
+                    transparent 32%
+                ),
+                var(--page);
         }
 
-        html.dark .blob-indigo {
-            background-color: rgba(67, 56, 202, 0.18);
+
+        /* =========================================
+           5. POSISI REGISTER
+           ========================================= */
+
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 35px 22px;
         }
 
-        html.dark .blob-light {
-            background-color: rgba(30, 64, 175, 0.12);
+        .register-container {
+            width: 100%;
+            max-width: 1060px;
         }
 
-        html.dark .brand-title {
-            color: #f8fafc;
+        .register-card {
+            display: grid;
+            grid-template-columns: .94fr 1.06fr;
+
+            min-height: 720px;
+
+            overflow: hidden;
+
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+
+            box-shadow: var(--shadow);
+
+            animation: fadeUp .7s ease both;
+
+            transition:
+                background .3s ease,
+                border-color .3s ease,
+                box-shadow .3s ease;
+        }
+
+
+        /* =========================================
+           6. PANEL KIRI
+           ========================================= */
+
+        .intro-panel {
+            position: relative;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            padding: 39px 37px;
+
+            overflow: hidden;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    var(--left-panel),
+                    var(--left-panel-end)
+                );
+
+            transition: background .3s ease;
+        }
+
+        .intro-panel::before {
+            content: "";
+            position: absolute;
+
+            width: 300px;
+            height: 300px;
+
+            top: -145px;
+            right: -125px;
+
+            border: 1px solid rgba(52, 120, 189, .13);
+            border-radius: 50%;
+
+            pointer-events: none;
+        }
+
+        .intro-panel::after {
+            content: "";
+            position: absolute;
+
+            width: 330px;
+            height: 330px;
+
+            bottom: -210px;
+            left: -155px;
+
+            border: 1px solid rgba(52, 120, 189, .12);
+            border-radius: 50%;
+
+            pointer-events: none;
+        }
+
+
+        /* IDENTITAS APLIKASI */
+
+        .intro-brand {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 53px;
+            height: 53px;
+
+            flex-shrink: 0;
+            padding: 3px;
+
+            border-radius: 12px;
+
+            background: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, .7);
+
+            box-shadow: 0 5px 15px rgba(38, 83, 122, .12);
+
+            overflow: hidden;
+        }
+
+        .brand-logo img {
+            width: 100%;
+            height: 100%;
+            border-radius: 9px;
+            object-fit: cover;
+        }
+
+        .brand-name {
+            color: #293F57;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.4;
+        }
+
+        .brand-subtitle {
+            margin-top: 3px;
+            color: #526982;
+            font-size: 8px;
+            font-weight: 700;
+            letter-spacing: .8px;
+        }
+
+        html.dark .brand-name {
+            color: #F0F6FC;
         }
 
         html.dark .brand-subtitle {
-            color: #60a5fa;
+            color: #C1D2E2;
         }
 
-        html.dark .logo-box {
-            background-color: #1e293b;
-            border-color: #334155;
+
+        /* SAMBUTAN */
+
+        .intro-content {
+            position: relative;
+            z-index: 2;
+            margin: 50px 0;
         }
 
-        html.dark .register-card {
-            background-color: rgba(15, 23, 42, 0.96);
-            border-color: #1e293b;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+        .intro-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 8px 13px;
+
+            border: 1px solid rgba(52, 120, 189, .16);
+            border-radius: 30px;
+
+            background: rgba(255, 255, 255, .55);
+
+            color: #285F96;
+
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .7px;
         }
 
-        html.dark .main-title {
-            color: #f8fafc;
+        html.dark .intro-label {
+            background: rgba(255, 255, 255, .07);
+            color: #B8D8F4;
+            border-color: rgba(255, 255, 255, .12);
         }
 
-        html.dark .description-text {
-            color: #94a3b8;
+        .intro-label span {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #3478BD;
         }
 
-        html.dark .label-text {
-            color: #cbd5e1;
+        .intro-content h1 {
+            max-width: 350px;
+            margin-top: 24px;
+
+            color: #203B57;
+
+            font-size: clamp(29px, 3.3vw, 38px);
+            line-height: 1.3;
+
+            font-weight: 800;
+            letter-spacing: -1.2px;
         }
 
-        html.dark .helper-text {
-            color: #64748b;
+        .intro-content h1 span {
+            color: #3478BD;
         }
 
-        html.dark .link-text {
-            color: #94a3b8;
+        .intro-content p {
+            max-width: 340px;
+            margin-top: 15px;
+
+            color: #526982;
+            font-size: 10px;
+            line-height: 2;
         }
 
-        html.dark .back-link {
-            color: #94a3b8;
+        html.dark .intro-content h1 {
+            color: #F0F6FC;
         }
 
-        html.dark .back-link:hover {
-            color: #60a5fa;
+        html.dark .intro-content h1 span {
+            color: #9BCBF0;
         }
 
-        html.dark .footer-text {
-            color: #64748b;
+        html.dark .intro-content p {
+            color: #C1D2E2;
         }
 
-        html.dark .input-field,
-        html.dark .select-field {
-            background-color: #1e293b;
-            border-color: #334155;
-            color: #f8fafc;
+
+        /* DEKORASI SEDERHANA */
+
+        .intro-decoration {
+            width: 100%;
+            max-width: 270px;
+
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            margin-top: 33px;
+        }
+
+        .intro-decoration span {
+            height: 5px;
+            border-radius: 20px;
+            background: #3478BD;
+        }
+
+        .intro-decoration span:nth-child(1) {
+            width: 47px;
+        }
+
+        .intro-decoration span:nth-child(2) {
+            width: 26px;
+            opacity: .55;
+        }
+
+        .intro-decoration span:nth-child(3) {
+            width: 13px;
+            opacity: .3;
+        }
+
+
+        /* FOOTER PANEL KIRI */
+
+        .intro-footer {
+            position: relative;
+            z-index: 2;
+
+            padding-top: 19px;
+
+            border-top: 1px solid rgba(52, 95, 135, .16);
+
+            color: #526982;
+            font-size: 8px;
+        }
+
+        html.dark .intro-footer {
+            color: #B6C8DA;
+            border-color: #405872;
+        }
+
+
+        /* =========================================
+           7. PANEL FORM
+           ========================================= */
+
+        .form-panel {
+            display: flex;
+            flex-direction: column;
+
+            padding: 34px 48px;
+
+            background: var(--surface);
+        }
+
+        .form-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .form-top-label {
+            color: var(--muted);
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+        }
+
+
+        /* TOMBOL TEMA */
+
+        .theme-button {
+            width: 39px;
+            height: 39px;
+
+            display: grid;
+            place-items: center;
+
+            border: 1px solid var(--border);
+            border-radius: 10px;
+
+            background: var(--surface-soft);
+            color: var(--text);
+
+            font-size: 16px;
+
+            transition: .25s;
+        }
+
+        .theme-button:hover {
+            background: var(--primary-soft);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+
+        /* =========================================
+           8. KONTEN FORM
+           ========================================= */
+
+        .form-inner {
+            width: 100%;
+            max-width: 385px;
+
+            margin: auto;
+            padding: 27px 0;
+        }
+
+        .form-heading {
+            margin-bottom: 25px;
+        }
+
+        .form-heading h2 {
+            color: var(--heading);
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -.8px;
+            line-height: 1.4;
+        }
+
+        .form-heading p {
+            margin-top: 7px;
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.8;
+        }
+
+
+        /* =========================================
+           9. PESAN ERROR DAN SUKSES
+           ========================================= */
+
+        .alert {
+            margin-bottom: 17px;
+            padding: 12px 14px;
+            border: 1px solid;
+            border-radius: 9px;
+        }
+
+        .error-box {
+            background: var(--error-bg);
+            border-color: var(--error-border);
+        }
+
+        .error-title {
+            margin-bottom: 5px;
+            color: var(--error-text);
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .error-text {
+            color: var(--error-text);
+            font-size: 9px;
+            line-height: 1.8;
+        }
+
+        .error-text li {
+            list-style: none;
+        }
+
+        .success-box {
+            background: var(--success-bg);
+            border-color: var(--success-border);
+        }
+
+        .success-text {
+            color: var(--success-text);
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+
+        /* =========================================
+           10. FORM INPUT
+           ========================================= */
+
+        .register-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            width: 100%;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 7px;
+
+            color: var(--text);
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-field,
+        .select-field {
+            display: block;
+            width: 100%;
+            min-height: 45px;
+
+            padding: 11px 13px;
+
+            border: 1px solid var(--border);
+            border-radius: 9px;
+
+            background: var(--input-bg);
+            color: var(--text);
+
+            font-size: 10px;
+            font-weight: 500;
+
+            outline: none;
+
+            transition: .2s;
+        }
+
+        .input-field::placeholder {
+            color: #94A7B9;
         }
 
         html.dark .input-field::placeholder {
-            color: #64748b;
+            color: #A0B3C7;
         }
 
-        html.dark .input-field:focus,
-        html.dark .select-field:focus {
-            background-color: #1e293b;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        .input-field:focus,
+        .select-field:focus {
+            border-color: var(--border-focus);
+            background: var(--surface);
+
+            box-shadow: 0 0 0 3px rgba(52, 120, 189, .12);
         }
 
-        html.dark .select-field option {
-            background-color: #1e293b;
-            color: #f8fafc;
+        .select-field {
+            cursor: pointer;
         }
 
-        html.dark .theme-button {
-            background-color: #1e293b;
-            border-color: #334155;
-            color: #f8fafc;
+        .select-field option {
+            background: var(--surface);
+            color: var(--text);
         }
 
-        html.dark .theme-button:hover {
-            background-color: #334155;
+        .helper-text {
+            display: block;
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 8px;
+            line-height: 1.7;
         }
 
-        html.dark .error-box {
-            background-color: rgba(127, 29, 29, 0.25);
-            border-color: #7f1d1d;
+
+        /* =========================================
+           11. TOMBOL TAMPIL PASSWORD
+           ========================================= */
+
+        .password-input {
+            padding-right: 47px;
         }
 
-        html.dark .error-title {
-            color: #fca5a5;
+        .password-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+
+            width: 44px;
+            height: 45px;
+
+            display: grid;
+            place-items: center;
+
+            border: 0;
+            background: transparent;
+            color: var(--muted);
         }
 
-        html.dark .error-text {
-            color: #f87171;
+        .password-toggle:hover {
+            color: var(--primary);
         }
 
-        html.dark .success-box {
-            background-color: rgba(6, 78, 59, 0.25);
-            border-color: #065f46;
+        .password-toggle svg {
+            width: 19px;
+            height: 19px;
         }
 
-        html.dark .success-text {
-            color: #6ee7b7;
+        .password-toggle svg.hidden {
+            display: none;
         }
+
+
+        /* =========================================
+           12. TOMBOL DAFTAR
+           ========================================= */
+
+        .submit-button {
+            position: relative;
+
+            width: 100%;
+            min-height: 46px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+
+            margin-top: 3px;
+            padding: 12px 18px;
+
+            border: none;
+            border-radius: 9px;
+
+            background: var(--primary);
+            color: #FFFFFF;
+
+            font-size: 11px;
+            font-weight: 800;
+
+            overflow: hidden;
+
+            box-shadow: 0 5px 14px rgba(52, 120, 189, .17);
+
+            transition: .25s;
+        }
+
+        .submit-button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(52, 120, 189, .22);
+        }
+
+        .submit-button:active {
+            transform: scale(.99);
+        }
+
+
+        /* =========================================
+           13. LINK LOGIN DAN LANDING
+           ========================================= */
+
+        .register-footer {
+            margin-top: 22px;
+            padding-top: 19px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .link-text {
+            color: var(--muted);
+            font-size: 9px;
+        }
+
+        .link-text a {
+            margin-left: 4px;
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        .link-text a:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
+        }
+
+        .back-link-wrapper {
+            margin-top: 14px;
+            text-align: center;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+
+            color: var(--muted);
+            font-size: 9px;
+            font-weight: 700;
+
+            transition: .2s;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+            transform: translateX(-3px);
+        }
+
+
+        /* =========================================
+           14. FOOTER
+           ========================================= */
+
+        .page-footer {
+            padding-top: 21px;
+            color: var(--muted);
+            text-align: center;
+            font-size: 8px;
+        }
+
+
+        /* =========================================
+           15. ANIMASI DAN RIPPLE
+           ========================================= */
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(17px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple .6s linear;
+            background: rgba(255, 255, 255, .3);
+            pointer-events: none;
+        }
+
+
+        /* =========================================
+           16. RESPONSIVE TABLET
+           ========================================= */
+
+        @media (max-width: 850px) {
+            .register-card {
+                grid-template-columns: .85fr 1.15fr;
+            }
+
+            .intro-panel {
+                padding: 32px 25px;
+            }
+
+            .form-panel {
+                padding: 30px 28px;
+            }
+
+            .intro-content h1 {
+                font-size: 30px;
+            }
+        }
+
+
+        /* =========================================
+           17. RESPONSIVE MOBILE
+           ========================================= */
+
+        @media (max-width: 650px) {
+            .page-wrapper {
+                padding: 16px;
+                align-items: flex-start;
+            }
+
+            .register-card {
+                grid-template-columns: 1fr;
+                min-height: auto;
+                border-radius: 15px;
+            }
+
+            .intro-panel {
+                min-height: 235px;
+                padding: 23px;
+            }
+
+            .intro-content {
+                margin: 30px 0 8px;
+            }
+
+            .intro-content h1 {
+                max-width: 450px;
+                margin-top: 15px;
+                font-size: 27px;
+            }
+
+            .intro-content p {
+                font-size: 9px;
+            }
+
+            .intro-decoration {
+                margin-top: 18px;
+            }
+
+            .intro-footer {
+                display: none;
+            }
+
+            .form-panel {
+                padding: 23px 24px 27px;
+            }
+
+            .form-inner {
+                max-width: 450px;
+                padding: 27px 0 10px;
+            }
+
+            .form-heading {
+                margin-bottom: 21px;
+            }
+
+            .form-heading h2 {
+                font-size: 24px;
+            }
+
+            .register-form {
+                gap: 15px;
+            }
+        }
+
+
+        @media (max-width: 390px) {
+            .page-wrapper {
+                padding: 10px;
+            }
+
+            .intro-panel {
+                padding: 20px;
+            }
+
+            .intro-content h1 {
+                font-size: 25px;
+            }
+
+            .form-panel {
+                padding: 20px 18px;
+            }
+        }
+
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+            }
+        }
+
     </style>
 </head>
 
-<body class="min-h-screen overflow-y-auto background-light text-slate-800 antialiased">
 
-    {{-- Background --}}
-    <div class="fixed inset-0 -z-10 overflow-hidden">
-        <div class="blob-blue absolute -top-32 -left-32 w-80 h-80 rounded-full blur-3xl"></div>
-        <div class="blob-indigo absolute top-1/3 -right-32 w-96 h-96 rounded-full blur-3xl"></div>
-        <div class="blob-light absolute -bottom-32 left-1/3 w-80 h-80 rounded-full blur-3xl"></div>
-    </div>
+<body>
 
-    {{-- Navbar --}}
-    <nav class="w-full px-5 sm:px-8 py-5">
-        <div class="max-w-6xl mx-auto flex items-center justify-between">
+    <div class="page-background"></div>
 
-            <a href="{{ route('landing') }}" class="flex items-center gap-3">
 
-                <div class="logo-box w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-blue-900/10 bg-white">
-                    <img
-                        src="{{ asset('images/Logo sistem akademik mini.jpeg') }}"
-                        alt="Logo Sistem Akademik Mini"
-                        class="w-full h-full object-cover"
-                    >
-                </div>
+    <!-- =========================================
+         HALAMAN REGISTER
+         ========================================= -->
 
-                <div>
-                    <p class="brand-title font-extrabold text-slate-800 leading-tight">
-                        Rapor Digital
-                    </p>
+    <main class="page-wrapper">
 
-                    <p class="brand-subtitle text-[10px] font-semibold tracking-[0.2em] text-blue-600">
-                        SISTEM AKADEMIK MINI
-                    </p>
-                </div>
+        <div class="register-container">
 
-            </a>
+            <div class="register-card">
 
-            <button
-                type="button"
-                onclick="toggleTheme()"
-                class="theme-button w-11 h-11 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-lg shadow-sm hover:bg-slate-100 hover:scale-105 active:scale-95"
-                title="Ganti tema"
-                aria-label="Ganti tema"
-            >
-                <span id="themeIcon">🌙</span>
-            </button>
 
-        </div>
-    </nav>
+                <!-- =================================
+                     PANEL KIRI
+                     ================================= -->
 
-    {{-- Main --}}
-    <main class="min-h-[calc(100vh-90px)] flex items-start justify-center px-5 py-6 sm:py-10">
+                <aside class="intro-panel">
 
-        <div class="w-full max-w-md">
 
-            {{-- Register Card --}}
-            <div class="register-card bg-white/95 backdrop-blur-sm rounded-[2rem] shadow-2xl shadow-blue-900/10 border border-white p-6 sm:p-8">
+                    <!-- LOGO DAN IDENTITAS -->
 
-                {{-- Logo --}}
-                <div class="flex justify-center mb-5">
-                    <div class="logo-box w-20 h-20 rounded-2xl overflow-hidden shadow-lg shadow-blue-900/10 border border-slate-100 bg-white">
-                        <img
-                            src="{{ asset('images/Logo sistem akademik mini.jpeg') }}"
-                            alt="Logo Sistem Akademik Mini"
-                            class="w-full h-full object-cover"
-                        >
-                    </div>
-                </div>
+                    <a href="{{ route('landing') }}" class="intro-brand">
 
-                {{-- Title --}}
-                <div class="text-center mb-6">
+                        <div class="brand-logo">
 
-                    <h1 class="main-title text-2xl sm:text-3xl font-extrabold text-slate-900">
-                        Buat Akun Baru
-                    </h1>
-
-                    <p class="description-text mt-2 text-sm text-slate-500">
-                        Daftarkan akun menggunakan data yang sudah terdaftar di sekolah
-                    </p>
-
-                </div>
-
-                {{-- Error --}}
-                @if ($errors->any())
-                    <div class="error-box mb-5 rounded-xl bg-red-50 border border-red-200 px-4 py-3">
-
-                        <p class="error-title text-sm font-semibold text-red-700 mb-1">
-                            Pendaftaran gagal
-                        </p>
-
-                        <ul class="error-text text-sm text-red-600 space-y-1">
-                            @foreach ($errors->all() as $error)
-                                <li>• {{ $error }}</li>
-                            @endforeach
-                        </ul>
-
-                    </div>
-                @endif
-
-                {{-- Success --}}
-                @if (session('success'))
-                    <div class="success-box mb-5 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3">
-
-                        <p class="success-text text-sm font-medium text-emerald-700">
-                            {{ session('success') }}
-                        </p>
-
-                    </div>
-                @endif
-
-                {{-- Form --}}
-                <form
-                    action="{{ route('register.process') }}"
-                    method="POST"
-                    class="space-y-4"
-                >
-
-                    @csrf
-
-                    {{-- Role --}}
-                    <div>
-
-                        <label
-                            for="role"
-                            class="label-text block text-sm font-semibold text-slate-700 mb-2"
-                        >
-                            Daftar Sebagai
-                        </label>
-
-                        <select
-                            id="role"
-                            name="role"
-                            required
-                            class="select-field w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 outline-none transition focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-                        >
-
-                            <option value="">-- Pilih Role --</option>
-
-                            <option value="siswa" {{ old('role') == 'siswa' ? 'selected' : '' }}>
-                                Siswa
-                            </option>
-
-                            <option value="guru" {{ old('role') == 'guru' ? 'selected' : '' }}>
-                                Guru
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                    {{-- Username --}}
-                    <div>
-
-                        <label
-                            for="identifier"
-                            class="label-text block text-sm font-semibold text-slate-700 mb-2"
-                        >
-                            Username
-                        </label>
-
-                        <input
-                            type="text"
-                            id="identifier"
-                            name="identifier"
-                            value="{{ old('identifier') }}"
-                            maxlength="30"
-                            required
-                            autocomplete="username"
-                            placeholder="Masukkan username"
-                            class="input-field w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 outline-none transition focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-                        >
-
-                        <p
-                            id="identifierHelper"
-                            class="helper-text text-xs text-slate-400 mt-2"
-                        >
-                            Username Siswa diisi menggunakan NIS yang sudah terdaftar.
-                        </p>
-
-                    </div>
-
-                    {{-- Password --}}
-                    <div>
-
-                        <label
-                            for="password"
-                            class="label-text block text-sm font-semibold text-slate-700 mb-2"
-                        >
-                            Password
-                        </label>
-
-                        <div class="relative">
-
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                minlength="8"
-                                autocomplete="new-password"
-                                required
-                                placeholder="Masukkan password"
-                                class="input-field w-full px-4 py-3.5 pr-12 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 outline-none transition focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                            <img
+                                src="{{ asset('images/Logo sistem akademik mini.jpeg') }}"
+                                alt="Logo Sistem Akademik Mini"
                             >
-
-                            <button
-                                type="button"
-                                id="togglePassword"
-                                class="absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 hover:text-blue-600 transition"
-                                aria-label="Tampilkan password"
-                                title="Tampilkan password"
-                            >
-
-                                <svg
-                                    id="eyeIcon"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1.8"
-                                    stroke="currentColor"
-                                    class="w-5 h-5"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M2.036 12.322a1.012 1.012 0 010-.644C3.423 7.51 7.36 4.5 12 4.5c4.64 0 8.577 3.01 9.964 7.178.08.24.08.498 0 .644C20.577 16.49 16.64 19.5 12 19.5c-4.64 0-8.577-3.01-9.964-7.178z"
-                                    />
-
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                    />
-                                </svg>
-
-                                <svg
-                                    id="eyeOffIcon"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1.8"
-                                    stroke="currentColor"
-                                    class="w-5 h-5 hidden"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.39 7.28 19.5 12 19.5c1.79 0 3.47-.47 4.92-1.29"
-                                    />
-
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M6.228 6.228A10.45 10.45 0 0112 4.5c4.72 0 8.774 3.11 10.066 7.5a10.523 10.523 0 01-4.132 5.411"
-                                    />
-
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M6.228 6.228L3 3m3.228 3.228l4.242 4.242m0 0a3 3 0 004.242 4.242m-4.242-4.242L3 21m7.47-7.47l4.242 4.242"
-                                    />
-                                </svg>
-
-                            </button>
 
                         </div>
 
-                        <p class="helper-text text-xs text-slate-400 mt-2">
-                            Minimal 8 karakter, harus mengandung huruf besar, huruf kecil, dan angka.
-                        </p>
+                        <div>
 
-                    </div>
+                            <div class="brand-name">
+                                Sistem Akademik Mini
+                            </div>
 
-                    {{-- Konfirmasi Password --}}
-                    <div>
-
-                        <label
-                            for="password_confirmation"
-                            class="label-text block text-sm font-semibold text-slate-700 mb-2"
-                        >
-                            Konfirmasi Password
-                        </label>
-
-                        <div class="relative">
-
-                            <input
-                                type="password"
-                                id="password_confirmation"
-                                name="password_confirmation"
-                                minlength="8"
-                                autocomplete="new-password"
-                                required
-                                placeholder="Ulangi password"
-                                class="input-field w-full px-4 py-3.5 pr-12 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 outline-none transition focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-                            >
-
-                            <button
-                                type="button"
-                                id="togglePasswordConfirmation"
-                                class="absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 hover:text-blue-600 transition"
-                                aria-label="Tampilkan konfirmasi password"
-                                title="Tampilkan konfirmasi password"
-                            >
-
-                                <svg
-                                    id="eyeConfirmationIcon"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1.8"
-                                    stroke="currentColor"
-                                    class="w-5 h-5"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M2.036 12.322a1.012 1.012 0 010-.644C3.423 7.51 7.36 4.5 12 4.5c4.64 0 8.577 3.01 9.964 7.178.08.24.08.498 0 .644C20.577 16.49 16.64 19.5 12 19.5c-4.64 0-8.577-3.01-9.964-7.178z"
-                                    />
-
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                    />
-                                </svg>
-
-                                <svg
-                                    id="eyeConfirmationOffIcon"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1.8"
-                                    stroke="currentColor"
-                                    class="w-5 h-5 hidden"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.39 7.28 19.5 12 19.5c1.79 0 3.47-.47 4.92-1.29"
-                                    />
-
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M6.228 6.228A10.45 10.45 0 0112 4.5c4.72 0 8.774 3.11 10.066 7.5a10.523 10.523 0 01-4.132 5.411"
-                                    />
-
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M6.228 6.228L3 3m3.228 3.228l4.242 4.242m0 0a3 3 0 004.242 4.242m0 0L3 21m7.47-7.47l4.242 4.242"
-                                    />
-                                </svg>
-
-                            </button>
+                            <div class="brand-subtitle">
+                                SISTEM INFORMASI AKADEMIK SEKOLAH
+                            </div>
 
                         </div>
 
-                        <p class="helper-text text-xs text-slate-400 mt-2">
-                            Masukkan kembali password yang sama.
-                        </p>
-
-                    </div>
-
-                    {{-- Button --}}
-                    <button
-                        type="submit"
-                        class="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold shadow-lg shadow-blue-600/20 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/25 active:translate-y-0 mt-5"
-                    >
-                        Daftar Sekarang
-                    </button>
-
-                </form>
-
-                {{-- Login Link --}}
-                <div class="mt-6 text-center">
-
-                    <p class="link-text text-sm text-slate-500">
-                        Sudah punya akun?
-
-                        <a
-                            href="{{ route('login') }}"
-                            class="font-bold text-blue-600 hover:text-indigo-600 dark:text-blue-400 dark:hover:text-indigo-400 transition"
-                        >
-                            Masuk di sini
-                        </a>
-                    </p>
-
-                </div>
-
-                {{-- Back --}}
-                <div class="mt-4 text-center">
-
-                    <a
-                        href="{{ route('landing') }}"
-                        class="back-link inline-flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-blue-600 transition"
-                    >
-                        ← Kembali ke halaman utama
                     </a>
 
-                </div>
+
+
+                    <!-- SAMBUTAN -->
+
+                    <div class="intro-content">
+
+                        <div class="intro-label">
+                            <span></span>
+                            PENDAFTARAN AKUN
+                        </div>
+
+
+                        <h1>
+                            Buat Akun untuk Mengakses
+                            <span>Sistem Akademik.</span>
+                        </h1>
+
+
+                        <p>
+                            Daftarkan akun menggunakan identitas yang
+                            sudah terdaftar pada data sekolah.
+                            Pastikan informasi yang dimasukkan benar.
+                        </p>
+
+
+                        <div class="intro-decoration">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- FOOTER PANEL -->
+
+                    <div class="intro-footer">
+                        Sistem Informasi Akademik Sekolah
+                    </div>
+
+
+                </aside>
+
+
+
+                <!-- =================================
+                     PANEL KANAN
+                     FORM REGISTER
+                     ================================= -->
+
+                <section class="form-panel">
+
+
+                    <!-- HEADER FORM -->
+
+                    <div class="form-topbar">
+
+                        <span class="form-top-label">
+                            DAFTAR AKUN BARU
+                        </span>
+
+
+                        <button
+                            type="button"
+                            onclick="toggleTheme()"
+                            class="theme-button"
+                            id="themeButton"
+                            aria-label="Ganti tema"
+                            title="Ganti tema"
+                        >
+                            <span id="themeIcon">🌙</span>
+                        </button>
+
+                    </div>
+
+
+
+                    <!-- ISI FORM -->
+
+                    <div class="form-inner">
+
+
+                        <div class="form-heading">
+
+                            <h2>
+                                Buat Akun Baru
+                            </h2>
+
+                            <p>
+                                Lengkapi data berikut untuk mendaftarkan akun.
+                            </p>
+
+                        </div>
+
+
+
+                        <!-- ERROR -->
+
+                        @if ($errors->any())
+
+                            <div class="alert error-box">
+
+                                <p class="error-title">
+                                    Pendaftaran gagal
+                                </p>
+
+                                <ul class="error-text">
+
+                                    @foreach ($errors->all() as $error)
+
+                                        <li>
+                                            • {{ $error }}
+                                        </li>
+
+                                    @endforeach
+
+                                </ul>
+
+                            </div>
+
+                        @endif
+
+
+
+                        <!-- SUCCESS -->
+
+                        @if (session('success'))
+
+                            <div class="alert success-box">
+
+                                <p class="success-text">
+                                    {{ session('success') }}
+                                </p>
+
+                            </div>
+
+                        @endif
+
+
+
+                        <!-- FORM PENDAFTARAN -->
+
+                        <form
+                            action="{{ route('register.process') }}"
+                            method="POST"
+                            class="register-form"
+                        >
+
+                            @csrf
+
+
+
+                            <!-- ROLE -->
+
+                            <div class="form-group">
+
+                                <label
+                                    for="role"
+                                    class="form-label"
+                                >
+                                    Daftar Sebagai
+                                </label>
+
+
+                                <select
+                                    id="role"
+                                    name="role"
+                                    required
+                                    class="select-field"
+                                >
+
+                                    <option value="">
+                                        -- Pilih Role --
+                                    </option>
+
+                                    <option
+                                        value="siswa"
+                                        {{ old('role') == 'siswa' ? 'selected' : '' }}
+                                    >
+                                        Siswa
+                                    </option>
+
+                                    <option
+                                        value="guru"
+                                        {{ old('role') == 'guru' ? 'selected' : '' }}
+                                    >
+                                        Guru
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+
+                            <!-- IDENTIFIER -->
+
+                            <div class="form-group">
+
+                                <label
+                                    for="identifier"
+                                    class="form-label"
+                                >
+                                    Username
+                                </label>
+
+
+                                <input
+                                    type="text"
+                                    id="identifier"
+                                    name="identifier"
+                                    value="{{ old('identifier') }}"
+                                    maxlength="30"
+                                    required
+                                    autocomplete="username"
+                                    placeholder="Masukkan username"
+                                    class="input-field"
+                                >
+
+
+                                <p
+                                    id="identifierHelper"
+                                    class="helper-text"
+                                >
+                                    Username Siswa diisi menggunakan NIS yang sudah terdaftar.
+                                </p>
+
+                            </div>
+
+
+
+                            <!-- PASSWORD -->
+
+                            <div class="form-group">
+
+                                <label
+                                    for="password"
+                                    class="form-label"
+                                >
+                                    Password
+                                </label>
+
+
+                                <div class="input-wrapper">
+
+                                    <input
+                                        type="password"
+                                        id="password"
+                                        name="password"
+                                        minlength="8"
+                                        autocomplete="new-password"
+                                        required
+                                        placeholder="Masukkan password"
+                                        class="input-field password-input"
+                                    >
+
+
+                                    <button
+                                        type="button"
+                                        id="togglePassword"
+                                        class="password-toggle"
+                                        aria-label="Tampilkan password"
+                                        title="Tampilkan password"
+                                    >
+
+                                        <svg
+                                            id="eyeIcon"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="1.8"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M2.036 12.322a1.012 1.012 0 010-.644C3.423 7.51 7.36 4.5 12 4.5c4.64 0 8.577 3.01 9.964 7.178.08.24.08.498 0 .644C20.577 16.49 16.64 19.5 12 19.5c-4.64 0-8.577-3.01-9.964-7.178z"
+                                            />
+
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                            />
+                                        </svg>
+
+
+                                        <svg
+                                            id="eyeOffIcon"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="1.8"
+                                            stroke="currentColor"
+                                            class="hidden"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M3 3l18 18"
+                                            />
+
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M10.58 10.58a2 2 0 002.84 2.84"
+                                            />
+
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M9.88 5.09A10.8 10.8 0 0112 4.5c4.64 0 8.58 3.01 9.96 7.18a10.8 10.8 0 01-3.06 4.4"
+                                            />
+
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M6.61 6.61a10.8 10.8 0 00-4.57 5.07 10.8 10.8 0 005.09 5.83A10.8 10.8 0 0012 19.5"
+                                            />
+                                        </svg>
+
+                                    </button>
+
+                                </div>
+
+
+                                <p class="helper-text">
+                                    Minimal 8 karakter, harus mengandung
+                                    huruf besar, huruf kecil, dan angka.
+                                </p>
+
+                            </div>
+
+
+
+                            <!-- KONFIRMASI PASSWORD -->
+
+                            <div class="form-group">
+
+                                <label
+                                    for="password_confirmation"
+                                    class="form-label"
+                                >
+                                    Konfirmasi Password
+                                </label>
+
+
+                                <div class="input-wrapper">
+
+                                    <input
+                                        type="password"
+                                        id="password_confirmation"
+                                        name="password_confirmation"
+                                        minlength="8"
+                                        autocomplete="new-password"
+                                        required
+                                        placeholder="Ulangi password"
+                                        class="input-field password-input"
+                                    >
+
+
+                                    <button
+                                        type="button"
+                                        id="togglePasswordConfirmation"
+                                        class="password-toggle"
+                                        aria-label="Tampilkan konfirmasi password"
+                                        title="Tampilkan konfirmasi password"
+                                    >
+
+                                        <svg
+                                            id="eyeConfirmationIcon"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="1.8"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M2.036 12.322a1.012 1.012 0 010-.644C3.423 7.51 7.36 4.5 12 4.5c4.64 0 8.577 3.01 9.964 7.178.08.24.08.498 0 .644C20.577 16.49 16.64 19.5 12 19.5c-4.64 0-8.577-3.01-9.964-7.178z"
+                                            />
+
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                            />
+                                        </svg>
+
+
+                                        <svg
+                                            id="eyeConfirmationOffIcon"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="1.8"
+                                            stroke="currentColor"
+                                            class="hidden"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M3 3l18 18"
+                                            />
+
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M10.58 10.58a2 2 0 002.84 2.84"
+                                            />
+
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M9.88 5.09A10.8 10.8 0 0112 4.5c4.64 0 8.58 3.01 9.96 7.18a10.8 10.8 0 01-3.06 4.4"
+                                            />
+
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M6.61 6.61a10.8 10.8 0 00-4.57 5.07 10.8 10.8 0 005.09 5.83A10.8 10.8 0 0012 19.5"
+                                            />
+                                        </svg>
+
+                                    </button>
+
+                                </div>
+
+
+                                <p class="helper-text">
+                                    Masukkan kembali password yang sama.
+                                </p>
+
+                            </div>
+
+
+
+                            <!-- TOMBOL DAFTAR -->
+
+                            <button
+                                type="submit"
+                                class="submit-button ripple-button"
+                            >
+                                Daftar Sekarang
+                                <span>→</span>
+                            </button>
+
+
+                        </form>
+
+
+
+                        <!-- LOGIN -->
+
+                        <div class="register-footer">
+
+                            <p class="link-text">
+
+                                Sudah punya akun?
+
+                                <a href="{{ route('login') }}">
+                                    Masuk di sini
+                                </a>
+
+                            </p>
+
+
+                            <div class="back-link-wrapper">
+
+                                <a
+                                    href="{{ route('landing') }}"
+                                    class="back-link"
+                                >
+                                    ← Kembali ke halaman utama
+                                </a>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+                </section>
+
 
             </div>
 
-            {{-- Footer --}}
-            <p class="footer-text text-center text-xs text-slate-400 mt-6">
+
+
+            <!-- FOOTER HALAMAN -->
+
+            <div class="page-footer">
                 © {{ date('Y') }} Sistem Akademik Mini
-            </p>
+            </div>
 
         </div>
 
     </main>
 
+
+
+    <!-- =========================================
+         JAVASCRIPT
+         ========================================= -->
+
     <script>
-        // =========================
-        // SHOW / HIDE PASSWORD
-        // =========================
 
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('password');
-        const eyeIcon = document.getElementById('eyeIcon');
-        const eyeOffIcon = document.getElementById('eyeOffIcon');
+        /* =========================================
+           1. TAMPILKAN / SEMBUNYIKAN PASSWORD
+           ========================================= */
 
-        togglePassword.addEventListener('click', function () {
+        function setupPasswordToggle(
+            inputId,
+            buttonId,
+            eyeId,
+            eyeOffId
+        ) {
 
-            const isPassword = passwordInput.type === 'password';
+            const input = document.getElementById(inputId);
+            const button = document.getElementById(buttonId);
+            const eye = document.getElementById(eyeId);
+            const eyeOff = document.getElementById(eyeOffId);
 
-            passwordInput.type = isPassword ? 'text' : 'password';
+            button.addEventListener('click', function () {
 
-            eyeIcon.classList.toggle('hidden', isPassword);
-            eyeOffIcon.classList.toggle('hidden', !isPassword);
+                const isPassword = input.type === 'password';
 
-            togglePassword.setAttribute(
-                'aria-label',
-                isPassword ? 'Sembunyikan password' : 'Tampilkan password'
-            );
+                input.type = isPassword ? 'text' : 'password';
 
-            togglePassword.setAttribute(
-                'title',
-                isPassword ? 'Sembunyikan password' : 'Tampilkan password'
-            );
-        });
+                eye.classList.toggle('hidden', isPassword);
+                eyeOff.classList.toggle('hidden', !isPassword);
 
+                button.setAttribute(
+                    'aria-label',
+                    isPassword
+                        ? 'Sembunyikan password'
+                        : 'Tampilkan password'
+                );
 
-        // =========================
-        // SHOW / HIDE KONFIRMASI
-        // =========================
+                button.setAttribute(
+                    'title',
+                    isPassword
+                        ? 'Sembunyikan password'
+                        : 'Tampilkan password'
+                );
 
-        const togglePasswordConfirmation =
-            document.getElementById('togglePasswordConfirmation');
-
-        const passwordConfirmationInput =
-            document.getElementById('password_confirmation');
-
-        const eyeConfirmationIcon =
-            document.getElementById('eyeConfirmationIcon');
-
-        const eyeConfirmationOffIcon =
-            document.getElementById('eyeConfirmationOffIcon');
-
-        togglePasswordConfirmation.addEventListener('click', function () {
-
-            const isPassword =
-                passwordConfirmationInput.type === 'password';
-
-            passwordConfirmationInput.type =
-                isPassword ? 'text' : 'password';
-
-            eyeConfirmationIcon.classList.toggle(
-                'hidden',
-                isPassword
-            );
-
-            eyeConfirmationOffIcon.classList.toggle(
-                'hidden',
-                !isPassword
-            );
-
-            togglePasswordConfirmation.setAttribute(
-                'aria-label',
-                isPassword
-                    ? 'Sembunyikan konfirmasi password'
-                    : 'Tampilkan konfirmasi password'
-            );
-
-            togglePasswordConfirmation.setAttribute(
-                'title',
-                isPassword
-                    ? 'Sembunyikan konfirmasi password'
-                    : 'Tampilkan konfirmasi password'
-            );
-        });
+            });
+        }
 
 
-        // =========================
-        // ROLE → USERNAME
-        // =========================
+        setupPasswordToggle(
+            'password',
+            'togglePassword',
+            'eyeIcon',
+            'eyeOffIcon'
+        );
+
+
+        setupPasswordToggle(
+            'password_confirmation',
+            'togglePasswordConfirmation',
+            'eyeConfirmationIcon',
+            'eyeConfirmationOffIcon'
+        );
+
+
+
+        /* =========================================
+           2. PETUNJUK USERNAME BERDASARKAN ROLE
+           ========================================= */
 
         const roleSelect =
             document.getElementById('role');
@@ -733,9 +1659,10 @@
                     'Masukkan username';
 
                 identifierHelper.textContent =
-                    'Username diisi menggunakan NIP untuk Guru atau NIS untuk Siswa.';
+                    'Pilih role Guru atau Siswa untuk melihat petunjuk username.';
 
             }
+
         }
 
 
@@ -747,9 +1674,10 @@
         updateIdentifierField();
 
 
-        // =========================
-        // DARK / LIGHT MODE
-        // =========================
+
+        /* =========================================
+           3. DARK / LIGHT MODE
+           ========================================= */
 
         function updateThemeIcon() {
 
@@ -759,11 +1687,15 @@
             const isDark =
                 document.documentElement.classList.contains('dark');
 
-            if (isDark) {
-                icon.textContent = '☀️';
-            } else {
-                icon.textContent = '🌙';
-            }
+            icon.textContent = isDark ? '☀️' : '🌙';
+
+            document.querySelector(
+                'meta[name="theme-color"]'
+            ).setAttribute(
+                'content',
+                isDark ? '#17283D' : '#EAF3FA'
+            );
+
         }
 
 
@@ -775,28 +1707,94 @@
             const isDark =
                 html.classList.toggle('dark');
 
-            if (isDark) {
+            try {
+
+                localStorage.setItem(
+                    'admin-theme',
+                    isDark ? 'dark' : 'light'
+                );
 
                 localStorage.setItem(
                     'theme',
-                    'dark'
+                    isDark ? 'dark' : 'light'
                 );
 
-            } else {
+            } catch (error) {
 
-                localStorage.setItem(
-                    'theme',
-                    'light'
+                console.warn(
+                    'Pengaturan tema tidak dapat disimpan.'
                 );
+
             }
 
             updateThemeIcon();
+
         }
 
 
         updateThemeIcon();
+
+
+
+        /* =========================================
+           4. RIPPLE EFFECT
+           ========================================= */
+
+        document.querySelectorAll('.ripple-button').forEach(
+            function (button) {
+
+                button.addEventListener('click', function (event) {
+
+                    const rect =
+                        button.getBoundingClientRect();
+
+                    const size = Math.max(
+                        button.clientWidth,
+                        button.clientHeight
+                    );
+
+                    const circle =
+                        document.createElement('span');
+
+                    circle.className = 'ripple';
+
+                    circle.style.width = size + 'px';
+                    circle.style.height = size + 'px';
+
+                    circle.style.left =
+                        (
+                            event.clientX -
+                            rect.left -
+                            size / 2
+                        ) + 'px';
+
+                    circle.style.top =
+                        (
+                            event.clientY -
+                            rect.top -
+                            size / 2
+                        ) + 'px';
+
+
+                    const oldRipple =
+                        button.querySelector('.ripple');
+
+                    if (oldRipple) {
+                        oldRipple.remove();
+                    }
+
+                    button.appendChild(circle);
+
+                    setTimeout(function () {
+                        circle.remove();
+                    }, 650);
+
+                });
+
+            }
+        );
+
     </script>
 
 </body>
-
 </html>

@@ -19,11 +19,46 @@ class MapelController extends Controller
         return ['X', 'XI', 'XII'];
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $mapelList = Mapel::with('pengaturanKelas')
-            ->orderBy('id_mapel', 'desc')
-            ->get();
+        $search = trim((string) $request->query('search', ''));
+        $filterJurusan = (string) $request->query('jurusan', '');
+        $filterTingkat = (string) $request->query('tingkat', '');
+
+        $query = Mapel::with('pengaturanKelas')
+            ->orderBy('id_mapel', 'desc');
+
+        // PENCARIAN NAMA MAPEL DAN KKM
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_mapel', 'like', "%{$search}%")
+                    ->orWhereRaw(
+                        'CAST(kkm AS CHAR) LIKE ?',
+                        ["%{$search}%"]
+                    );
+            });
+        }
+
+        // FILTER JURUSAN DAN TINGKAT
+        if ($filterJurusan !== '' || $filterTingkat !== '') {
+            $query->whereHas('pengaturanKelas', function ($q) use (
+                $filterJurusan,
+                $filterTingkat
+            ) {
+                if ($filterJurusan !== '') {
+                    $q->where('jurusan', $filterJurusan);
+                }
+
+                if ($filterTingkat !== '') {
+                    $q->where('tingkat', $filterTingkat);
+                }
+            });
+        }
+
+        // PAGINATION 10 DATA PER HALAMAN
+        $mapelList = $query
+            ->paginate(10)
+            ->withQueryString();
 
         $jurusanList = $this->daftarJurusan();
         $tingkatList = $this->daftarTingkat();

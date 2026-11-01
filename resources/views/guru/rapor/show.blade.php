@@ -1,4 +1,3 @@
-
 @extends('layouts.guru')
 
 @section('title', 'Detail Rapor - Sistem Akademik Mini')
@@ -189,12 +188,12 @@
             <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800">
                 <h3 class="font-extrabold text-slate-900 dark:text-white">Daftar Nilai</h3>
                 <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">
-                    Semua nilai mata pelajaran siswa yang tersimpan pada periode ini.
+                    Nilai mata pelajaran siswa pada periode ini, beserta KKM dan status ketuntasannya.
                 </p>
             </div>
 
             <div class="w-full overflow-x-auto">
-                <table class="w-full min-w-[700px]">
+                <table class="w-full min-w-[900px]">
                     <thead>
                         <tr class="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
                             <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">No</th>
@@ -203,38 +202,73 @@
                             <th class="px-6 py-4 text-center text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">UTS</th>
                             <th class="px-6 py-4 text-center text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">UAS</th>
                             <th class="px-6 py-4 text-center text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Nilai Akhir</th>
+                            <th class="px-6 py-4 text-center text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">KKM</th>
+                            <th class="px-6 py-4 text-center text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Status</th>
                             <th class="px-6 py-4 text-center text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Predikat</th>
                         </tr>
                     </thead>
 
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                         @forelse($nilaiList as $index => $nilai)
+                            @php
+                                $nilaiAkhir = $nilai->nilai_akhir;
+                                $kkm = $nilai->mapel->kkm ?? null;
+                                $nilaiValid = is_numeric($nilaiAkhir) && is_numeric($kkm);
+                                $tuntas = $nilaiValid && (float) $nilaiAkhir >= (float) $kkm;
+                            @endphp
+
                             <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/70 transition">
                                 <td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
                                     {{ $index + 1 }}
                                 </td>
+
                                 <td class="px-6 py-4 text-sm font-semibold text-slate-800 dark:text-slate-200">
                                     {{ $nilai->mapel->nama_mapel ?? 'Mapel tidak ditemukan' }}
                                 </td>
+
                                 <td class="px-6 py-4 text-center text-sm text-slate-700 dark:text-slate-300">
                                     {{ $nilai->nilai_harian ?? '-' }}
                                 </td>
+
                                 <td class="px-6 py-4 text-center text-sm text-slate-700 dark:text-slate-300">
                                     {{ $nilai->nilai_uts ?? '-' }}
                                 </td>
+
                                 <td class="px-6 py-4 text-center text-sm text-slate-700 dark:text-slate-300">
                                     {{ $nilai->nilai_uas ?? '-' }}
                                 </td>
+
                                 <td class="px-6 py-4 text-center text-sm font-extrabold text-blue-600 dark:text-blue-400">
-                                    {{ $nilai->nilai_akhir ?? '-' }}
+                                    {{ $nilaiAkhir ?? '-' }}
                                 </td>
+
+                                <td class="px-6 py-4 text-center text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                    {{ $kkm ?? '-' }}
+                                </td>
+
+                                <td class="px-6 py-4 text-center text-sm font-bold">
+                                    @if($nilaiValid)
+                                        @if($tuntas)
+                                            <span class="inline-flex px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
+                                                Tuntas
+                                            </span>
+                                        @else
+                                            <span class="inline-flex px-3 py-1 rounded-full bg-red-100 text-red-800 dark:bg-red-500/10 dark:text-red-300">
+                                                Remedial
+                                            </span>
+                                        @endif
+                                    @else
+                                        <span class="text-slate-400">-</span>
+                                    @endif
+                                </td>
+
                                 <td class="px-6 py-4 text-center text-sm font-bold text-slate-700 dark:text-slate-300">
                                     {{ $nilai->predikat ?? '-' }}
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-12 text-center text-sm text-slate-400 dark:text-slate-500">
+                                <td colspan="9" class="px-6 py-12 text-center text-sm text-slate-400 dark:text-slate-500">
                                     Belum ada nilai untuk siswa pada periode ini.
                                 </td>
                             </tr>
@@ -303,7 +337,7 @@
                     Ekstrakurikuler Siswa
                 </h3>
                 <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                    Tambahkan kegiatan ekstrakurikuler, predikat, dan keterangan jika ada.
+                    Tambahkan kegiatan ekstrakurikuler, pilih predikat, dan isi keterangan jika ada.
                 </p>
             </div>
 
@@ -320,7 +354,9 @@
                                     <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                                         Nama Ekstrakurikuler
                                     </label>
-                                    <input type="text" name="ekstrakurikuler[{{ $index }}][nama]" maxlength="100"
+                                    <input type="text"
+                                           name="ekstrakurikuler[{{ $index }}][nama]"
+                                           maxlength="100"
                                            value="{{ $ekskul->nama_ekstrakurikuler }}"
                                            placeholder="Contoh: Pramuka"
                                            class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -330,17 +366,23 @@
                                     <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                                         Predikat
                                     </label>
-                                    <input type="text" name="ekstrakurikuler[{{ $index }}][predikat]" maxlength="20"
-                                           value="{{ $ekskul->predikat }}"
-                                           placeholder="Contoh: Baik"
-                                           class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <select name="ekstrakurikuler[{{ $index }}][predikat]"
+                                            class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">-- Pilih predikat --</option>
+                                        <option value="Sangat Baik" {{ $ekskul->predikat === 'Sangat Baik' ? 'selected' : '' }}>Sangat Baik</option>
+                                        <option value="Baik" {{ $ekskul->predikat === 'Baik' ? 'selected' : '' }}>Baik</option>
+                                        <option value="Cukup Baik" {{ $ekskul->predikat === 'Cukup Baik' ? 'selected' : '' }}>Cukup Baik</option>
+                                        <option value="Kurang" {{ $ekskul->predikat === 'Kurang' ? 'selected' : '' }}>Kurang</option>
+                                    </select>
                                 </div>
 
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                                         Keterangan
                                     </label>
-                                    <textarea name="ekstrakurikuler[{{ $index }}][keterangan]" rows="2" maxlength="2000"
+                                    <textarea name="ekstrakurikuler[{{ $index }}][keterangan]"
+                                              rows="2"
+                                              maxlength="2000"
                                               placeholder="Keterangan kegiatan (opsional)"
                                               class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">{{ $ekskul->keterangan }}</textarea>
                                 </div>
@@ -358,7 +400,9 @@
                                     <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                                         Nama Ekstrakurikuler
                                     </label>
-                                    <input type="text" name="ekstrakurikuler[0][nama]" maxlength="100"
+                                    <input type="text"
+                                           name="ekstrakurikuler[0][nama]"
+                                           maxlength="100"
                                            placeholder="Contoh: Pramuka"
                                            class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 </div>
@@ -367,16 +411,23 @@
                                     <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                                         Predikat
                                     </label>
-                                    <input type="text" name="ekstrakurikuler[0][predikat]" maxlength="20"
-                                           placeholder="Contoh: Baik"
-                                           class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <select name="ekstrakurikuler[0][predikat]"
+                                            class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">-- Pilih predikat --</option>
+                                        <option value="Sangat Baik">Sangat Baik</option>
+                                        <option value="Baik">Baik</option>
+                                        <option value="Cukup Baik">Cukup Baik</option>
+                                        <option value="Kurang">Kurang</option>
+                                    </select>
                                 </div>
 
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                                         Keterangan
                                     </label>
-                                    <textarea name="ekstrakurikuler[0][keterangan]" rows="2" maxlength="2000"
+                                    <textarea name="ekstrakurikuler[0][keterangan]"
+                                              rows="2"
+                                              maxlength="2000"
                                               placeholder="Keterangan kegiatan (opsional)"
                                               class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                                 </div>
@@ -412,7 +463,9 @@
                         <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                             Nama Ekstrakurikuler
                         </label>
-                        <input type="text" name="ekstrakurikuler[__INDEX__][nama]" maxlength="100"
+                        <input type="text"
+                               name="ekstrakurikuler[__INDEX__][nama]"
+                               maxlength="100"
                                placeholder="Contoh: Pramuka"
                                class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
@@ -421,16 +474,23 @@
                         <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                             Predikat
                         </label>
-                        <input type="text" name="ekstrakurikuler[__INDEX__][predikat]" maxlength="20"
-                               placeholder="Contoh: Baik"
-                               class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <select name="ekstrakurikuler[__INDEX__][predikat]"
+                                class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">-- Pilih predikat --</option>
+                            <option value="Sangat Baik">Sangat Baik</option>
+                            <option value="Baik">Baik</option>
+                            <option value="Cukup Baik">Cukup Baik</option>
+                            <option value="Kurang">Kurang</option>
+                        </select>
                     </div>
 
                     <div class="md:col-span-2">
                         <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                             Keterangan
                         </label>
-                        <textarea name="ekstrakurikuler[__INDEX__][keterangan]" rows="2" maxlength="2000"
+                        <textarea name="ekstrakurikuler[__INDEX__][keterangan]"
+                                  rows="2"
+                                  maxlength="2000"
                                   placeholder="Keterangan kegiatan (opsional)"
                                   class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                     </div>
@@ -454,6 +514,7 @@
                     return;
                 }
 
+                // TAMBAH BARIS EKSTRAKURIKULER
                 tombolTambah.addEventListener('click', function () {
                     const jumlahBaris = daftar.querySelectorAll('.ekskul-row').length;
 
@@ -470,10 +531,19 @@
                     daftar.insertAdjacentHTML('beforeend', html);
                 });
 
+                // HAPUS BARIS EKSTRAKURIKULER
                 daftar.addEventListener('click', function (event) {
                     const tombolHapus = event.target.closest('.hapus-ekskul');
 
                     if (!tombolHapus) {
+                        return;
+                    }
+
+                    const jumlahBaris = daftar.querySelectorAll('.ekskul-row').length;
+
+                    // Minimal satu baris harus tetap tersedia.
+                    if (jumlahBaris <= 1) {
+                        alert('Minimal harus ada satu baris ekstrakurikuler.');
                         return;
                     }
 
