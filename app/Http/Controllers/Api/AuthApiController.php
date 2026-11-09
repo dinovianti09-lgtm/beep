@@ -28,9 +28,6 @@ class AuthApiController extends Controller
         $identity = trim($credentials['identity']);
         $password = $credentials['password'];
 
-        /*
-         * Cari akun berdasarkan role dan identitas.
-         */
         if ($role === 'admin') {
             $user = User::query()
                 ->where('role', 'admin')
@@ -52,13 +49,7 @@ class AuthApiController extends Controller
                 ->first();
         }
 
-        /*
-         * Periksa akun dan password.
-         */
-        if (
-            !$user ||
-            !Hash::check($password, $user->password)
-        ) {
+        if (!$user || !Hash::check($password, $user->password)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Identitas atau password salah.',
@@ -68,9 +59,6 @@ class AuthApiController extends Controller
         $userRole = strtolower(trim((string) $user->role));
         $status = strtolower(trim((string) $user->status));
 
-        /*
-         * Pastikan role sesuai dan diizinkan.
-         */
         if (!in_array($userRole, ['admin', 'guru', 'siswa'], true)) {
             return response()->json([
                 'success' => false,
@@ -85,9 +73,6 @@ class AuthApiController extends Controller
             ], 403);
         }
 
-        /*
-         * Guru dan siswa harus memiliki akun aktif.
-         */
         if (
             in_array($userRole, ['guru', 'siswa'], true) &&
             $status !== 'aktif'
@@ -98,19 +83,16 @@ class AuthApiController extends Controller
             ], 403);
         }
 
-        /*
-         * Password harus diganti melalui website terlebih dahulu.
-         */
-        if ($user->must_change_password) {
+        if (
+            in_array($userRole, ['guru', 'siswa'], true) &&
+            $user->must_change_password
+        ) {
             return response()->json([
                 'success' => false,
                 'message' => 'Kamu harus mengganti password melalui website terlebih dahulu.',
             ], 403);
         }
 
-        /*
-         * Buat token akses Sanctum.
-         */
         $token = $user->createToken(
             'sistem-akademik-api'
         )->plainTextToken;
@@ -130,12 +112,11 @@ class AuthApiController extends Controller
     }
 
     /**
-     * Logout dan hapus token yang sedang digunakan.
+     * Logout hanya menghapus token yang sedang digunakan.
      */
     public function logout(Request $request): JsonResponse
     {
-        $user = $request->user();
-        $token = $user?->currentAccessToken();
+        $token = $request->user()?->currentAccessToken();
 
         if ($token && method_exists($token, 'delete')) {
             $token->delete();

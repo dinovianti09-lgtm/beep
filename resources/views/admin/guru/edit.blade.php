@@ -1825,6 +1825,22 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
+    // S3-07: Pulihkan tombol saat kembali melalui riwayat browser.
+    const editSubmitOriginalButton = form.querySelector('button[type="submit"]');
+    const editSubmitOriginalHTML = editSubmitOriginalButton
+        ? editSubmitOriginalButton.innerHTML
+        : '';
+
+    window.addEventListener('pageshow', function () {
+        form.dataset.s3Submitting = 'false';
+
+        if (editSubmitOriginalButton) {
+            editSubmitOriginalButton.removeAttribute('aria-disabled');
+            editSubmitOriginalButton.style.pointerEvents = '';
+            editSubmitOriginalButton.style.opacity = '';
+            editSubmitOriginalButton.innerHTML = editSubmitOriginalHTML;
+        }
+    });
     const MAX_HISTORY = 6;
 
     const historyInputs = form.querySelectorAll(
@@ -2332,6 +2348,26 @@ document.addEventListener('DOMContentLoaded', function () {
         /*
          * Simpan riwayat NIP.
          */
+        // S3-07: Cegah pengiriman formulir Edit Guru berulang.
+        if (form.dataset.s3Submitting === 'true') {
+            event.preventDefault();
+            return;
+        }
+
+        if (event.defaultPrevented) {
+            return;
+        }
+
+        form.dataset.s3Submitting = 'true';
+
+        const editSubmitButton = form.querySelector('button[type="submit"]');
+
+        if (editSubmitButton) {
+            editSubmitButton.setAttribute('aria-disabled', 'true');
+            editSubmitButton.style.pointerEvents = 'none';
+            editSubmitButton.style.opacity = '0.7';
+            editSubmitButton.innerHTML = 'Memproses...';
+        }
         const nipInput = document.getElementById('nip');
 
         if (nipInput && nipInput.value.trim()) {

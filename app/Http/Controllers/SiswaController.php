@@ -19,6 +19,8 @@ use Throwable;
 
 class SiswaController extends Controller
 {
+    private const MAX_BARIS_IMPORT = 500;
+
     // ========================================
     // DAFTAR SISWA
     // ========================================
@@ -33,12 +35,10 @@ class SiswaController extends Controller
         $query = Siswa::with('user')
             ->orderBy('nama_siswa');
 
-        // FILTER KELAS
         if ($kelasTerpilih !== '') {
             $query->where('kelas', $kelasTerpilih);
         }
 
-        // PENCARIAN NAMA, NIS, ATAU KELAS
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->where('nama_siswa', 'like', "%{$search}%")
@@ -47,13 +47,10 @@ class SiswaController extends Controller
             });
         }
 
-        // PAGINATION 10 SISWA PER HALAMAN
-        // Parameter pencarian dan filter tetap dibawa saat pindah halaman.
         $siswaList = $query
             ->paginate(10)
             ->withQueryString();
 
-        // MENENTUKAN STATUS AKUN SISWA
         foreach ($siswaList as $siswa) {
             $user = $siswa->user;
 
@@ -99,8 +96,6 @@ class SiswaController extends Controller
             });
         }
 
-        // Export tetap mengambil seluruh hasil filter,
-        // bukan hanya 10 data pada halaman aktif.
         $siswaList = $query->get();
 
         $data = $siswaList->map(function ($siswa) {
@@ -238,18 +233,30 @@ class SiswaController extends Controller
                 ->withInput();
         }
 
+        $spreadsheet = null;
+
         try {
             $file = $request->file('file');
 
             $spreadsheet = IOFactory::load($file->getRealPath());
 
-            $rows = $spreadsheet
-                ->getActiveSheet()
-                ->toArray(null, true, true, true);
+            $sheet = $spreadsheet->getActiveSheet();
+
+            $jumlahBarisData = max(
+                0,
+                $sheet->getHighestDataRow() - 1
+            );
+
+            if ($jumlahBarisData > self::MAX_BARIS_IMPORT) {
+                return back()->with(
+                    'error',
+                    'Import maksimal 500 baris data siswa dalam satu file.'
+                );
+            }
+
+            $rows = $sheet->toArray(null, true, true, true);
 
             if (count($rows) < 2) {
-                $spreadsheet->disconnectWorksheets();
-
                 return back()->with(
                     'error',
                     'File Excel belum berisi data siswa.'
@@ -263,9 +270,7 @@ class SiswaController extends Controller
                 $key = strtolower(trim((string) $header));
 
                 if ($key !== '') {
-                    if (in_array($key, $headers, true)) {
-                        $spreadsheet->disconnectWorksheets();
-
+                    if (array_key_exists($key, $headers)) {
                         return back()->with(
                             'error',
                             'Ada nama kolom yang duplikat di file Excel: ' . $key
@@ -285,8 +290,6 @@ class SiswaController extends Controller
 
             foreach ($requiredHeaders as $requiredHeader) {
                 if (!array_key_exists($requiredHeader, $headers)) {
-                    $spreadsheet->disconnectWorksheets();
-
                     return back()->with(
                         'error',
                         'Kolom ' . $requiredHeader .
@@ -377,9 +380,6 @@ class SiswaController extends Controller
                 }
             });
 
-            $spreadsheet->disconnectWorksheets();
-            unset($spreadsheet);
-
             $message = "Import selesai. {$berhasil} data berhasil ditambahkan.";
 
             if ($dilewati > 0) {
@@ -397,6 +397,11 @@ class SiswaController extends Controller
                 'error',
                 'Import gagal. Periksa format file Excel dan pastikan kolomnya sesuai template.'
             );
+        } finally {
+            if ($spreadsheet !== null) {
+                $spreadsheet->disconnectWorksheets();
+                unset($spreadsheet);
+            }
         }
     }
 
@@ -451,7 +456,6 @@ class SiswaController extends Controller
             DB::transaction(function () use ($siswa, $validated) {
                 $nisBaru = trim($validated['nis']);
 
-                // Pastikan NIS tidak digunakan sebagai username akun lain.
                 if ($siswa->user_id) {
                     $usernameDipakai = User::where('username', $nisBaru)
                         ->where('id', '!=', $siswa->user_id)
@@ -476,7 +480,6 @@ class SiswaController extends Controller
                     'jenis_kelamin' => $validated['jenis_kelamin'],
                 ]);
 
-                // Jika NIS berubah, username akun yang terhubung ikut berubah.
                 if ($siswa->user_id) {
                     $user = User::where('id', $siswa->user_id)
                         ->where('role', 'siswa')
@@ -532,11 +535,19 @@ class SiswaController extends Controller
 
         $statusSaatIni = strtolower(trim($user->status ?? 'aktif'));
 
-        $user->status = $statusSaatIni === 'aktif'
+        $statusBaru = $statusSaatIni === 'aktif'
             ? 'nonaktif'
             : 'aktif';
 
-        $user->save();
+        DB::transaction(function () use ($user, $statusBaru) {
+            $user->status = $statusBaru;
+            $user->save();
+
+            // Cabut semua token API jika akun dinonaktifkan.
+            if ($statusBaru === 'nonaktif') {
+                $user->tokens()->delete();
+            }
+        });
 
         return redirect()
             ->route('admin.siswa.index')
@@ -574,18 +585,17 @@ class SiswaController extends Controller
                 ->with('error', 'Akun siswa tidak ditemukan.');
         }
 
-        // Password sementara hanya menggunakan huruf dan angka.
         $passwordSementara = Str::upper(Str::random(4))
             . random_int(1000, 9999)
             . Str::lower(Str::random(2));
 
         DB::transaction(function () use ($user, $passwordSementara) {
-            // Model User otomatis melakukan hashing password.
             $user->password = $passwordSementara;
             $user->must_change_password = true;
-
-            // Status akun tidak diubah.
             $user->save();
+
+            // Cabut semua token API lama setelah password direset.
+            $user->tokens()->delete();
         });
 
         return redirect()
@@ -625,12 +635,25 @@ class SiswaController extends Controller
 
         try {
             DB::transaction(function () use ($siswa) {
+                // Cari akun siswa yang masih terhubung.
+                $user = null;
+
+                if ($siswa->user_id) {
+                    $user = User::where('id', $siswa->user_id)
+                        ->where('role', 'siswa')
+                        ->first();
+                }
+
+                // Cabut token sebelum hubungan profil siswa diputus.
+                if ($user) {
+                    $user->tokens()->delete();
+                }
+
+                // Tetap pertahankan akun User seperti perilaku sebelumnya.
                 $siswa->user_id = null;
                 $siswa->save();
 
                 $siswa->delete();
-
-                // Akun pengguna tetap dipertahankan.
             });
 
             return redirect()

@@ -10,6 +10,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use App\Http\Middleware\RoleMiddleware;
+use App\Http\Middleware\SecurityHeaders;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -19,6 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+
+        // Security Headers untuk semua respons
+        $middleware->append(SecurityHeaders::class);
+
+        // Alias middleware role
         $middleware->alias([
             'role' => RoleMiddleware::class,
         ]);
@@ -84,12 +90,10 @@ return Application::configure(basePath: dirname(__DIR__))
             \Throwable $exception,
             Request $request
         ) {
-            // Jangan sampai error validasi dianggap sebagai error 500
             if ($exception instanceof ValidationException) {
                 return null;
             }
 
-            // Jangan sampai error autentikasi dianggap sebagai error 500
             if ($exception instanceof AuthenticationException) {
                 return null;
             }

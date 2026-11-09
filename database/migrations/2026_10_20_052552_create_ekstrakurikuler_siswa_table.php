@@ -1,38 +1,30 @@
+
 <?php
 
-namespace App\Models;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Database\Eloquent\Model;
-
-class EkstrakurikulerSiswa extends Model
+return new class extends Migration
 {
-    protected $table = 'ekstrakurikuler_siswa';
-
-    protected $primaryKey = 'id_ekstrakurikuler_siswa';
-
-    protected $fillable = [
-        'id_siswa',
-        'id_rapor',
-        'nama_ekstrakurikuler',
-        'predikat',
-        'keterangan',
-    ];
-
-    public function siswa()
+    public function up(): void
     {
-        return $this->belongsTo(
-            Siswa::class,
-            'id_siswa',
-            'id_siswa'
-        );
+        Schema::create('ekstrakurikuler_siswa', function (Blueprint $table) {
+            $table->id('id_ekstrakurikuler_siswa');
+
+            $table->unsignedBigInteger('id_siswa');
+            $table->unsignedBigInteger('id_rapor');
+
+            $table->string('nama_ekstrakurikuler');
+            $table->string('predikat')->nullable();
+            $table->text('keterangan')->nullable();
+
+            $table->timestamps();
+        });
     }
 
-    public function rapor()
+    public function down(): void
     {
-        return $this->belongsTo(
-            Rapor::class,
-            'id_rapor',
-            'id_rapor'
-        );
+        Schema::dropIfExists('ekstrakurikuler_siswa');
     }
-}
+};

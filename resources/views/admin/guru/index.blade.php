@@ -313,9 +313,7 @@
 
 .guru-panel-body {
     padding: 22px;
-}
-
-/* =====================================================
+}/* =====================================================
    IKON BAGIAN
 ===================================================== */
 
@@ -630,18 +628,19 @@
 
 /* =====================================================
    PASSWORD SEMENTARA
+   HANYA WARNA YANG DIUBAH MENJADI BIRU EDUVIA
 ===================================================== */
 
 .guru-password-box {
     padding: 20px;
-    border: 1px solid #F1D49C;
+    border: 1px solid #A4BFDF;
     border-radius: 14px;
-    background: linear-gradient(135deg, #FFFAF0, #FFF5DD);
+    background: linear-gradient(135deg, #E3F0FA, #C3E0F4);
 }
 
 .dark .guru-password-box {
-    border-color: #70592E;
-    background: linear-gradient(135deg, #3B311E, #322919);
+    border-color: #405B78;
+    background: linear-gradient(135deg, #17283D, #243E59);
 }
 
 .guru-password-input {
@@ -649,7 +648,7 @@
     width: 100%;
     min-width: 0;
     padding: 12px 14px;
-    border: 1px solid #E8D9B5;
+    border: 1px solid #C3D8EB;
     border-radius: 9px;
     background: #FFFFFF;
     color: #2E4054;
@@ -659,7 +658,7 @@
 }
 
 .dark .guru-password-input {
-    border-color: #70592E;
+    border-color: #405B78;
     background: #1B2431;
     color: #F1F5F9;
 }
@@ -684,9 +683,7 @@
 .guru-copy-button:hover {
     transform: translateY(-1px);
     background: #285F96;
-}
-
-/* =====================================================
+}/* =====================================================
    TABEL GURU
 ===================================================== */
 
@@ -996,7 +993,7 @@
 .guru-action {
     display: flex;
     width: 100%;
-    min-height: 34px;
+    min-height: 44px;
     align-items: center;
     justify-content: center;
     gap: 7px;
@@ -1149,25 +1146,24 @@
 
 /* =====================================================
    PASSWORD DAN INFORMASI
+   WARNA DIUBAH MENJADI BIRU EDUVIA
 ===================================================== */
 
 .guru-password-heading {
-    color: #865C11;
+    color: #214A77;
 }
 
 .dark .guru-password-heading {
-    color: #F8D99A;
+    color: #C6E1FF;
 }
 
 .guru-password-description {
-    color: #865C11;
+    color: #365F89;
 }
 
 .dark .guru-password-description {
-    color: #F8D99A;
-}
-
-/* =====================================================
+    color: #C6E1FF;
+}/* =====================================================
    DATA KOSONG
 ===================================================== */
 
@@ -1387,9 +1383,7 @@
                         <path stroke-linecap="round"
                               stroke-linejoin="round"
                               d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v4h14v-4"/>
-                    </svg>
-
-                    Export Excel
+                    </svg>                    Export Excel
 
                 </a>
 
@@ -1493,7 +1487,7 @@
 
             <div class="flex items-start gap-4">
 
-                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-amber-200 bg-white text-amber-700 dark:border-amber-700 dark:bg-slate-800 dark:text-amber-300">
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-blue-200 bg-white text-blue-700 dark:border-blue-700 dark:bg-slate-800 dark:text-blue-300">
 
                     <svg class="w-5 h-5"
                          fill="none"
@@ -1511,7 +1505,7 @@
 
                 <div class="min-w-0 flex-1">
 
-                    <div class="text-xs font-extrabold uppercase tracking-widest text-amber-700 dark:text-amber-300">
+                    <div class="text-xs font-extrabold uppercase tracking-widest text-blue-700 dark:text-blue-300">
                         Informasi Akun
                     </div>
 
@@ -1523,7 +1517,7 @@
                         Berikan password sementara ini kepada guru yang bersangkutan.
                     </p>
 
-                    <div class="mt-4 rounded-xl border border-amber-200 bg-white p-4 dark:border-amber-700 dark:bg-slate-900">
+                    <div class="mt-4 rounded-xl border border-blue-200 bg-white p-4 dark:border-blue-700 dark:bg-slate-900">
 
                         <div class="grid gap-4 sm:grid-cols-2">
 
@@ -1602,7 +1596,7 @@
 
                         </div>
 
-                        <div class="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-amber-900 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-200">
+                        <div class="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm leading-6 text-blue-900 dark:border-blue-700 dark:bg-blue-950/30 dark:text-blue-200">
                             Guru harus mengganti password setelah berhasil login jika sistem login sudah menerapkan kewajiban ganti password.
                         </div>
 
@@ -1645,9 +1639,7 @@
 
                 <h3 class="text-base font-extrabold">
                     Import Data Guru dari Excel
-                </h3>
-
-                <p class="guru-panel-description mt-1 text-xs leading-relaxed">
+                </h3>                <p class="guru-panel-description mt-1 text-xs leading-relaxed">
                     Tambahkan banyak data guru sekaligus tanpa mengisi formulir satu per satu.
                 </p>
 
@@ -1961,9 +1953,7 @@
                 </button>
 
 
-                @if(request('search'))
-
-                    <a
+                @if(request('search'))                    <a
                         href="{{ route('admin.guru.index') }}"
                         class="guru-reset-button"
                     >
@@ -2296,8 +2286,7 @@
 
                                                 <svg fill="none"
                                                      stroke="currentColor"
-                                                     stroke-width="1.8"
-                                                     viewBox="0 0 24 24"
+                                                     stroke-width="1.8"                                                     viewBox="0 0 24 24"
                                                      aria-hidden="true">
                                                     <rect x="4" y="10" width="16" height="11" rx="2"/>
                                                     <path stroke-linecap="round"
@@ -2546,9 +2535,7 @@
 ===================================================== --}}
 
 <script>
-async function salinPasswordGuru() {
-
-    const field = document.getElementById('passwordSementaraGuru');
+async function salinPasswordGuru() {    const field = document.getElementById('passwordSementaraGuru');
     const status = document.getElementById('statusSalinPasswordGuru');
 
     if (!field || !status) {

@@ -1,691 +1,429 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@extends('layouts.siswa')
 
-    <title>Dashboard Guru - Sistem Akademik Mini</title>
+@section('title', 'Nilai Saya - Sistem Akademik Mini')
 
-    <script src="https://cdn.tailwindcss.com"></script>
+@section('content')
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
+<div class="nilai-page space-y-6">
 
-    <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+    {{-- HEADER --}}
+    <div class="rounded-2xl border border-[#B8D2EB] bg-gradient-to-r from-[#C3E0F4] via-[#BAD1EC] to-[#A4BFDF] p-6 sm:p-7 dark:border-[#344D68] dark:from-[#263E59] dark:via-[#304B6A] dark:to-[#263E59]">
 
-        .ripple-effect {
-            position: absolute;
-            border-radius: 50%;
-            transform: scale(0);
-            animation: ripple 600ms linear;
-            pointer-events: none;
-        }
-
-        @keyframes ripple {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
-        }
-
-        .transition-smooth {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-
-        .gradient-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .gradient-secondary {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .gradient-success {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-
-        .gradient-warning {
-            background: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
-        }
-
-        .nav-item-active {
-            background: linear-gradient(
-                90deg,
-                rgba(99, 102, 241, 0.15) 0%,
-                transparent 100%
-            );
-
-            border-left: 3px solid #6366f1;
-            color: #6366f1;
-        }
-    </style>
-</head>
-
-<body class="bg-slate-50 font-sans antialiased">
-
-<div class="flex min-h-screen">
-
-    <!-- SIDEBAR -->
-    <aside class="w-72 bg-slate-900 text-slate-300 flex flex-col min-h-screen shadow-2xl">
-
-        <!-- LOGO -->
-        <div class="p-6 border-b border-slate-800">
-
-            <div class="flex items-center space-x-3">
-
-                <div class="relative">
-
-                    <div class="absolute inset-0 bg-indigo-500 rounded-xl blur opacity-30"></div>
-
-                    <div class="relative w-10 h-10 rounded-xl bg-white p-1 shadow-lg flex items-center justify-center text-xl">
-                        🎓
-                    </div>
-
-                </div>
-
-                <span class="font-bold text-sm tracking-wide text-white leading-tight">
-                    Sistem Akademik<br>
-                    Mini
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <!-- MENU -->
-        <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
-
-            <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-2">
-                Menu Guru
+        <div>
+            <p class="mb-2 text-xs font-extrabold uppercase tracking-wider text-[#355779] dark:text-[#BBD7F2]">
+                Akademik Siswa
             </p>
 
+            <h1 class="text-2xl font-extrabold text-[#263F59] dark:text-white sm:text-3xl">
+                Nilai Saya
+            </h1>
 
-            <!-- DASHBOARD -->
-            <a
-                href="{{ route('guru.dashboard') }}"
-                class="ripple-btn relative flex items-center space-x-3 px-4 py-3 rounded-xl nav-item-active font-medium text-sm overflow-hidden"
-            >
+            <p class="mt-2 text-sm font-medium text-[#456783] dark:text-[#D0E2F4]">
+                Lihat hasil belajar dan perkembangan nilai setiap mata pelajaran.
+            </p>
+        </div>
 
-                <svg
-                    class="w-5 h-5 text-indigo-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+    </div>
+
+
+    {{-- FILTER SEMESTER --}}
+    <div class="rounded-2xl border border-[#C3D8EB] bg-[#E3F0FA] p-5 dark:border-slate-700 dark:bg-slate-800">
+
+        <form action="{{ route('siswa.nilai.index') }}" method="GET"
+              class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+
+            <div class="flex-1">
+                <label for="id_rapor"
+                       class="mb-2 block text-sm font-extrabold text-[#355779] dark:text-slate-200">
+                    Pilih Periode Semester
+                </label>
+
+                <select
+                    name="id_rapor"
+                    id="id_rapor"
+                    onchange="this.form.submit()"
+                    class="w-full rounded-xl border border-[#B8D2EB] bg-[#F5F9FD] px-4 py-3 text-sm font-semibold text-[#355779] outline-none transition focus:border-[#719BC5] focus:ring-2 focus:ring-[#A4BFDF]/40 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                 >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                    />
-                </svg>
+                    @foreach ($semesterList as $periode)
+                        <option
+                            value="{{ $periode->id_rapor }}"
+                            {{ (string) request('id_rapor', $periodeAktif->id_rapor ?? '') === (string) $periode->id_rapor ? 'selected' : '' }}
+                        >
+                            {{ $periode->semester }} - {{ $periode->tahun_ajaran }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-                <span>Beranda Guru</span>
-
-            </a>
-
-
-            <!-- INPUT NILAI -->
-            <a
-                href="{{ route('guru.nilai.create') }}"
-                class="ripple-btn relative flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white font-medium text-sm transition-smooth group overflow-hidden"
+            <button
+                type="submit"
+                class="rounded-xl bg-[#89AAD7] px-5 py-3 text-sm font-extrabold text-[#263F59] transition hover:bg-[#719BC5] dark:bg-[#46698F] dark:text-white dark:hover:bg-[#557BA5]"
             >
+                Tampilkan Nilai
+            </button>
 
-                <svg
-                    class="w-5 h-5 group-hover:text-white transition-smooth"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                </svg>
+        </form>
 
-                <span>Input Nilai Siswa</span>
-
-            </a>
+    </div>
 
 
-            <!-- REKAP NILAI -->
-            <a
-                href="{{ route('guru.rekap.index') }}"
-                class="ripple-btn relative flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white font-medium text-sm transition-smooth group overflow-hidden"
-            >
+    {{-- INFORMASI PERIODE --}}
+    @if ($periodeAktif)
+        <div class="rounded-2xl border border-[#B8D2EB] bg-gradient-to-r from-[#C3E0F4] to-[#DCEBFA] p-5 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800">
 
-                <svg
-                    class="w-5 h-5 group-hover:text-white transition-smooth"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                    />
-                </svg>
+            <div class="flex items-center gap-4">
 
-                <span>Rekap Nilai</span>
-
-            </a>
-
-        </nav>
-
-
-        <!-- LOGOUT -->
-        <div class="p-4 border-t border-slate-800">
-
-            <form
-                action="{{ route('logout') }}"
-                method="POST"
-            >
-
-                @csrf
-
-                <button
-                    type="submit"
-                    class="ripple-btn relative w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-400 font-medium text-sm transition-smooth group text-left overflow-hidden"
-                >
-
-                    <svg
-                        class="w-5 h-5 group-hover:text-red-400 transition-smooth"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                        />
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#EAF4FC] text-[#355779] dark:bg-slate-700 dark:text-[#BBD7F2]">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
+                </div>
 
-                    <span>Logout</span>
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-[#527391] dark:text-slate-400">
+                        Periode yang ditampilkan
+                    </p>
 
-                </button>
+                    <h2 class="mt-1 text-lg font-extrabold text-[#263F59] dark:text-white">
+                        {{ $periodeAktif->semester ?? '-' }}
+                        {{ $periodeAktif->tahun_ajaran ?? '' }}
+                    </h2>
+                </div>
 
-            </form>
+            </div>
+
+        </div>
+    @endif
+
+
+    {{-- RINGKASAN NILAI --}}
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+        {{-- TOTAL MAPEL --}}
+        <div class="rounded-2xl border border-[#C3D8EB] bg-gradient-to-br from-[#E3F0FA] to-[#C3E0F4] p-5 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800">
+
+            <div class="flex items-center justify-between gap-3">
+
+                <div>
+                    <p class="text-sm font-bold text-[#527391] dark:text-slate-400">
+                        Total Mata Pelajaran
+                    </p>
+
+                    <h3 class="mt-2 text-3xl font-extrabold text-[#355779] dark:text-white">
+                        {{ $totalMapel ?? $nilais->count() }}
+                    </h3>
+                </div>
+
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-[#C3D8EB] bg-[#EAF4FC] text-[#355779] dark:border-slate-600 dark:bg-slate-700 dark:text-[#BBD7F2]">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                </div>
+
+            </div>
+        </div>
+
+
+        {{-- NILAI TERISI --}}
+        <div class="rounded-2xl border border-[#C3D8EB] bg-gradient-to-br from-[#DCEBFA] to-[#BAD1EC] p-5 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800">
+
+            <div class="flex items-center justify-between gap-3">
+
+                <div>
+                    <p class="text-sm font-bold text-[#527391] dark:text-slate-400">
+                        Nilai Terisi
+                    </p>
+
+                    <h3 class="mt-2 text-3xl font-extrabold text-[#355779] dark:text-white">
+                        {{ $totalNilaiTerisi ?? 0 }}
+                    </h3>
+                </div>
+
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-[#B8D2EB] bg-[#EAF4FC] text-[#355779] dark:border-slate-600 dark:bg-slate-700 dark:text-[#BBD7F2]">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+
+            </div>
+        </div>
+
+
+        {{-- NILAI TERBAIK --}}
+        <div class="rounded-2xl border border-[#C3D8EB] bg-gradient-to-br from-[#EAF4FC] to-[#C3E0F4] p-5 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800">
+
+            <div class="flex items-center justify-between gap-3">
+
+                <div>
+                    <p class="text-sm font-bold text-[#527391] dark:text-slate-400">
+                        Nilai Tertinggi
+                    </p>
+
+                    <h3 class="mt-2 text-3xl font-extrabold text-[#355779] dark:text-white">
+                        {{ is_numeric($nilaiTerbaik ?? null) ? number_format($nilaiTerbaik, 2) : '-' }}
+                    </h3>
+                </div>
+
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-[#C3D8EB] bg-[#EAF4FC] text-[#355779] dark:border-slate-600 dark:bg-slate-700 dark:text-[#BBD7F2]">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 15l-2 5-1-3-3-1 5-2m1-10l2 2 3 .5-2 2 .5 3-3-1.5L10 12l.5-3-2-2 3-.5L12 4z"/>
+                    </svg>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    {{-- TABEL NILAI --}}
+    <div class="overflow-hidden rounded-2xl border border-[#C3D8EB] bg-[#E3F0FA] shadow-sm dark:border-slate-700 dark:bg-slate-800">
+
+        <div class="border-b border-[#C3D8EB] bg-[#D5E7F7] px-5 py-5 dark:border-slate-700 dark:bg-slate-800">
+
+            <h2 class="text-lg font-extrabold text-[#355779] dark:text-white">
+                Daftar Nilai Mata Pelajaran
+            </h2>
+
+            <p class="mt-1 text-sm font-medium text-[#607D98] dark:text-slate-400">
+                Rincian nilai harian, UTS, UAS, dan nilai akhir.
+            </p>
 
         </div>
 
-    </aside>
 
+        <div class="overflow-x-auto">
 
-    <!-- CONTENT -->
-    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+            <table class="w-full min-w-[1050px] border-collapse text-left">
 
-        <!-- HEADER -->
-        <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 py-6 flex items-center justify-between sticky top-0 z-20">
+                <thead>
+                    <tr class="bg-[#A4BFDF] text-[#263F59] dark:bg-slate-700 dark:text-slate-100">
 
-            <div>
+                        <th class="whitespace-nowrap px-4 py-4 text-xs font-extrabold uppercase tracking-wide">
+                            No
+                        </th>
 
-                <h1 class="text-2xl font-bold text-slate-800">
-                    Dashboard Guru
-                </h1>
+                        <th class="whitespace-nowrap px-4 py-4 text-xs font-extrabold uppercase tracking-wide">
+                            Mata Pelajaran
+                        </th>
 
-                <p class="text-sm text-slate-500 mt-1">
-                    Selamat datang di Sistem Akademik Mini
-                </p>
+                        <th class="whitespace-nowrap px-4 py-4 text-xs font-extrabold uppercase tracking-wide">
+                            Semester
+                        </th>
 
-            </div>
+                        <th class="whitespace-nowrap px-4 py-4 text-center text-xs font-extrabold uppercase tracking-wide">
+                            Harian
+                        </th>
 
+                        <th class="whitespace-nowrap px-4 py-4 text-center text-xs font-extrabold uppercase tracking-wide">
+                            UTS
+                        </th>
 
-            <div class="flex items-center space-x-4">
+                        <th class="whitespace-nowrap px-4 py-4 text-center text-xs font-extrabold uppercase tracking-wide">
+                            UAS
+                        </th>
+
+                        <th class="whitespace-nowrap px-4 py-4 text-center text-xs font-extrabold uppercase tracking-wide">
+                            Nilai Akhir
+                        </th>
 
-                <div class="text-right hidden sm:block">
+                        <th class="whitespace-nowrap px-4 py-4 text-center text-xs font-extrabold uppercase tracking-wide">
+                            KKM
+                        </th>
 
-                    <p class="text-sm font-semibold text-slate-700">
-                        {{ ucfirst(auth()->user()->username) }}
-                    </p>
+                        <th class="whitespace-nowrap px-4 py-4 text-center text-xs font-extrabold uppercase tracking-wide">
+                            Status Ketuntasan
+                        </th>
+
+                        <th class="whitespace-nowrap px-4 py-4 text-center text-xs font-extrabold uppercase tracking-wide">
+                            Predikat
+                        </th>
+
+                    </tr>
+                </thead>
+
 
-                    <p class="text-xs text-slate-500">
-                        Guru
-                    </p>
+                <tbody class="divide-y divide-[#C9DCEC] dark:divide-slate-700">
 
-                </div>
+                    @forelse ($nilais as $index => $nilai)
 
+                        @php
+                            $harian = data_get($nilai, 'nilai_harian');
+                            $uts = data_get($nilai, 'nilai_uts');
+                            $uas = data_get($nilai, 'nilai_uas');
+                            $akhir = data_get($nilai, 'nilai_akhir');
+                            $kkm = data_get($nilai, 'mapel.kkm');
+                            $predikat = data_get($nilai, 'predikat');
 
-                <div class="w-10 h-10 rounded-full gradient-primary flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                            $namaMapel = data_get($nilai, 'mapel.nama_mapel', 'Mata Pelajaran');
+                            $semester = data_get($nilai, 'rapor.semester', $periodeAktif->semester ?? '-');
+
+                            $nilaiLengkap = is_numeric($harian)
+                                && is_numeric($uts)
+                                && is_numeric($uas)
+                                && is_numeric($akhir);
 
-                    {{ strtoupper(substr(auth()->user()->username, 0, 1)) }}
+                            $tuntas = is_numeric($akhir)
+                                && is_numeric($kkm)
+                                && $akhir >= $kkm;
+                        @endphp
 
-                </div>
+                        <tr class="{{ $loop->even ? 'bg-[#DCEBFA]' : 'bg-[#EDF5FC]' }} transition hover:bg-[#CFE3F5] dark:bg-slate-800 dark:hover:bg-slate-700">
 
-            </div>
+                            <td class="whitespace-nowrap px-4 py-4 text-sm font-bold text-[#527391] dark:text-slate-300">
+                                {{ ($pagination->firstItem() ?? 1) + $loop->index }}
+                            </td>
 
-        </header>
+                            <td class="px-4 py-4 text-sm font-extrabold text-[#355779] dark:text-slate-100">
+                                {{ $namaMapel }}
+                            </td>
 
+                            <td class="whitespace-nowrap px-4 py-4">
+                                <span class="inline-flex rounded-lg border border-[#B8D2EB] bg-[#EAF4FC] px-3 py-1.5 text-xs font-extrabold text-[#355779] dark:border-slate-600 dark:bg-slate-700 dark:text-[#D0E2F4]">
+                                    {{ $semester }}
+                                </span>
+                            </td>
 
-        <!-- MAIN -->
-        <main class="p-8 overflow-y-auto flex-1">
+                            <td class="whitespace-nowrap px-4 py-4 text-center text-sm font-extrabold text-[#355779] dark:text-slate-200">
+                                {{ is_numeric($harian) ? number_format($harian, 2) : 'Belum Ada Nilai' }}
+                            </td>
 
+                            <td class="whitespace-nowrap px-4 py-4 text-center text-sm font-extrabold text-[#355779] dark:text-slate-200">
+                                {{ is_numeric($uts) ? number_format($uts, 2) : 'Belum Ada Nilai' }}
+                            </td>
 
-            <!-- WELCOME -->
-            <div class="mb-6">
+                            <td class="whitespace-nowrap px-4 py-4 text-center text-sm font-extrabold text-[#355779] dark:text-slate-200">
+                                {{ is_numeric($uas) ? number_format($uas, 2) : 'Belum Ada Nilai' }}
+                            </td>
 
-                <h2 class="text-xl font-bold text-slate-800">
-                    Selamat Datang, {{ ucfirst(auth()->user()->username) }} 👋
-                </h2>
+                            <td class="whitespace-nowrap px-4 py-4 text-center text-sm font-extrabold text-[#355779] dark:text-white">
+                                {{ is_numeric($akhir) ? number_format($akhir, 2) : 'Belum Ada Nilai' }}
+                            </td>
 
-                <p class="text-sm text-slate-500 mt-1">
-                    Kelola nilai dan pantau data akademik siswa dari halaman Guru.
-                </p>
+                            <td class="whitespace-nowrap px-4 py-4 text-center text-sm font-extrabold text-[#355779] dark:text-slate-200">
+                                {{ is_numeric($kkm) ? number_format($kkm, 0) : 'KKM Belum Diatur' }}
+                            </td>
 
-            </div>
+                            <td class="whitespace-nowrap px-4 py-4 text-center">
 
+                                @if (!is_numeric($akhir))
+                                    <span class="inline-flex rounded-lg bg-[#E5EAF0] px-3 py-1.5 text-xs font-bold text-[#64748B] dark:bg-slate-700 dark:text-slate-300">
+                                        Belum Ada Nilai
+                                    </span>
+                                @elseif (!is_numeric($kkm))
+                                    <span class="inline-flex rounded-lg bg-[#E5EAF0] px-3 py-1.5 text-xs font-bold text-[#64748B] dark:bg-slate-700 dark:text-slate-300">
+                                        KKM Belum Diatur
+                                    </span>
+                                @elseif ($tuntas)
+                                    <span class="inline-flex rounded-lg bg-[#D9F1E3] px-3 py-1.5 text-xs font-extrabold text-[#287A4B] dark:bg-green-900/30 dark:text-green-300">
+                                        Tuntas
+                                    </span>
+                                @else
+                                    <span class="inline-flex rounded-lg bg-[#FCE8D9] px-3 py-1.5 text-xs font-extrabold text-[#B76532] dark:bg-orange-900/30 dark:text-orange-300">
+                                        Belum Tuntas
+                                    </span>
+                                @endif
 
-            <!-- STATISTIK -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                            </td>
 
+                            <td class="whitespace-nowrap px-4 py-4 text-center">
 
-                <!-- TOTAL SISWA -->
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                                @if (!empty($predikat))
+                                    <span class="inline-flex min-w-9 justify-center rounded-lg bg-[#C3E0F4] px-3 py-1.5 text-sm font-extrabold text-[#355779] dark:bg-slate-700 dark:text-[#D0E2F4]">
+                                        {{ $predikat }}
+                                    </span>
+                                @else
+                                    <span class="text-xs font-bold text-[#71869B] dark:text-slate-400">
+                                        Belum Ada Predikat
+                                    </span>
+                                @endif
 
-                    <div class="flex items-center justify-between">
+                            </td>
 
-                        <div>
+                        </tr>
 
-                            <p class="text-sm font-medium text-slate-500 mb-1">
-                                Total Siswa
-                            </p>
+                    @empty
 
-                            <h3 class="text-3xl font-bold text-slate-800">
-                                {{ \App\Models\Siswa::count() }}
-                            </h3>
+                        <tr>
+                            <td colspan="10" class="px-5 py-12 text-center">
 
-                            <p class="text-xs text-slate-400 mt-1">
-                                Siswa terdaftar
-                            </p>
+                                <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#D5E7F7] text-[#527391] dark:bg-slate-700 dark:text-slate-300">
+                                    <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253"/>
+                                    </svg>
+                                </div>
 
-                        </div>
+                                <h3 class="mt-4 text-base font-extrabold text-[#355779] dark:text-white">
+                                    Belum Ada Data Nilai
+                                </h3>
 
-                        <div class="w-12 h-12 rounded-xl gradient-success flex items-center justify-center shadow-lg">
+                                <p class="mt-1 text-sm font-medium text-[#71869B] dark:text-slate-400">
+                                    Belum ada nilai yang tersedia pada periode ini.
+                                </p>
 
-                            <svg
-                                class="w-6 h-6 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                                />
-                            </svg>
+                            </td>
+                        </tr>
 
-                        </div>
+                    @endforelse
 
-                    </div>
+                </tbody>
 
-                </div>
+            </table>
 
+        </div>
 
-                <!-- TOTAL MAPEL -->
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
 
-                    <div class="flex items-center justify-between">
+        {{-- PAGINATION: SEBELUMNYA DAN SELANJUTNYA SAJA --}}
+        @if ($pagination->lastPage() > 1)
 
-                        <div>
+            <div class="flex items-center justify-between gap-3 border-t border-[#C3D8EB] bg-[#DCEBFA] px-5 py-4 dark:border-slate-700 dark:bg-slate-800">
 
-                            <p class="text-sm font-medium text-slate-500 mb-1">
-                                Total Mapel
-                            </p>
-
-                            <h3 class="text-3xl font-bold text-slate-800">
-                                {{ \App\Models\Mapel::count() }}
-                            </h3>
-
-                            <p class="text-xs text-slate-400 mt-1">
-                                Mata pelajaran tersedia
-                            </p>
-
-                        </div>
-
-                        <div class="w-12 h-12 rounded-xl gradient-secondary flex items-center justify-center shadow-lg">
-
-                            <svg
-                                class="w-6 h-6 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                                />
-                            </svg>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- NILAI -->
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-
-                    <div class="flex items-center justify-between">
-
-                        <div>
-
-                            <p class="text-sm font-medium text-slate-500 mb-1">
-                                Nilai Masuk
-                            </p>
-
-                            <h3 class="text-3xl font-bold text-amber-600">
-                                {{ \App\Models\Nilai::count() }}
-                            </h3>
-
-                            <p class="text-xs text-slate-400 mt-1">
-                                Data nilai tersimpan
-                            </p>
-
-                        </div>
-
-                        <div class="w-12 h-12 rounded-xl gradient-warning flex items-center justify-center shadow-lg">
-
-                            <svg
-                                class="w-6 h-6 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                                />
-                            </svg>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- PERIODE RAPOR -->
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-
-                    <div class="flex items-center justify-between">
-
-                        <div>
-
-                            <p class="text-sm font-medium text-slate-500 mb-1">
-                                Periode Rapor
-                            </p>
-
-                            <h3 class="text-3xl font-bold text-indigo-600">
-                                {{ \App\Models\Rapor::count() }}
-                            </h3>
-
-                            <p class="text-xs text-slate-400 mt-1">
-                                Periode tersedia
-                            </p>
-
-                        </div>
-
-                        <div class="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center shadow-lg">
-
-                            <svg
-                                class="w-6 h-6 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                />
-                            </svg>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- MENU UTAMA GURU -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-
-                <!-- INPUT NILAI -->
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-
-                    <div class="flex items-start gap-4">
-
-                        <div class="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center shrink-0">
-
-                            <svg
-                                class="w-6 h-6 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                />
-                            </svg>
-
-                        </div>
-
-                        <div class="flex-1">
-
-                            <h2 class="text-lg font-bold text-slate-800">
-                                Input Nilai Siswa
-                            </h2>
-
-                            <p class="text-sm text-slate-500 mt-1 mb-4">
-                                Masukkan nilai harian, UTS, dan UAS siswa.
-                            </p>
-
-                            <a
-                                href="{{ route('guru.nilai.create') }}"
-                                class="inline-flex items-center px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition-smooth"
-                            >
-                                Input Nilai
-                                <span class="ml-2">→</span>
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- REKAP NILAI -->
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-
-                    <div class="flex items-start gap-4">
-
-                        <div class="w-12 h-12 rounded-xl gradient-success flex items-center justify-center shrink-0">
-
-                            <svg
-                                class="w-6 h-6 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                                />
-                            </svg>
-
-                        </div>
-
-                        <div class="flex-1">
-
-                            <h2 class="text-lg font-bold text-slate-800">
-                                Rekap Nilai
-                            </h2>
-
-                            <p class="text-sm text-slate-500 mt-1 mb-4">
-                                Lihat dan pantau data nilai siswa yang sudah dimasukkan.
-                            </p>
-
-                            <a
-                                href="{{ route('guru.rekap.index') }}"
-                                class="inline-flex items-center px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition-smooth"
-                            >
-                                Lihat Rekap
-                                <span class="ml-2">→</span>
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- INFORMASI -->
-            <div class="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-
-                <div class="flex items-start gap-4">
-
-                    <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center shrink-0">
-
-                        <svg
-                            class="w-5 h-5 text-indigo-600"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
+                @if ($pagination->onFirstPage())
+                    <span class="inline-flex cursor-not-allowed items-center gap-2 rounded-xl border border-[#C3D8EB] bg-[#EDF5FC] px-4 py-2.5 text-sm font-bold text-[#9AAFC3] dark:border-slate-700 dark:bg-slate-700 dark:text-slate-500">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                         </svg>
+                        Sebelumnya
+                    </span>
+                @else
+                    <a href="{{ $pagination->previousPageUrl() }}"
+                       class="inline-flex items-center gap-2 rounded-xl border border-[#A4BFDF] bg-[#EAF4FC] px-4 py-2.5 text-sm font-extrabold text-[#355779] transition hover:bg-[#C3E0F4] dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:hover:bg-slate-600">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Sebelumnya
+                    </a>
+                @endif
 
-                    </div>
 
-                    <div>
-
-                        <h3 class="font-semibold text-slate-800">
-                            Informasi Guru
-                        </h3>
-
-                        <p class="text-sm text-slate-500 mt-1 leading-relaxed">
-                            Gunakan menu Input Nilai untuk memasukkan nilai siswa.
-                            Setelah nilai tersimpan, data dapat dilihat melalui menu Rekap Nilai.
-                        </p>
-
-                    </div>
-
-                </div>
+                @if ($pagination->hasMorePages())
+                    <a href="{{ $pagination->nextPageUrl() }}"
+                       class="inline-flex items-center gap-2 rounded-xl border border-[#A4BFDF] bg-[#EAF4FC] px-4 py-2.5 text-sm font-extrabold text-[#355779] transition hover:bg-[#C3E0F4] dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:hover:bg-slate-600">
+                        Selanjutnya
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                @else
+                    <span class="inline-flex cursor-not-allowed items-center gap-2 rounded-xl border border-[#C3D8EB] bg-[#EDF5FC] px-4 py-2.5 text-sm font-bold text-[#9AAFC3] dark:border-slate-700 dark:bg-slate-700 dark:text-slate-500">
+                        Selanjutnya
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                @endif
 
             </div>
 
-        </main>
+        @endif
 
     </div>
 
 </div>
 
-
-<!-- RIPPLE EFFECT -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-
-        function createRipple(event) {
-
-            const button = event.currentTarget;
-
-            const circle = document.createElement('span');
-
-            const diameter = Math.max(
-                button.clientWidth,
-                button.clientHeight
-            );
-
-            const radius = diameter / 2;
-
-            const rect = button.getBoundingClientRect();
-
-            circle.style.width = circle.style.height = `${diameter}px`;
-
-            circle.style.left =
-                `${event.clientX - rect.left - radius}px`;
-
-            circle.style.top =
-                `${event.clientY - rect.top - radius}px`;
-
-            circle.style.backgroundColor =
-                "rgba(99, 102, 241, 0.2)";
-
-            circle.classList.add('ripple-effect');
-
-            const ripple =
-                button.getElementsByClassName('ripple-effect')[0];
-
-            if (ripple) {
-                ripple.remove();
-            }
-
-            button.appendChild(circle);
-        }
-
-        const buttons =
-            document.querySelectorAll('.ripple-btn');
-
-        for (const button of buttons) {
-            button.addEventListener('click', createRipple);
-        }
-
-    });
-</script>
-
-</body>
-</html>
+@endsection

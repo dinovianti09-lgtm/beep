@@ -1,44 +1,30 @@
+
 <?php
 
-namespace App\Models;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Database\Eloquent\Model;
-
-class KehadiranSiswa extends Model
+return new class extends Migration
 {
-    protected $table = 'kehadiran_siswa';
-
-    protected $primaryKey = 'id_kehadiran';
-
-    protected $fillable = [
-        'id_siswa',
-        'id_rapor',
-        'sakit',
-        'izin',
-        'tanpa_keterangan',
-    ];
-
-    protected $casts = [
-        'sakit' => 'integer',
-        'izin' => 'integer',
-        'tanpa_keterangan' => 'integer',
-    ];
-
-    public function siswa()
+    public function up(): void
     {
-        return $this->belongsTo(
-            Siswa::class,
-            'id_siswa',
-            'id_siswa'
-        );
+        Schema::create('kehadiran_siswa', function (Blueprint $table) {
+            $table->id('id_kehadiran');
+
+            $table->unsignedBigInteger('id_siswa');
+            $table->unsignedBigInteger('id_rapor');
+
+            $table->integer('sakit')->default(0);
+            $table->integer('izin')->default(0);
+            $table->integer('tanpa_keterangan')->default(0);
+
+            $table->timestamps();
+        });
     }
 
-    public function rapor()
+    public function down(): void
     {
-        return $this->belongsTo(
-            Rapor::class,
-            'id_rapor',
-            'id_rapor'
-        );
+        Schema::dropIfExists('kehadiran_siswa');
     }
-}
+};

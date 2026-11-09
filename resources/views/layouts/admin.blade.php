@@ -1265,7 +1265,7 @@
                 </svg>
 
                 <span class="text-sm font-semibold">
-                    Data Mata Pelajaran
+                    Mata Pelajaran
                 </span>
             </a>
 
@@ -1373,7 +1373,7 @@
                 </svg>
 
                 <span class="text-sm font-semibold">
-                    Data Kepala Sekolah
+                    Kepala Sekolah
                 </span>
             </a>
 
@@ -1433,7 +1433,7 @@
                 </svg>
 
                 <span class="text-sm font-semibold">
-                    Data Periode Rapor
+                    Periode Rapor
                 </span>
             </a>
 
@@ -1460,7 +1460,7 @@
                 </svg>
 
                 <span class="text-sm font-semibold">
-                    Data Rapor Siswa
+                    Rapor Siswa
                 </span>
             </a>
 
@@ -1524,7 +1524,7 @@
                     </svg>
 
                     <span class="text-sm font-semibold">
-                        Logout
+                        Keluar
                     </span>
                 </button>
 
@@ -1674,6 +1674,53 @@
         ========================================== --}}
 
         <div class="admin-content px-5 md:px-8 py-6 md:py-8">
+            {{-- S3-07 BREADCRUMB ADMIN --}}
+            @php
+                $routeName = request()->route()?->getName() ?? '';
+                $segments = explode('.', $routeName);
+                $section = $segments[1] ?? null;
+                $action = $segments[2] ?? null;
+                $labels = [
+                    'siswa' => 'Data Siswa', 'guru' => 'Data Guru',
+                    'kelas' => 'Data Kelas', 'mapel' => 'Mata Pelajaran',
+                    'nilai' => 'Nilai', 'rapor' => 'Rapor',
+                    'rapor_siswa' => 'Rapor Siswa',
+                    'pengaturan-sekolah' => 'Pengaturan Sekolah',
+                    'profil' => 'Profil',
+                ];
+                $actions = ['create' => 'Tambah', 'edit' => 'Edit', 'show' => 'Detail'];
+                $sectionLabel = $labels[$section] ?? null;
+                $actionLabel = $actions[$action] ?? null;
+                $sectionRoute = $section ? 'admin.' . $section . '.index' : null;
+            @endphp
+            <nav aria-label="Breadcrumb" class="mb-5 text-sm text-slate-500 dark:text-slate-400">
+                <ol class="flex flex-wrap items-center gap-2">
+                    <li>
+                        @if($routeName === 'admin.dashboard')
+                            <span aria-current="page" class="font-semibold text-slate-700 dark:text-slate-200">Dashboard</span>
+                        @else
+                            <a href="{{ route('admin.dashboard') }}" class="hover:underline">Dashboard</a>
+                        @endif
+                    </li>
+                    @if($sectionLabel)
+                        <li aria-hidden="true">›</li>
+                        <li>
+                            @if($actionLabel && $sectionRoute && Route::has($sectionRoute))
+                                <a href="{{ route($sectionRoute) }}" class="hover:underline">{{ $sectionLabel }}</a>
+                            @else
+                                <span aria-current="page" class="font-semibold text-slate-700 dark:text-slate-200">{{ $sectionLabel }}</span>
+                            @endif
+                        </li>
+                        @if($actionLabel)
+                            <li aria-hidden="true">›</li>
+                            <li aria-current="page" class="font-semibold text-slate-700 dark:text-slate-200">{{ $actionLabel }}</li>
+                        @endif
+                    @elseif($routeName === 'admin.profil')
+                        <li aria-hidden="true">›</li>
+                        <li aria-current="page" class="font-semibold text-slate-700 dark:text-slate-200">Profil</li>
+                    @endif
+                </ol>
+            </nav>
 
 
             {{-- NOTIFIKASI BERHASIL --}}

@@ -9,15 +9,13 @@
 
     /*
     |--------------------------------------------------------------------------
-    | Data nilai dari SiswaNilaiController
+    | Data nilai
     |--------------------------------------------------------------------------
     */
 
     $daftarNilai = collect($nilais ?? [])->map(function ($item) {
         return (object) [
-            'id_mapel' => $item->id_mapel
-                ?? $item->mapel->id_mapel
-                ?? null,
+            'id_mapel' => $item->id_mapel ?? $item->mapel->id_mapel ?? null,
             'mapel' => $item->mapel ?? null,
             'nama_mapel' => $item->mapel->nama_mapel ?? '-',
             'nilai_harian' => $item->nilai_harian ?? null,
@@ -30,7 +28,7 @@
 
     /*
     |--------------------------------------------------------------------------
-    | Data kelas, wali kelas, dan NIP wali kelas
+    | Data kelas dan wali kelas
     |--------------------------------------------------------------------------
     */
 
@@ -48,7 +46,6 @@
     $waliKelas = $kelasData->wali_kelas ?? null;
     $nipWaliKelas = null;
 
-    // Ambil NIP berdasarkan nama wali kelas.
     if (!empty($waliKelas)) {
         $guruWaliKelas = DB::table('guru')
             ->whereRaw('TRIM(nama_guru) = ?', [trim($waliKelas)])
@@ -62,7 +59,7 @@
 
     /*
     |--------------------------------------------------------------------------
-    | Identitas kepala sekolah dari pengaturan sekolah
+    | Identitas kepala sekolah
     |--------------------------------------------------------------------------
     */
 
@@ -76,7 +73,7 @@
 
     /*
     |--------------------------------------------------------------------------
-    | Mata pelajaran wajib berdasarkan kelas siswa
+    | Mata pelajaran wajib
     |--------------------------------------------------------------------------
     */
 
@@ -110,15 +107,14 @@
 
     /*
     |--------------------------------------------------------------------------
-    | Gabungkan mata pelajaran dengan nilai
+    | Gabungkan mata pelajaran dan nilai
     |--------------------------------------------------------------------------
     */
 
     if ($mapelWajib->isNotEmpty()) {
         $barisRapor = $mapelWajib->map(function ($mapel) use ($daftarNilai) {
             $nilai = $daftarNilai->first(function ($item) use ($mapel) {
-                return (string) $item->id_mapel
-                    === (string) $mapel->id_mapel;
+                return (string) $item->id_mapel === (string) $mapel->id_mapel;
             });
 
             return (object) [
@@ -179,12 +175,7 @@
             return 'Belum diinput';
         }
 
-        return number_format(
-            (float) $nilai->{$kolom},
-            2,
-            ',',
-            '.'
-        );
+        return number_format((float) $nilai->{$kolom}, 2, ',', '.');
     };
 
     $formatKKM = function ($kkm) {
@@ -195,7 +186,7 @@
 
     /*
     |--------------------------------------------------------------------------
-    | Ringkasan nilai rapor
+    | Ringkasan rapor
     |--------------------------------------------------------------------------
     */
 
@@ -238,638 +229,1180 @@
     $daftarEkstrakurikuler = collect($ekstrakurikulerList ?? []);
 @endphp
 
+
 @push('styles')
 <style>
-    .rapor-siswa {
-        color: #0f172a;
+    /* =========================================
+       HALAMAN RAPOR SISWA
+    ========================================= */
+
+    .rs-show-page {
+        color: #293F57;
     }
 
-    .rapor-siswa .rapor-paper {
-        background: #ffffff;
-        color: #111827;
-        font-family: Arial, Helvetica, sans-serif;
-        line-height: 1.6;
+    .rs-show-hero {
+        background: linear-gradient(
+            115deg,
+            #C3E0F4 0%,
+            #E3F0FA 58%,
+            #F8FAFC 100%
+        );
+        border: 1px solid #BDD6EE;
+        border-radius: 17px;
     }
 
-    .rapor-siswa .report-school-header {
+    .rs-show-muted {
+        color: #526982;
+    }
+
+    .rs-select-semester {
+        min-width: 220px;
+        background: #FFFFFF;
+        border: 1px solid #BDD6EE;
+        color: #293F57;
+        font-weight: 700;
+        border-radius: 10px;
+        padding: 9px 14px;
+        font-size: 13px;
+        outline: none;
+    }
+
+    .rs-select-semester:focus {
+        border-color: #3478BD;
+        box-shadow: 0 0 0 3px rgba(52, 120, 189, .15);
+    }
+
+    .rs-document-shell {
+        overflow: hidden;
+        border: 1px solid #D5E1ED;
+        border-radius: 16px;
+        background: #FFFFFF;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(41, 63, 87, .05);
+    }
+
+    /* =========================================
+       LEMBAR RAPOR (FORMAL & BERSIH)
+    ========================================= */
+
+    .print-card {
+        background: #FFFFFF !important;
+        color: #111111 !important;
+        color-scheme: light !important;
+        font-family: Arial, Helvetica, sans-serif !important;
+        font-size: 14px !important;
+        line-height: 1.65 !important;
+        isolation: isolate;
+    }
+
+    .print-card,
+    .print-card * {
+        box-sizing: border-box;
+        opacity: 1 !important;
+        text-shadow: none !important;
+    }
+
+    /* KECUALIKAN TEKS REMEDIAL DARI ATURAN WARNA HITAM */
+    .print-card p:not(.text-remedial),
+    .print-card span:not(.text-remedial),
+    .print-card div:not(.text-remedial),
+    .print-card td:not(.text-remedial),
+    .print-card th:not(.text-remedial) {
+        color: #111111;
+    }
+
+    .print-card h1,
+    .print-card h2,
+    .print-card h3 {
+        color: #000000 !important;
+        font-weight: 800 !important;
+    }
+
+    /* =========================================
+       KOP SEKOLAH
+    ========================================= */
+
+    .report-school-header {
         display: flex;
+        position: relative;
         align-items: center;
         justify-content: center;
-        position: relative;
-        min-height: 115px;
-        padding: 12px 10px 18px;
-        border-bottom: 4px double #111827;
-        background: #ffffff;
+        min-height: 125px;
+        padding: 10px 10px 20px;
+        border-bottom: 4px double #111111 !important;
+        background: #FFFFFF !important;
     }
 
-    .rapor-siswa .school-logo {
+    .school-logo {
         position: absolute;
         left: 10px;
         top: 50%;
         transform: translateY(-50%);
-        width: 78px;
-        height: 78px;
+        width: 90px;
+        height: 90px;
         object-fit: contain;
     }
 
-    .rapor-siswa .school-heading-content {
+    .school-heading-content {
         width: 100%;
-        text-align: center;
+        text-align: center !important;
         padding: 0 10px;
     }
 
-    .rapor-siswa .school-heading {
-        font-size: 12px;
-        font-weight: 800;
+    .school-heading {
+        font-size: 14px !important;
+        font-weight: 800 !important;
+        text-align: center !important;
     }
 
-    .rapor-siswa .school-name {
+    .school-name {
         margin-top: 5px;
-        font-size: 23px;
-        line-height: 1.3;
-        font-weight: 900;
+        font-size: 25px !important;
+        line-height: 1.3 !important;
+        font-weight: 900 !important;
+        text-align: center !important;
     }
 
-    .rapor-siswa .school-subheading {
+    .school-subheading {
         margin-top: 5px;
-        font-size: 12px;
-        font-weight: 700;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        text-align: center !important;
     }
 
-    .rapor-siswa .section-heading {
-        margin-bottom: 14px;
+    .report-title {
+        font-size: 21px !important;
+        font-weight: 900 !important;
+        letter-spacing: 1px;
+        text-align: center !important;
+    }
+
+    .report-subtitle {
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        text-align: center !important;
+    }
+
+    /* =========================================
+       IDENTITAS SISWA
+    ========================================= */
+
+    .section-heading {
+        margin-bottom: 16px;
         padding-bottom: 8px;
-        border-bottom: 2px solid #333333;
-        font-size: 14px;
-        font-weight: 900;
-        color: #111827;
+        border-bottom: 2px solid #333333 !important;
+        font-size: 15px !important;
+        font-weight: 900 !important;
     }
 
-    .rapor-siswa .identity-grid {
+    .identity-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 8px 24px;
+        gap: 10px 28px;
+        background: #FFFFFF !important;
     }
 
-    .rapor-siswa .identity-row {
+    .identity-row {
         display: grid;
-        grid-template-columns: 110px 12px minmax(0, 1fr);
+        grid-template-columns: 125px 12px minmax(0, 1fr);
         gap: 4px;
         align-items: start;
-        font-size: 13px;
+        font-size: 14px !important;
+        line-height: 1.8 !important;
     }
 
-    .rapor-siswa .identity-label,
-    .rapor-siswa .identity-colon {
-        font-weight: 600;
+    .identity-label,
+    .identity-colon {
+        font-weight: 600 !important;
     }
 
-    .rapor-siswa .identity-value {
-        font-weight: 800;
+    .identity-value {
+        font-weight: 800 !important;
         overflow-wrap: anywhere;
     }
 
-    .rapor-siswa .report-table {
+    /* =========================================
+       TABEL RAPOR (FORMAL)
+    ========================================= */
+
+    .report-table {
         width: 100%;
-        border-collapse: collapse;
-        background: #ffffff;
-        color: #111827;
-        font-size: 12px;
+        border-collapse: collapse !important;
+        background: #FFFFFF !important;
+        color: #000000 !important;
+        font-size: 12px !important;
     }
 
-    .rapor-siswa .report-table th,
-    .rapor-siswa .report-table td {
-        padding: 8px 6px;
-        border: 1px solid #555555;
-        color: #111827;
-        vertical-align: middle;
-        background: #ffffff;
+    .report-table th,
+    .report-table td {
+        padding: 8px 6px !important;
+        border: 1px solid #555555 !important;
+        vertical-align: middle !important;
+        background: #FFFFFF !important;
+        font-size: 12px !important;
         overflow-wrap: anywhere;
     }
 
-    .rapor-siswa .report-table th {
-        background: #e5e7eb;
-        font-weight: 900;
+    .report-table th {
+        background: #FFFFFF !important;
+        font-weight: 900 !important;
     }
 
-    .rapor-siswa .status-tuntas {
-        display: inline-block;
-        padding: 3px 7px;
-        border-radius: 5px;
-        background-color: #dcfce7;
-        color: #15803d;
-        font-weight: 800;
-    }
-
-    .rapor-siswa .report-table tbody tr.baris-remedial > td {
-        background-color: #fee2e2 !important;
-        color: #dc2626 !important;
-        font-weight: 700 !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
-
-    .rapor-siswa .report-table tbody tr.baris-remedial > td span {
-        color: #dc2626 !important;
-        -webkit-text-fill-color: #dc2626 !important;
-    }
-
-    .rapor-siswa .status-remedial {
-        display: inline-block;
-        padding: 3px 7px;
-        border-radius: 5px;
-        background-color: #fecaca;
-        color: #dc2626;
-        font-weight: 800;
-    }
-
-    .rapor-siswa .status-belum {
-        display: inline-block;
-        padding: 3px 7px;
-        border-radius: 5px;
-        background-color: #f1f5f9;
-        color: #64748b;
-        font-weight: 700;
-    }
-
-    .rapor-siswa .summary-table th {
+    .summary-table th {
         width: 65%;
     }
 
-    .rapor-siswa .summary-table td {
-        font-weight: 800;
+    .summary-table td,
+    .grade-value,
+    .final-value {
+        font-weight: 800 !important;
     }
 
-    .rapor-siswa .signature-name {
-        font-size: 13px;
-        font-weight: 900;
+    /* =========================================
+       PENANDA NILAI DI BAWAH KKM (MERAH TEBAL)
+    ========================================= */
+
+    .text-remedial,
+    td.text-remedial,
+    span.text-remedial {
+        color: #DC2626 !important;
+        font-weight: 900 !important;
+    }
+
+    .text-tuntas {
+        color: #111111 !important;
+        font-weight: 700 !important;
+    }
+
+    .text-belum {
+        color: #64748B !important;
+        font-weight: 600 !important;
+    }
+
+    /* =========================================
+       TANDA TANGAN
+    ========================================= */
+
+    .signature-name {
+        font-size: 14px !important;
+        font-weight: 900 !important;
         text-decoration: underline;
     }
 
-    .rapor-siswa .signature-role {
-        font-size: 12px;
-        font-weight: 700;
+    .signature-role {
+        font-size: 13px !important;
+        font-weight: 700 !important;
     }
 
+    /* =========================================
+       TAMPILAN RESPONSIVE
+    ========================================= */
+
     @media (max-width: 640px) {
-        .rapor-siswa .identity-grid {
-            grid-template-columns: 1fr;
-            gap: 8px;
+        .rs-document-shell {
+            padding: 12px;
         }
 
-        .rapor-siswa .school-name {
-            font-size: 19px;
+        .print-card {
+            padding: 20px !important;
         }
 
-        .rapor-siswa .report-school-header {
-            padding-top: 95px;
+        .report-school-header {
+            min-height: 180px;
+            padding-top: 105px;
         }
 
-        .rapor-siswa .school-logo {
+        .school-logo {
             top: 5px;
             left: 50%;
             transform: translateX(-50%);
-            width: 70px;
-            height: 70px;
+            width: 78px;
+            height: 78px;
         }
 
-        .rapor-siswa .report-table {
+        .school-name {
+            font-size: 21px !important;
+        }
+
+        .identity-grid {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+        }
+
+        .report-table {
             min-width: 760px;
         }
 
-        .rapor-siswa .summary-table {
-            min-width: 0;
+        .summary-table {
+            min-width: 0 !important;
+        }
+    }
+
+    /* =========================================
+       DARK MODE HALAMAN
+    ========================================= */
+
+    .dark .rs-show-page {
+        color: #E4ECF6;
+    }
+
+    .dark .rs-show-hero {
+        background: linear-gradient(
+            115deg,
+            #243E59 0%,
+            #1C3049 58%,
+            #17283D 100%
+        );
+        border-color: #354962;
+    }
+
+    .dark .rs-show-muted {
+        color: #A7B8CC;
+    }
+
+    .dark .rs-select-semester {
+        background: #192438;
+        border-color: #354962;
+        color: #E2ECF7;
+    }
+
+    .dark .rs-document-shell {
+        background: #192438;
+        border-color: #354962;
+    }
+
+    .dark .text-remedial {
+        color: #EF4444 !important;
+    }
+
+    /* =========================================
+       CETAK RAPOR
+    ========================================= */
+
+    @media print {
+        @page {
+            size: A4 portrait;
+            margin: 10mm;
+        }
+
+        html,
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #FFFFFF !important;
+            color: #000000 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body * {
+            visibility: hidden !important;
+        }
+
+        .print-card,
+        .print-card * {
+            visibility: visible !important;
+        }
+
+        .print-card {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            background: #FFFFFF !important;
+            color: #000000 !important;
+            font-size: 9pt !important;
+        }
+
+        .print-card,
+        .print-card * {
+            opacity: 1 !important;
+        }
+
+        .print-card .text-remedial,
+        td.text-remedial {
+            color: #DC2626 !important;
+            -webkit-text-fill-color: #DC2626 !important;
+        }
+
+        .print-card .text-tuntas {
+            color: #111111 !important;
+            -webkit-text-fill-color: #111111 !important;
+        }
+
+        .rs-document-shell {
+            display: block !important;
+            overflow: visible !important;
+            border: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            background: #FFFFFF !important;
+            box-shadow: none !important;
+        }
+
+        .report-school-header {
+            min-height: 95px !important;
+            padding: 5px 5px 12px !important;
+        }
+
+        .school-logo {
+            left: 5px !important;
+            width: 65px !important;
+            height: 65px !important;
+        }
+
+        .school-heading-content {
+            padding-left: 55px !important;
+        }
+
+        .school-name {
+            font-size: 16pt !important;
+        }
+
+        .school-heading,
+        .school-subheading {
+            font-size: 9pt !important;
+        }
+
+        .report-title {
+            font-size: 14pt !important;
+        }
+
+        .identity-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 5px 10px !important;
+        }
+
+        .identity-row,
+        .identity-label,
+        .identity-colon,
+        .identity-value {
+            font-size: 8pt !important;
+        }
+
+        .report-table {
+            min-width: 0 !important;
+            width: 100% !important;
+            font-size: 7pt !important;
+        }
+
+        .report-table th,
+        .report-table td {
+            padding: 4px 3px !important;
+            font-size: 7pt !important;
+        }
+
+        .signature-section,
+        .report-table tr {
+            break-inside: avoid;
+        }
+
+        .no-print {
+            display: none !important;
         }
     }
 </style>
 @endpush
 
-@section('content')
-<div class="rapor-siswa space-y-6">
 
-    {{-- Header dan pilihan semester --}}
-    <div class="dashboard-card rounded-2xl border border-slate-200 p-5 shadow-sm dark:border-slate-800 sm:p-6">
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+@section('content')
+
+<div class="rs-show-page space-y-6">
+
+    {{-- HEADER DAN FILTER SEMESTER --}}
+    <div class="no-print rs-show-hero flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between lg:p-7">
+
+        <div class="flex items-center gap-4">
+
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-white/60 bg-white/70 text-[#3478BD] shadow-sm dark:border-slate-500/20 dark:bg-slate-800/40 dark:text-blue-300">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    width="27"
+                    height="27"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <path d="M14 2v6h6"/>
+                    <path d="M8 13h8"/>
+                    <path d="M8 17h8"/>
+                </svg>
+            </div>
+
             <div>
-                <h2 class="text-xl font-bold text-slate-800 dark:text-white">
+                <p class="mb-1 text-xs font-bold uppercase tracking-wider text-[#3478BD] dark:text-blue-300">
+                    Akademik Siswa
+                </p>
+
+                <h2 class="text-xl font-extrabold text-[#293F57] dark:text-white lg:text-2xl">
                     Rapor Saya
                 </h2>
-                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+
+                <p class="mt-1 text-xs text-[#526982] dark:text-slate-300 sm:text-sm">
                     Lihat nilai, KKM, dan status hasil belajar kamu.
                 </p>
             </div>
 
-            <form action="{{ route('siswa.rapor.index') }}" method="GET">
-                <label for="semester-nilai"
-                       class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+        </div>
+
+        {{-- FILTER SEMESTER --}}
+        <form action="{{ route('siswa.rapor.index') }}" method="GET" class="w-full sm:w-auto">
+            <div class="flex flex-col sm:items-end">
+                <label for="semester-nilai" class="mb-1 text-xs font-extrabold text-[#293F57] dark:text-slate-200">
                     Pilih Semester
                 </label>
 
-                <select id="semester-nilai"
-                        name="semester"
-                        onchange="this.form.submit()"
-                        class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 sm:min-w-64">
+                <select
+                    id="semester-nilai"
+                    name="semester"
+                    onchange="this.form.submit()"
+                    class="rs-select-semester"
+                >
                     @forelse (($semesterList ?? collect()) as $periode)
-                        <option value="{{ $periode->id_rapor }}"
-                            {{ (string) ($semesterDipilih ?? '') === (string) $periode->id_rapor ? 'selected' : '' }}>
+                        <option
+                            value="{{ $periode->id_rapor }}"
+                            {{ (string) ($semesterDipilih ?? '') === (string) $periode->id_rapor ? 'selected' : '' }}
+                        >
                             {{ $periode->semester }} - {{ $periode->tahun_ajaran }}
                         </option>
                     @empty
                         <option value="">Belum ada periode rapor</option>
                     @endforelse
                 </select>
-            </form>
-        </div>
+            </div>
+        </form>
+
     </div>
 
-    {{-- Ringkasan --}}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div class="dashboard-card rounded-2xl border border-slate-200 p-5 shadow-sm dark:border-slate-800">
-            <p class="text-sm text-slate-500 dark:text-slate-400">Mata Pelajaran</p>
-            <p class="mt-2 text-2xl font-extrabold text-slate-800 dark:text-white">
-                {{ $jumlahSeluruhMapel }}
-            </p>
-            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Jumlah seluruh mapel</p>
+
+    {{-- KARTU RINGKASAN ATAS --}}
+    <div class="no-print grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+        {{-- JUMLAH MAPEL --}}
+        <div class="rounded-xl border border-[#BDD6EE] bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-[#526982] dark:text-slate-400">
+                        Mata Pelajaran
+                    </p>
+                    <h3 class="mt-2 text-3xl font-black text-[#293F57] dark:text-white">
+                        {{ $jumlahSeluruhMapel }}
+                    </h3>
+                    <p class="mt-1 text-xs font-medium text-[#71869B] dark:text-slate-400">
+                        Jumlah seluruh mapel
+                    </p>
+                </div>
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#E3F0FA] text-[#3478BD] dark:bg-slate-700 dark:text-blue-300">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253"/>
+                    </svg>
+                </div>
+            </div>
         </div>
 
-        <div class="dashboard-card rounded-2xl border border-slate-200 p-5 shadow-sm dark:border-slate-800">
-            <p class="text-sm text-slate-500 dark:text-slate-400">Rata-rata Nilai Akhir</p>
-            <p class="mt-2 text-2xl font-extrabold text-blue-600 dark:text-blue-400">
-                {{ $rataRataRapor !== null
-                    ? number_format($rataRataRapor, 2, ',', '.')
-                    : '-' }}
-            </p>
-            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Dari nilai yang lengkap</p>
+        {{-- RATA-RATA --}}
+        <div class="rounded-xl border border-[#BDD6EE] bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-[#526982] dark:text-slate-400">
+                        Rata-rata Nilai Akhir
+                    </p>
+                    <h3 class="mt-2 text-3xl font-black text-[#293F57] dark:text-white">
+                        {{ $rataRataRapor !== null ? number_format($rataRataRapor, 2, ',', '.') : '-' }}
+                    </h3>
+                    <p class="mt-1 text-xs font-medium text-[#71869B] dark:text-slate-400">
+                        Dari nilai yang lengkap
+                    </p>
+                </div>
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#E3F0FA] text-[#3478BD] dark:bg-slate-700 dark:text-blue-300">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l-2 2m2-2l2 2m4 11V4l-2 2m2-2l2 2"/>
+                    </svg>
+                </div>
+            </div>
         </div>
 
-        <div class="dashboard-card rounded-2xl border border-emerald-200 p-5 shadow-sm dark:border-emerald-900">
-            <p class="text-sm text-slate-500 dark:text-slate-400">Tuntas</p>
-            <p class="mt-2 text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">
-                {{ $jumlahTuntas }}
-            </p>
-            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Nilai memenuhi KKM</p>
+        {{-- TUNTAS --}}
+        <div class="rounded-xl border border-[#BDD6EE] bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-[#526982] dark:text-slate-400">
+                        Tuntas
+                    </p>
+                    <h3 class="mt-2 text-3xl font-black text-emerald-600 dark:text-emerald-400">
+                        {{ $jumlahTuntas }}
+                    </h3>
+                    <p class="mt-1 text-xs font-medium text-[#71869B] dark:text-slate-400">
+                        Nilai memenuhi KKM
+                    </p>
+                </div>
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
         </div>
 
-        <div class="dashboard-card rounded-2xl border border-red-200 p-5 shadow-sm dark:border-red-900">
-            <p class="text-sm text-slate-500 dark:text-slate-400">Remedial</p>
-            <p class="mt-2 text-2xl font-extrabold text-red-600 dark:text-red-400">
-                {{ $jumlahRemedial }}
-            </p>
-            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Nilai di bawah KKM</p>
+        {{-- REMEDIAL --}}
+        <div class="rounded-xl border border-[#BDD6EE] bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-[#526982] dark:text-slate-400">
+                        Remedial
+                    </p>
+                    <h3 class="mt-2 text-3xl font-black text-rose-600 dark:text-rose-400">
+                        {{ $jumlahRemedial }}
+                    </h3>
+                    <p class="mt-1 text-xs font-medium text-[#71869B] dark:text-slate-400">
+                        Nilai di bawah KKM
+                    </p>
+                </div>
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.3 3.86L1.82 18a2 2 0 001.7 3h16.96a2 2 0 001.7-3L13.7 3.86a2 2 0 00-3.4 0z"/>
+                    </svg>
+                </div>
+            </div>
         </div>
+
     </div>
 
+
+    {{-- PERIODE BELUM TERSEDIA --}}
     @if (!isset($rapor) || !$rapor)
-        <div class="dashboard-card rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300">
+
+        <div class="rounded-2xl border border-amber-300 bg-amber-50 p-6 text-sm font-semibold text-amber-800 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300">
             Periode rapor belum tersedia atau belum dipilih.
         </div>
+
     @else
-        <div class="rapor-paper mx-auto max-w-5xl rounded-2xl border border-slate-200 p-5 shadow-sm dark:border-slate-700 sm:p-10">
 
-            {{-- Kop sekolah --}}
-            <div class="report-school-header">
-                @if (file_exists(public_path('images/logo-sekolah.png')))
-                    <img src="{{ asset('images/logo-sekolah.png') }}"
-                         alt="Logo sekolah"
-                         class="school-logo">
-                @endif
+        {{-- LEMBAR RAPOR FORMAL --}}
+        <div class="rs-document-shell">
 
-                <div class="school-heading-content">
-                    <p class="school-heading uppercase tracking-wider">
-                        LEMBAR HASIL BELAJAR SISWA
-                    </p>
+            <div class="print-card mx-auto max-w-5xl rounded-xl p-6 sm:p-10">
 
-                    <h1 class="school-name uppercase">
-                        SMK BUDI BAKTI CIWIDEY
-                    </h1>
+                {{-- KOP SEKOLAH --}}
+                <div class="report-school-header">
 
-                    <p class="school-subheading uppercase">
-                        RAPOR HASIL BELAJAR PESERTA DIDIK
-                    </p>
+                    @if (file_exists(public_path('images/logo-sekolah.png')))
+                        <img
+                            src="{{ asset('images/logo-sekolah.png') }}"
+                            alt="Logo sekolah"
+                            class="school-logo"
+                        >
+                    @endif
+
+                    <div class="school-heading-content">
+
+                        <p class="school-heading uppercase tracking-wider">
+                            LEMBAR HASIL BELAJAR SISWA
+                        </p>
+
+                        <h1 class="school-name uppercase">
+                            SMK BUDI BAKTI CIWIDEY
+                        </h1>
+
+                        <p class="school-subheading uppercase">
+                            RAPOR HASIL BELAJAR PESERTA DIDIK
+                        </p>
+
+                    </div>
+
                 </div>
-            </div>
 
-            {{-- Judul --}}
-            <div class="mb-7 mt-6 text-center">
-                <h2 class="text-xl font-black tracking-wider text-black">
-                    RAPOR SISWA
-                </h2>
 
-                <p class="mt-1 text-sm font-semibold text-black">
-                    Tahun Ajaran {{ $rapor->tahun_ajaran ?? '-' }}
-                </p>
-            </div>
+                {{-- JUDUL RAPOR --}}
+                <div class="mb-7 mt-6 text-center">
 
-            {{-- A. Identitas siswa --}}
-            <div class="mb-7">
-                <h3 class="section-heading uppercase">
-                    A. Identitas Peserta Didik
-                </h3>
+                    <h2 class="report-title uppercase">
+                        RAPOR SISWA
+                    </h2>
 
-                <div class="identity-grid">
-                    <div class="identity-row">
-                        <span class="identity-label">Nama Siswa</span>
-                        <span class="identity-colon">:</span>
-                        <span class="identity-value">{{ $siswa->nama_siswa ?? '-' }}</span>
-                    </div>
-
-                    <div class="identity-row">
-                        <span class="identity-label">NIS</span>
-                        <span class="identity-colon">:</span>
-                        <span class="identity-value">{{ $siswa->nis ?? '-' }}</span>
-                    </div>
-
-                    <div class="identity-row">
-                        <span class="identity-label">Kelas</span>
-                        <span class="identity-colon">:</span>
-                        <span class="identity-value">{{ $siswa->kelas ?? '-' }}</span>
-                    </div>
-
-                    <div class="identity-row">
-                        <span class="identity-label">Wali Kelas</span>
-                        <span class="identity-colon">:</span>
-                        <span class="identity-value">{{ $waliKelas ?: 'Belum Ditentukan' }}</span>
-                    </div>
-
-                    <div class="identity-row">
-                        <span class="identity-label">Semester</span>
-                        <span class="identity-colon">:</span>
-                        <span class="identity-value">{{ $rapor->semester ?? '-' }}</span>
-                    </div>
-
-                    <div class="identity-row">
-                        <span class="identity-label">Tahun Ajaran</span>
-                        <span class="identity-colon">:</span>
-                        <span class="identity-value">{{ $rapor->tahun_ajaran ?? '-' }}</span>
-                    </div>
-                </div>
-            </div>
-
-            {{-- B. Capaian hasil belajar --}}
-            <div class="mb-8">
-                <h3 class="section-heading uppercase">
-                    B. Capaian Hasil Belajar
-                </h3>
-
-                @if (!$daftarMapelTersedia)
-                    <p class="mb-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
-                        Daftar mata pelajaran wajib untuk kelas ini belum diatur.
-                        Tabel menampilkan nilai yang sudah tercatat.
+                    <p class="report-subtitle mt-1">
+                        Tahun Ajaran {{ $rapor->tahun_ajaran ?? '-' }}
                     </p>
-                @endif
 
-                <div class="overflow-x-auto">
-                    <table class="report-table">
+                </div>
+
+
+                {{-- A. IDENTITAS SISWA --}}
+                <div class="identity-section mb-7">
+
+                    <h3 class="section-heading uppercase">
+                        A. Identitas Peserta Didik
+                    </h3>
+
+                    <div class="identity-grid">
+
+                        <div class="identity-row">
+                            <span class="identity-label">Nama Siswa</span>
+                            <span class="identity-colon">:</span>
+                            <span class="identity-value">
+                                {{ $siswa->nama_siswa ?? '-' }}
+                            </span>
+                        </div>
+
+                        <div class="identity-row">
+                            <span class="identity-label">NIS</span>
+                            <span class="identity-colon">:</span>
+                            <span class="identity-value">
+                                {{ $siswa->nis ?? '-' }}
+                            </span>
+                        </div>
+
+                        <div class="identity-row">
+                            <span class="identity-label">Kelas</span>
+                            <span class="identity-colon">:</span>
+                            <span class="identity-value">
+                                {{ $siswa->kelas ?? '-' }}
+                            </span>
+                        </div>
+
+                        <div class="identity-row">
+                            <span class="identity-label">Wali Kelas</span>
+                            <span class="identity-colon">:</span>
+                            <span class="identity-value">
+                                {{ $waliKelas ?: 'Belum Ditentukan' }}
+                            </span>
+                        </div>
+
+                        <div class="identity-row">
+                            <span class="identity-label">Semester</span>
+                            <span class="identity-colon">:</span>
+                            <span class="identity-value">
+                                {{ $rapor->semester ?? '-' }}
+                            </span>
+                        </div>
+
+                        <div class="identity-row">
+                            <span class="identity-label">Tahun Ajaran</span>
+                            <span class="identity-colon">:</span>
+                            <span class="identity-value">
+                                {{ $rapor->tahun_ajaran ?? '-' }}
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {{-- B. CAPAIAN HASIL BELAJAR --}}
+                <div class="mb-8">
+
+                    <h3 class="section-heading uppercase">
+                        B. Capaian Hasil Belajar
+                    </h3>
+
+                    @if (!$daftarMapelTersedia)
+                        <div class="no-print mb-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                            Daftar mata pelajaran wajib untuk kelas ini belum diatur.
+                            Tabel menampilkan nilai yang sudah tercatat saja.
+                        </div>
+                    @endif
+
+                    <div class="overflow-x-auto">
+
+                        <table class="report-table">
+
+                            <thead>
+                                <tr>
+                                    <th class="text-center">No.</th>
+                                    <th class="text-left">Mata Pelajaran</th>
+                                    <th class="text-center">Harian</th>
+                                    <th class="text-center">UTS</th>
+                                    <th class="text-center">UAS</th>
+                                    <th class="text-center">Nilai Akhir</th>
+                                    <th class="text-center">KKM</th>
+                                    <th class="text-center">Predikat</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @forelse ($barisRapor as $index => $baris)
+
+                                    @php
+                                        $nilai = $baris->nilai;
+                                        $status = $statusNilai($baris);
+                                        $isRemedial = ($status === 'Remedial');
+
+                                        $predikat = strtoupper(
+                                            trim((string) ($nilai->predikat ?? ''))
+                                        );
+                                    @endphp
+
+                                    <tr>
+
+                                        <td class="text-center">
+                                            {{ $index + 1 }}
+                                        </td>
+
+                                        <td>
+                                            {{ $baris->nama_mapel }}
+                                        </td>
+
+                                        <td class="text-center">
+                                            {{ $formatNilai($nilai, 'nilai_harian') }}
+                                        </td>
+
+                                        <td class="text-center">
+                                            {{ $formatNilai($nilai, 'nilai_uts') }}
+                                        </td>
+
+                                        <td class="text-center">
+                                            {{ $formatNilai($nilai, 'nilai_uas') }}
+                                        </td>
+
+                                        {{-- NILAI AKHIR (MERAH JIKA REMEDIAL/DI BAWAH KKM) --}}
+                                        <td class="text-center final-value {{ $isRemedial ? 'text-remedial' : 'text-tuntas' }}">
+
+                                            @if ($nilai && is_numeric($nilai->nilai_akhir))
+                                                {{ $formatNilai($nilai, 'nilai_akhir') }}
+                                            @else
+                                                <span class="text-belum">Belum diinput</span>
+                                            @endif
+
+                                        </td>
+
+                                        {{-- KKM --}}
+                                        <td class="text-center">
+                                            {{ $formatKKM($baris->kkm) }}
+                                        </td>
+
+                                        {{-- PREDIKAT (MERAH JIKA REMEDIAL/DI BAWAH KKM) --}}
+                                        <td class="text-center grade-value {{ $isRemedial ? 'text-remedial' : 'text-tuntas' }}">
+
+                                            @if (in_array($predikat, ['A', 'B', 'C', 'D'], true))
+                                                {{ $predikat }}
+                                            @else
+                                                <span class="text-belum">Belum diinput</span>
+                                            @endif
+
+                                        </td>
+
+                                        {{-- STATUS (MERAH JIKA REMEDIAL) --}}
+                                        <td class="text-center {{ $isRemedial ? 'text-remedial' : ($status === 'Tuntas' ? 'text-tuntas' : 'text-belum') }}">
+                                            {{ $status }}
+                                        </td>
+
+                                    </tr>
+
+                                @empty
+
+                                    <tr>
+                                        <td colspan="9" class="text-center">
+                                            Belum ada data mata pelajaran atau nilai untuk rapor ini.
+                                        </td>
+                                    </tr>
+
+                                @endforelse
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                {{-- C. RINGKASAN HASIL BELAJAR --}}
+                <div class="mb-8 mt-6">
+
+                    <h3 class="section-heading uppercase">
+                        C. Ringkasan Hasil Belajar
+                    </h3>
+
+                    <table class="report-table summary-table">
+
+                        <tbody>
+
+                            <tr>
+                                <th class="text-left">
+                                    Jumlah Semua Mata Pelajaran
+                                </th>
+
+                                <td class="text-center">
+                                    {{ $jumlahSeluruhMapel }} Mata Pelajaran
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th class="text-left">
+                                    Mata Pelajaran dengan Nilai Lengkap
+                                </th>
+
+                                <td class="text-center">
+                                    {{ $jumlahMapel }} Mata Pelajaran
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th class="text-left">
+                                    Mata Pelajaran Belum Lengkap
+                                </th>
+
+                                <td class="text-center">
+                                    {{ $daftarMapelTersedia
+                                        ? $jumlahMapelBelumLengkap . ' Mata Pelajaran'
+                                        : 'Daftar wajib belum diatur' }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th class="text-left">
+                                    {{ $raporLengkap
+                                        ? 'Rata-rata Nilai Akhir'
+                                        : 'Rata-rata Sementara' }}
+                                </th>
+
+                                <td class="text-center final-value">
+
+                                    @if ($rataRataRapor !== null)
+                                        {{ number_format($rataRataRapor, 2, ',', '.') }}
+                                    @else
+                                        <span class="text-belum">Belum tersedia</span>
+                                    @endif
+
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th class="text-left">
+                                    Status Kelengkapan Rapor
+                                </th>
+
+                                <td class="text-center">
+
+                                    @if (!$daftarMapelTersedia)
+                                        <span class="text-belum">Pemetaan mapel belum tersedia</span>
+                                    @elseif ($raporLengkap)
+                                        <span class="text-tuntas">Lengkap</span>
+                                    @else
+                                        <span class="text-remedial">Belum Lengkap</span>
+                                    @endif
+
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                    <p class="mt-2 text-xs text-slate-500">
+                        Rata-rata dihitung dari mata pelajaran yang memiliki nilai harian,
+                        UTS, UAS, dan nilai akhir lengkap.
+                    </p>
+
+                </div>
+
+
+                {{-- D. KEHADIRAN SISWA --}}
+                <div class="mb-8">
+
+                    <h3 class="section-heading uppercase">
+                        D. Kehadiran Siswa
+                    </h3>
+
+                    <table class="report-table summary-table">
+
                         <thead>
                             <tr>
-                                <th class="text-center">No.</th>
-                                <th class="text-left">Mata Pelajaran</th>
-                                <th class="text-center">Harian</th>
-                                <th class="text-center">UTS</th>
-                                <th class="text-center">UAS</th>
-                                <th class="text-center">Nilai Akhir</th>
-                                <th class="text-center">KKM</th>
-                                <th class="text-center">Predikat</th>
-                                <th class="text-center">Status</th>
+                                <th class="text-left">
+                                    Keterangan
+                                </th>
+
+                                <th class="text-center">
+                                    Jumlah Hari
+                                </th>
                             </tr>
                         </thead>
 
                         <tbody>
-                            @forelse ($barisRapor as $index => $baris)
-                                @php
-                                    $nilai = $baris->nilai;
-                                    $status = $statusNilai($baris);
-                                @endphp
 
-                                <tr class="{{ $status === 'Remedial' ? 'baris-remedial' : '' }}">
-                                    <td class="text-center">{{ $index + 1 }}</td>
-
-                                    <td>{{ $baris->nama_mapel }}</td>
-
-                                    <td class="text-center">
-                                        {{ $formatNilai($nilai, 'nilai_harian') }}
-                                    </td>
-
-                                    <td class="text-center">
-                                        {{ $formatNilai($nilai, 'nilai_uts') }}
-                                    </td>
-
-                                    <td class="text-center">
-                                        {{ $formatNilai($nilai, 'nilai_uas') }}
-                                    </td>
-
-                                    <td class="text-center font-extrabold">
-                                        {{ $formatNilai($nilai, 'nilai_akhir') }}
-                                    </td>
-
-                                    <td class="text-center">
-                                        {{ $formatKKM($baris->kkm) }}
-                                    </td>
-
-                                    <td class="text-center font-extrabold">
-                                        {{ $nilai && filled($nilai->predikat)
-                                            ? $nilai->predikat
-                                            : 'Belum diinput' }}
-                                    </td>
-
-                                    <td class="text-center">
-                                        @if ($status === 'Tuntas')
-                                            <span class="status-tuntas">
-                                                {{ $status }}
-                                            </span>
-                                        @elseif ($status === 'Remedial')
-                                            <span class="status-remedial">
-                                                {{ $status }}
-                                            </span>
-                                        @else
-                                            <span class="status-belum">
-                                                {{ $status }}
-                                            </span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="9" class="text-center">
-                                        Belum ada data nilai untuk periode rapor ini.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {{-- C. Ringkasan hasil belajar --}}
-            <div class="mb-8">
-                <h3 class="section-heading uppercase">
-                    C. Ringkasan Hasil Belajar
-                </h3>
-
-                <table class="report-table summary-table">
-                    <tbody>
-                        <tr>
-                            <th class="text-left">Jumlah Semua Mata Pelajaran</th>
-                            <td class="text-center">{{ $jumlahSeluruhMapel }} Mata Pelajaran</td>
-                        </tr>
-
-                        <tr>
-                            <th class="text-left">Mata Pelajaran dengan Nilai Lengkap</th>
-                            <td class="text-center">{{ $jumlahMapel }} Mata Pelajaran</td>
-                        </tr>
-
-                        <tr>
-                            <th class="text-left">Mata Pelajaran Belum Lengkap</th>
-                            <td class="text-center">
-                                {{ $daftarMapelTersedia
-                                    ? $jumlahMapelBelumLengkap . ' Mata Pelajaran'
-                                    : 'Daftar wajib belum diatur' }}
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <th class="text-left">
-                                {{ $raporLengkap ? 'Rata-rata Nilai Akhir' : 'Rata-rata Sementara' }}
-                            </th>
-                            <td class="text-center">
-                                {{ $rataRataRapor !== null
-                                    ? number_format($rataRataRapor, 2, ',', '.')
-                                    : 'Belum tersedia' }}
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <th class="text-left">Status Kelengkapan Rapor</th>
-                            <td class="text-center">
-                                @if (!$daftarMapelTersedia)
-                                    Pemetaan mapel belum tersedia
-                                @elseif ($raporLengkap)
-                                    Lengkap
-                                @else
-                                    Belum Lengkap
-                                @endif
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <p class="mt-2 text-xs text-slate-500">
-                    Rata-rata dihitung dari nilai akhir mata pelajaran yang memiliki
-                    nilai harian, UTS, UAS, dan nilai akhir lengkap.
-                </p>
-            </div>
-
-            {{-- D. Kehadiran siswa --}}
-            <div class="mb-8">
-                <h3 class="section-heading uppercase">
-                    D. Kehadiran Siswa
-                </h3>
-
-                <table class="report-table summary-table">
-                    <thead>
-                        <tr>
-                            <th class="text-left">Keterangan</th>
-                            <th class="text-center">Jumlah Hari</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr>
-                            <td>Sakit</td>
-                            <td class="text-center">{{ $dataKehadiran->sakit ?? 0 }}</td>
-                        </tr>
-                        <tr>
-                            <td>Izin</td>
-                            <td class="text-center">{{ $dataKehadiran->izin ?? 0 }}</td>
-                        </tr>
-                        <tr>
-                            <td>Tanpa Keterangan</td>
-                            <td class="text-center">{{ $dataKehadiran->tanpa_keterangan ?? 0 }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                @if (!$dataKehadiran)
-                    <p class="mt-2 text-xs text-slate-500">
-                        Data kehadiran belum diinput oleh guru.
-                    </p>
-                @endif
-            </div>
-
-            {{-- E. Ekstrakurikuler --}}
-            <div class="mb-8">
-                <h3 class="section-heading uppercase">
-                    E. Ekstrakurikuler
-                </h3>
-
-                <table class="report-table">
-                    <thead>
-                        <tr>
-                            <th class="text-center">No.</th>
-                            <th class="text-left">Kegiatan Ekstrakurikuler</th>
-                            <th class="text-center">Predikat</th>
-                            <th class="text-left">Keterangan</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        @forelse ($daftarEkstrakurikuler as $index => $ekskul)
                             <tr>
-                                <td class="text-center">{{ $index + 1 }}</td>
-                                <td>{{ $ekskul->nama_ekstrakurikuler ?? '-' }}</td>
-                                <td class="text-center">{{ $ekskul->predikat ?? '-' }}</td>
-                                <td>{{ $ekskul->keterangan ?? '-' }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="text-center">
-                                    Belum ada data ekstrakurikuler untuk periode ini.
+                                <td>Sakit</td>
+
+                                <td class="text-center">
+                                    {{ $dataKehadiran->sakit ?? 0 }}
                                 </td>
                             </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
 
-            {{-- Tanda tangan: mengikuti Admin Rapor --}}
-            <div class="signature-section mt-12 grid grid-cols-2 gap-6">
+                            <tr>
+                                <td>Izin</td>
 
-                {{-- Kiri: Kepala Sekolah --}}
-                <div class="w-full text-center">
-                    <p>Mengetahui,</p>
-                    <p class="signature-role mt-1">Kepala Sekolah</p>
+                                <td class="text-center">
+                                    {{ $dataKehadiran->izin ?? 0 }}
+                                </td>
+                            </tr>
 
-                    <div style="height: 80px;"></div>
+                            <tr>
+                                <td>Tanpa Keterangan</td>
 
-                    <p class="signature-name">
-                        {{ $kepalaSekolah ?: 'Nama Kepala Sekolah' }}
-                    </p>
-                    <p>NIP. {{ $nipKepalaSekolah ?: '…………………' }}</p>
+                                <td class="text-center">
+                                    {{ $dataKehadiran->tanpa_keterangan ?? 0 }}
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                    @if (!$dataKehadiran)
+                        <p class="mt-2 text-sm text-slate-500">
+                            Data kehadiran belum diinput oleh Guru.
+                        </p>
+                    @endif
+
                 </div>
 
-                {{-- Kanan: Wali Kelas --}}
-                <div class="w-full text-center">
-                    <p>Bandung, {{ now()->translatedFormat('d F Y') }}</p>
 
-                    <p class="signature-role mt-1">
-                        Wali Kelas {{ $siswa->kelas ?? '-' }}
-                    </p>
+                {{-- E. EKSTRAKURIKULER --}}
+                <div class="mb-8">
 
-                    <div style="height: 80px;"></div>
+                    <h3 class="section-heading uppercase">
+                        E. Ekstrakurikuler
+                    </h3>
 
-                    <p class="signature-name">
-                        {{ $waliKelas ?: 'Wali Kelas Belum Ditentukan' }}
-                    </p>
-                    <p>NIP. {{ $nipWaliKelas ?: '…………………' }}</p>
+                    <table class="report-table">
+
+                        <thead>
+                            <tr>
+
+                                <th class="text-center">
+                                    No.
+                                </th>
+
+                                <th class="text-left">
+                                    Kegiatan Ekstrakurikuler
+                                </th>
+
+                                <th class="text-center">
+                                    Predikat
+                                </th>
+
+                                <th class="text-left">
+                                    Keterangan
+                                </th>
+
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @forelse ($daftarEkstrakurikuler as $index => $ekskul)
+
+                                <tr>
+
+                                    <td class="text-center">
+                                        {{ $index + 1 }}
+                                    </td>
+
+                                    <td>
+                                        {{ $ekskul->nama_ekstrakurikuler ?: '-' }}
+                                    </td>
+
+                                    <td class="text-center">
+                                        {{ $ekskul->predikat ?: '-' }}
+                                    </td>
+
+                                    <td>
+                                        {{ $ekskul->keterangan ?: '-' }}
+                                    </td>
+
+                                </tr>
+
+                            @empty
+
+                                <tr>
+                                    <td colspan="4" class="text-center">
+                                        Belum ada data ekstrakurikuler untuk periode ini.
+                                    </td>
+                                </tr>
+
+                            @endforelse
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                {{-- TANDA TANGAN --}}
+                <div class="signature-section mt-12 grid grid-cols-2 gap-6">
+
+                    {{-- KEPALA SEKOLAH --}}
+                    <div class="w-full text-center">
+
+                        <p>Mengetahui,</p>
+
+                        <p class="signature-role mt-1">
+                            Kepala Sekolah
+                        </p>
+
+                        <div style="height: 80px;"></div>
+
+                        <p class="signature-name">
+                            {{ $kepalaSekolah ?: 'Nama Kepala Sekolah' }}
+                        </p>
+
+                        <p>
+                            NIP. {{ $nipKepalaSekolah ?: '…………………' }}
+                        </p>
+
+                    </div>
+
+
+                    {{-- WALI KELAS --}}
+                    <div class="w-full text-center">
+
+                        <p>
+                            Bandung, {{ now()->translatedFormat('d F Y') }}
+                        </p>
+
+                        <p class="signature-role mt-1">
+                            Wali Kelas {{ $siswa->kelas ?? '-' }}
+                        </p>
+
+                        <div style="height: 80px;"></div>
+
+                        <p class="signature-name">
+                            {{ $waliKelas ?: 'Wali Kelas Belum Ditentukan' }}
+                        </p>
+
+                        <p>
+                            NIP. {{ $nipWaliKelas ?: '…………………' }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                {{-- FOOTER DOKUMEN --}}
+                <div class="mt-8 border-t border-slate-300 pt-4 text-center text-xs">
+                    Dokumen ini dibuat melalui Sistem Akademik Mini.
                 </div>
 
             </div>
 
-            {{-- Footer --}}
-            <div class="mt-8 border-t border-slate-300 pt-4 text-center text-xs">
-                Dokumen ini dibuat melalui Sistem Akademik Mini.
-            </div>
         </div>
+
     @endif
+
 </div>
+
 @endsection

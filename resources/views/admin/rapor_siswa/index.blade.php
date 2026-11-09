@@ -64,6 +64,7 @@
         justify-content: center;
         gap: 7px;
         padding: 11px 17px;
+        min-height: 44px;
         border-radius: 9px;
         background: #3478BD;
         color: white;
@@ -82,6 +83,7 @@
         align-items: center;
         justify-content: center;
         padding: 11px 17px;
+        min-height: 44px;
         border: 1px solid #D5E1ED;
         border-radius: 9px;
         background: #FFFFFF;
@@ -204,6 +206,7 @@
         justify-content: center;
         gap: 5px;
         padding: 8px 11px;
+        min-height: 44px;
         border-radius: 8px;
         font-size: 11px;
         font-weight: 800;
@@ -287,7 +290,7 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-height: 38px;
+        min-height: 44px;
         padding: 8px 14px;
         border: 1px solid #C8DCEE;
         border-radius: 8px;
@@ -1017,7 +1020,7 @@
                             <td class="whitespace-nowrap">
 
                                 @if($item->tgl_cetak)
-                                    {{ $item->tgl_cetak }}
+                                    {{ \Carbon\Carbon::parse($item->tgl_cetak)->translatedFormat('d F Y') }}
                                 @else
                                     <span class="rs-muted">-</span>
                                 @endif

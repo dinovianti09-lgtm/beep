@@ -1,3 +1,4 @@
+
 @extends('layouts.admin')
 
 @section('title', 'Data Nilai - Sistem Akademik Mini')
@@ -207,7 +208,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    min-height: 42px;
+    min-height: 44px;
     padding: 10px 16px;
     border: 1px solid transparent;
     border-radius: 9px;
@@ -422,7 +423,7 @@
     background: #EDF6FF;
 }
 
-/* NAMA SISWA TANPA AVATAR */
+/* NAMA SISWA */
 
 .nv-student-name {
     color: #304B69;
@@ -453,7 +454,7 @@
     color: #3F6691;
 }
 
-/* SEMESTER GANJIL DAN GENAP */
+/* SEMESTER */
 
 .nv-status {
     display: inline-flex;
@@ -468,7 +469,7 @@
     white-space: nowrap;
 }
 
-/* GANJIL - BIRU PASTEL */
+/* GANJIL */
 
 .nv-semester-ganjil {
     border-color: #C8DCEE;
@@ -476,7 +477,7 @@
     color: #3478BD;
 }
 
-/* GENAP - BIRU MEDIUM PASTEL */
+/* GENAP */
 
 .nv-semester-genap {
     border-color: #AFC7E2;
@@ -528,10 +529,12 @@
     color: #3478BD;
 }
 
+/* C = KUNING PASTEL */
+
 .nv-grade-c {
-    border-color: #BDE3E3;
-    background: #E8F7F6;
-    color: #287A78;
+    border-color: #F5DFA5;
+    background: #FFF7DF;
+    color: #A66B12;
 }
 
 .nv-grade-d {
@@ -605,8 +608,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 38px;
-    padding: 8px 14px;
+    min-height: 44px;
     border: 1px solid #C8DCEE;
     border-radius: 8px;
     background: #FFFFFF;
@@ -856,15 +858,13 @@
     color: #D4E5FC;
 }
 
-/* DARK SEMESTER GANJIL */
+/* DARK SEMESTER */
 
 .dark .nv-semester-ganjil {
     border-color: #405773;
     background: #263E59;
     color: #D5E5F8;
 }
-
-/* DARK SEMESTER GENAP */
 
 .dark .nv-semester-genap {
     border-color: #58799E;
@@ -894,10 +894,12 @@
     color: #D5E5F8;
 }
 
+/* C = KUNING PASTEL DARK MODE */
+
 .dark .nv-grade-c {
-    border-color: #376665;
-    background: #203E40;
-    color: #A9E1DC;
+    border-color: #80652F;
+    background: #493A20;
+    color: #FDE7A3;
 }
 
 .dark .nv-grade-d {
@@ -1024,41 +1026,26 @@
 </style>
 @endpush
 
-
 @section('content')
 
 <div class="nilai-page space-y-6">
 
     {{-- HEADER HALAMAN --}}
     <section class="nv-hero nv-enter">
-
         <div class="flex items-center gap-4 p-5 sm:p-7">
 
             <div class="nv-hero-icon">
-
-                <svg fill="none"
-                     stroke="currentColor"
-                     stroke-width="1.8"
-                     viewBox="0 0 24 24"
-                     aria-hidden="true">
-
-                    <path stroke-linecap="round"
-                          stroke-linejoin="round"
+                <svg fill="none" stroke="currentColor" stroke-width="1.8"
+                     viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round"
                           d="M4 19V5m0 14h16"/>
-
-                    <path stroke-linecap="round"
-                          stroke-linejoin="round"
+                    <path stroke-linecap="round" stroke-linejoin="round"
                           d="M8 16v-5m4 5V7m4 9v-8"/>
-
                 </svg>
-
             </div>
 
             <div class="min-w-0">
-
-                <p class="nv-hero-label mb-1">
-                    Akademik
-                </p>
+                <p class="nv-hero-label mb-1">Akademik</p>
 
                 <h2 class="nv-hero-title text-xl font-extrabold sm:text-2xl">
                     Data Nilai
@@ -1068,39 +1055,25 @@
                     Lihat dan pantau nilai akademik siswa berdasarkan kelas,
                     semester, dan mata pelajaran.
                 </p>
-
             </div>
 
         </div>
-
     </section>
-
 
     {{-- INFORMASI DATA NILAI --}}
     <section class="nv-panel nv-enter">
-
         <div class="nv-panel-body">
 
             <div class="flex flex-col sm:flex-row sm:items-start gap-4">
 
                 <div class="nv-info-icon">
-
-                    <svg fill="none"
-                         stroke="currentColor"
-                         stroke-width="1.8"
-                         viewBox="0 0 24 24"
-                         aria-hidden="true">
-
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
+                    <svg fill="none" stroke="currentColor" stroke-width="1.8"
+                         viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round"
                               d="M4 19V5m0 14h16"/>
-
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
+                        <path stroke-linecap="round" stroke-linejoin="round"
                               d="M8 16v-5m4 5V7m4 9v-8"/>
-
                     </svg>
-
                 </div>
 
                 <div class="min-w-0 flex-1">
@@ -1119,48 +1092,49 @@
                     <div class="mt-4 flex flex-wrap gap-2">
 
                         <span class="nv-chip nv-chip-green">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/>
+                            <svg width="14" height="14" fill="none"
+                                 stroke="currentColor" stroke-width="2"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="m5 12 4 4L19 6"/>
                             </svg>
                             Lihat Data Nilai
                         </span>
 
                         <span class="nv-chip nv-chip-blue">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/>
+                            <svg width="14" height="14" fill="none"
+                                 stroke="currentColor" stroke-width="2"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="m5 12 4 4L19 6"/>
                             </svg>
                             Filter Nilai
                         </span>
 
                         <span class="nv-chip nv-chip-teal">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/>
+                            <svg width="14" height="14" fill="none"
+                                 stroke="currentColor" stroke-width="2"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="m5 12 4 4L19 6"/>
                             </svg>
                             Pantau KKM
                         </span>
 
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </section>
-
 
     {{-- FILTER DATA NILAI --}}
     <section class="nv-panel nv-enter">
 
         <div class="nv-panel-header">
-
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 
                 <div>
-                    <h3 class="nv-panel-title">
-                        Filter Data Nilai
-                    </h3>
+                    <h3 class="nv-panel-title">Filter Data Nilai</h3>
 
                     <p class="nv-panel-description">
                         Pilih kelas, semester, dan mata pelajaran untuk melihat nilai tertentu.
@@ -1172,178 +1146,100 @@
                 </span>
 
             </div>
-
         </div>
-
 
         <div class="nv-panel-body">
 
-            <form
-                method="GET"
-                action="{{ route('admin.nilai.index') }}"
-                class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-end"
-            >
+            <form method="GET"
+                  action="{{ route('admin.nilai.index') }}"
+                  class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-end">
 
                 {{-- KELAS --}}
                 <div>
+                    <label for="filter-kelas" class="nv-label">Kelas</label>
 
-                    <label for="filter-kelas" class="nv-label">
-                        Kelas
-                    </label>
-
-                    <select
-                        id="filter-kelas"
-                        name="kelas"
-                        class="nv-select"
-                    >
-
-                        <option value="">
-                            Semua Kelas
-                        </option>
+                    <select id="filter-kelas" name="kelas" class="nv-select">
+                        <option value="">Semua Kelas</option>
 
                         @foreach($kelasList as $kelas)
-
-                            <option
-                                value="{{ $kelas->nama_kelas }}"
-                                {{ $kelasTerpilih == $kelas->nama_kelas ? 'selected' : '' }}
-                            >
+                            <option value="{{ $kelas->nama_kelas }}"
+                                {{ $kelasTerpilih == $kelas->nama_kelas ? 'selected' : '' }}>
                                 {{ $kelas->nama_kelas }}
                             </option>
-
                         @endforeach
-
                     </select>
-
                 </div>
-
 
                 {{-- SEMESTER --}}
                 <div>
+                    <label for="filter-semester" class="nv-label">Semester</label>
 
-                    <label for="filter-semester" class="nv-label">
-                        Semester
-                    </label>
+                    <select id="filter-semester" name="semester" class="nv-select">
+                        <option value="">Semua Semester</option>
 
-                    <select
-                        id="filter-semester"
-                        name="semester"
-                        class="nv-select"
-                    >
-
-                        <option value="">
-                            Semua Semester
-                        </option>
-
-                        <option
-                            value="1"
-                            {{ (string) $semesterTerpilih === '1' ? 'selected' : '' }}
-                        >
+                        <option value="1"
+                            {{ (string) $semesterTerpilih === '1' ? 'selected' : '' }}>
                             Semester 1 - Ganjil
                         </option>
 
-                        <option
-                            value="2"
-                            {{ (string) $semesterTerpilih === '2' ? 'selected' : '' }}
-                        >
+                        <option value="2"
+                            {{ (string) $semesterTerpilih === '2' ? 'selected' : '' }}>
                             Semester 2 - Genap
                         </option>
-
                     </select>
-
                 </div>
-
 
                 {{-- MATA PELAJARAN --}}
                 <div>
+                    <label for="filter-mapel" class="nv-label">Mata Pelajaran</label>
 
-                    <label for="filter-mapel" class="nv-label">
-                        Mata Pelajaran
-                    </label>
-
-                    <select
-                        id="filter-mapel"
-                        name="mapel"
-                        class="nv-select"
-                    >
-
-                        <option value="">
-                            Semua Mata Pelajaran
-                        </option>
+                    <select id="filter-mapel" name="mapel" class="nv-select">
+                        <option value="">Semua Mata Pelajaran</option>
 
                         @foreach($mapelList as $mapel)
-
-                            <option
-                                value="{{ $mapel->id_mapel }}"
-                                {{ (string) $mapelTerpilih === (string) $mapel->id_mapel ? 'selected' : '' }}
-                            >
+                            <option value="{{ $mapel->id_mapel }}"
+                                {{ (string) $mapelTerpilih === (string) $mapel->id_mapel ? 'selected' : '' }}>
                                 {{ $mapel->nama_mapel }}
                             </option>
-
                         @endforeach
-
                     </select>
-
                 </div>
-
 
                 {{-- TOMBOL FILTER --}}
                 <div class="nv-filter-actions flex gap-2">
 
-                    <button
-                        type="submit"
-                        class="nv-button nv-button-primary flex-1"
-                    >
-
-                        <svg fill="none"
-                             stroke="currentColor"
-                             stroke-width="2"
-                             viewBox="0 0 24 24"
-                             aria-hidden="true">
-
+                    <button type="submit"
+                            class="nv-button nv-button-primary flex-1">
+                        <svg fill="none" stroke="currentColor" stroke-width="2"
+                             viewBox="0 0 24 24" aria-hidden="true">
                             <circle cx="11" cy="11" r="7"/>
-
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
+                            <path stroke-linecap="round" stroke-linejoin="round"
                                   d="m16 16 4 4"/>
-
                         </svg>
-
                         Tampilkan
-
                     </button>
 
                     @if($kelasTerpilih || $semesterTerpilih || $mapelTerpilih)
-
-                        <a
-                            href="{{ route('admin.nilai.index') }}"
-                            class="nv-button nv-button-secondary"
-                        >
+                        <a href="{{ route('admin.nilai.index') }}"
+                           class="nv-button nv-button-secondary">
                             Reset
                         </a>
-
                     @endif
 
                 </div>
 
             </form>
-
         </div>
-
     </section>
-
 
     {{-- INFORMASI FILTER AKTIF --}}
     <section class="nv-panel">
-
         <div class="nv-panel-body">
 
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
                 <div class="min-w-0">
-
-                    <h3 class="nv-panel-title">
-                        Daftar Nilai
-                    </h3>
+                    <h3 class="nv-panel-title">Daftar Nilai</h3>
 
                     <p class="nv-panel-description mt-2">
 
@@ -1362,7 +1258,6 @@
                         @endif
 
                         @if($mapelTerpilih)
-
                             @php
                                 $mapelDipilih = $mapelList->firstWhere(
                                     'id_mapel',
@@ -1371,11 +1266,9 @@
                             @endphp
 
                             • {{ $mapelDipilih->nama_mapel ?? 'Mata Pelajaran' }}
-
                         @endif
 
                     </p>
-
                 </div>
 
                 <span class="nv-count">
@@ -1383,15 +1276,11 @@
                 </span>
 
             </div>
-
         </div>
-
     </section>
-
 
     {{-- KETERANGAN STATUS NILAI --}}
     <section class="nv-panel">
-
         <div class="nv-panel-body">
 
             <h3 class="nv-panel-title mb-4">
@@ -1421,27 +1310,19 @@
                 </span>
 
             </div>
-
         </div>
-
     </section>
-
 
     {{-- TABEL DATA NILAI --}}
     <section class="nv-table-shell">
 
         <div class="nv-panel-header">
-
-            <h3 class="nv-panel-title">
-                Data Nilai Siswa
-            </h3>
+            <h3 class="nv-panel-title">Data Nilai Siswa</h3>
 
             <p class="nv-panel-description">
                 Admin hanya memiliki akses untuk melihat dan memantau data nilai.
             </p>
-
         </div>
-
 
         <div class="nv-table-scroll">
 
@@ -1465,7 +1346,6 @@
                     </tr>
                 </thead>
 
-
                 <tbody>
 
                     @forelse($nilaiList as $index => $nilai)
@@ -1484,7 +1364,6 @@
                                 </span>
                             </td>
 
-
                             {{-- NIS --}}
                             <td>
                                 <span class="whitespace-nowrap font-semibold">
@@ -1492,14 +1371,12 @@
                                 </span>
                             </td>
 
-
-                            {{-- NAMA SISWA TANPA HURUF INISIAL --}}
+                            {{-- NAMA SISWA --}}
                             <td>
                                 <span class="nv-student-name">
                                     {{ $nilai->siswa->nama_siswa ?? '-' }}
                                 </span>
                             </td>
-
 
                             {{-- KELAS --}}
                             <td>
@@ -1508,7 +1385,6 @@
                                 </span>
                             </td>
 
-
                             {{-- MATA PELAJARAN --}}
                             <td>
                                 <span class="nv-data-chip nv-mapel-chip">
@@ -1516,30 +1392,20 @@
                                 </span>
                             </td>
 
-
                             {{-- SEMESTER --}}
                             <td class="text-center">
-
                                 @if($nilai->semester == 1)
-
                                     <span class="nv-status nv-semester-ganjil">
                                         Ganjil
                                     </span>
-
                                 @elseif($nilai->semester == 2)
-
                                     <span class="nv-status nv-semester-genap">
                                         Genap
                                     </span>
-
                                 @else
-
                                     <span class="nv-muted">-</span>
-
                                 @endif
-
                             </td>
-
 
                             {{-- NILAI HARIAN --}}
                             <td class="text-center">
@@ -1548,14 +1414,12 @@
                                 </span>
                             </td>
 
-
                             {{-- NILAI UTS --}}
                             <td class="text-center">
                                 <span class="whitespace-nowrap font-semibold">
                                     {{ is_numeric($nilai->nilai_uts) ? number_format((float) $nilai->nilai_uts, 2) : '-' }}
                                 </span>
                             </td>
-
 
                             {{-- NILAI UAS --}}
                             <td class="text-center">
@@ -1564,102 +1428,64 @@
                                 </span>
                             </td>
 
-
                             {{-- NILAI AKHIR --}}
                             <td class="text-center">
-
                                 @if($nilaiAkhirTersedia)
-
                                     <span class="nv-final-score">
                                         {{ number_format((float) $nilai->nilai_akhir, 2) }}
                                     </span>
-
                                 @else
-
                                     <span class="nv-muted">-</span>
-
                                 @endif
-
                             </td>
-
 
                             {{-- KKM --}}
                             <td class="text-center">
-
                                 @if($kkmTersedia)
-
                                     <span class="whitespace-nowrap font-semibold">
                                         {{ number_format((float) $nilai->mapel->kkm, 0) }}
                                     </span>
-
                                 @else
-
                                     <span class="nv-muted whitespace-nowrap">
                                         Belum diatur
                                     </span>
-
                                 @endif
-
                             </td>
-
 
                             {{-- PREDIKAT --}}
                             <td class="text-center">
-
                                 @if($nilai->predikat === 'A')
-
                                     <span class="nv-grade nv-grade-a">A</span>
-
                                 @elseif($nilai->predikat === 'B')
-
                                     <span class="nv-grade nv-grade-b">B</span>
-
                                 @elseif($nilai->predikat === 'C')
-
                                     <span class="nv-grade nv-grade-c">C</span>
-
                                 @elseif($nilai->predikat === 'D')
-
                                     <span class="nv-grade nv-grade-d">D</span>
-
                                 @else
-
                                     <span class="nv-muted">-</span>
-
                                 @endif
-
                             </td>
-
 
                             {{-- STATUS --}}
                             <td class="text-center">
-
                                 @if(!$nilaiAkhirTersedia)
-
                                     <span class="nv-status nv-status-muted">
                                         Belum dinilai
                                     </span>
-
                                 @elseif(!$kkmTersedia)
-
                                     <span class="nv-status nv-status-info">
                                         KKM belum diatur
                                     </span>
-
                                 @elseif((float) $nilai->nilai_akhir >= (float) $nilai->mapel->kkm)
-
                                     <span class="nv-status nv-status-success">
                                         Tuntas
                                     </span>
-
                                 @else
-
                                     <span class="nv-status nv-status-danger">
                                         Remedial
                                     </span>
-
                                 @endif
-
                             </td>
 
                         </tr>
@@ -1667,29 +1493,20 @@
                     @empty
 
                         <tr>
-
                             <td colspan="13">
-
                                 <div class="nv-empty">
 
                                     <div class="nv-empty-icon">
-
-                                        <svg fill="none"
-                                             stroke="currentColor"
-                                             stroke-width="1.6"
-                                             viewBox="0 0 24 24"
+                                        <svg fill="none" stroke="currentColor"
+                                             stroke-width="1.6" viewBox="0 0 24 24"
                                              aria-hidden="true">
-
                                             <path stroke-linecap="round"
                                                   stroke-linejoin="round"
                                                   d="M4 19V5m0 14h16"/>
-
                                             <path stroke-linecap="round"
                                                   stroke-linejoin="round"
                                                   d="M8 16v-5m4 5V7m4 9v-8"/>
-
                                         </svg>
-
                                     </div>
 
                                     <h4 class="nv-panel-title">
@@ -1701,86 +1518,62 @@
                                     </p>
 
                                 </div>
-
                             </td>
-
                         </tr>
 
                     @endforelse
 
                 </tbody>
-
             </table>
-
         </div>
-
     </section>
 
-
-    {{-- PAGINATION: TOMBOL SAJA --}}
+    {{-- PAGINATION --}}
     @if($nilaiList->hasPages())
 
         <section class="nv-panel">
-
             <div class="nv-panel-body">
 
-                <nav class="nv-pagination" aria-label="Navigasi halaman data nilai">
+                <nav class="nv-pagination"
+                     aria-label="Navigasi halaman data nilai">
 
                     {{-- SEBELUMNYA --}}
                     @if($nilaiList->onFirstPage())
-
                         <span class="nv-page-link nv-page-link-disabled">
                             ← Sebelumnya
                         </span>
-
                     @else
-
-                        <a
-                            href="{{ request()->fullUrlWithQuery(['page' => $nilaiList->currentPage() - 1]) }}"
-                            class="nv-page-link"
-                        >
+                        <a href="{{ request()->fullUrlWithQuery(['page' => $nilaiList->currentPage() - 1]) }}"
+                           class="nv-page-link">
                             ← Sebelumnya
                         </a>
-
                     @endif
-
 
                     {{-- SELANJUTNYA --}}
                     @if($nilaiList->hasMorePages())
-
-                        <a
-                            href="{{ request()->fullUrlWithQuery(['page' => $nilaiList->currentPage() + 1]) }}"
-                            class="nv-page-link"
-                        >
+                        <a href="{{ request()->fullUrlWithQuery(['page' => $nilaiList->currentPage() + 1]) }}"
+                           class="nv-page-link">
                             Selanjutnya →
                         </a>
-
                     @else
-
                         <span class="nv-page-link nv-page-link-disabled">
                             Selanjutnya →
                         </span>
-
                     @endif
 
                 </nav>
-
             </div>
-
         </section>
 
     @endif
 
-
     {{-- FOOTER --}}
     <footer class="pt-2 pb-3 text-center">
-
         <div class="nv-footer-line"></div>
 
         <p class="nv-footer">
             © {{ date('Y') }} Sistem Akademik Mini
         </p>
-
     </footer>
 
 </div>

@@ -1,40 +1,403 @@
-
 @extends('layouts.guru')
 
-@section('content')
-<div class="space-y-6">
+@section('title', 'Pengaturan Bobot Nilai - Sistem Akademik')
+@section('page-title', 'Pengaturan Bobot Nilai')
+@section('page-subtitle', 'Atur persentase nilai Harian, UTS, dan UAS')
 
-    {{-- Header --}}
-    <div class="flex items-center gap-3">
-        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m12 12a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-            </svg>
+@push('styles')
+<style>
+.bobot-page {
+    --bobot-text: #26374A;
+    --bobot-muted: #647991;
+    --bobot-border: #D8E3EE;
+}
+
+.bobot-page .bobot-page-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 22px 24px;
+    border: 1px solid #C8DCEE;
+    border-radius: 16px;
+    background: linear-gradient(120deg, #E3F0FA 0%, #F3F8FD 100%);
+    box-shadow: 0 3px 10px rgba(39,77,119,.045);
+}
+
+.bobot-page .bobot-page-header .bobot-icon {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #C8DCEE;
+    border-radius: 13px;
+    background: #FFFFFF;
+    color: #416D99;
+}
+
+.bobot-page .bobot-page-header h1 {
+    color: #294D70;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.bobot-page .bobot-page-header p {
+    color: #607A94;
+}
+
+.bobot-page .bobot-card {
+    overflow: hidden;
+    border: 1px solid #D8E3EE;
+    border-radius: 16px;
+    background: #FFFFFF;
+    box-shadow: 0 3px 10px rgba(39,77,119,.045);
+}
+
+.bobot-page .bobot-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 20px;
+    border-bottom: 1px solid #E5ECF3;
+}
+
+.bobot-page .bobot-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border: 1px solid #D5E5F3;
+    border-radius: 11px;
+    background: #EAF3FB;
+    color: #416D99;
+}
+
+.bobot-page .bobot-heading {
+    color: #26374A;
+    font-weight: 800;
+}
+
+.bobot-page .bobot-muted {
+    color: #647991;
+}
+
+.bobot-page .bobot-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #344B63;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.bobot-page .bobot-control {
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 14px;
+    border: 1px solid #D5E1ED;
+    border-radius: 11px;
+    background: #F9FBFD;
+    color: #30445B;
+    font-size: 14px;
+    outline: none;
+    transition: .2s ease;
+}
+
+.bobot-page .bobot-control:focus {
+    border-color: #6B9FD1;
+    background: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(73,137,198,.12);
+}
+
+.bobot-page .bobot-weight-card {
+    padding: 17px;
+    border: 1px solid #D8E3EE;
+    border-radius: 13px;
+    background: #F8FAFD;
+    transition: .2s ease;
+}
+
+.bobot-page .bobot-weight-card:hover {
+    border-color: #A9C8E5;
+}
+
+.bobot-page .bobot-number-wrap {
+    position: relative;
+}
+
+.bobot-page .bobot-number {
+    width: 100%;
+    min-height: 48px;
+    padding: 11px 42px 11px 14px;
+    border: 1px solid #D5E1ED;
+    border-radius: 11px;
+    background: #FFFFFF;
+    color: #26374A;
+    font-size: 19px;
+    font-weight: 800;
+    outline: none;
+    transition: .2s ease;
+}
+
+.bobot-page .bobot-number:focus {
+    border-color: #6B9FD1;
+    box-shadow: 0 0 0 3px rgba(73,137,198,.12);
+}
+
+.bobot-page .bobot-percent {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    color: #647991;
+    font-weight: 700;
+}
+
+.bobot-page .bobot-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 45px;
+    padding: 11px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    transition: .2s ease;
+}
+
+.bobot-page .bobot-btn:hover {
+    transform: translateY(-1px);
+}
+
+.bobot-page .bobot-btn-primary {
+    background: #397DBB;
+    color: #FFFFFF;
+}
+
+.bobot-page .bobot-btn-primary:hover {
+    background: #286AA8;
+}
+
+.bobot-page .bobot-btn-primary:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.bobot-page .bobot-btn-outline {
+    border: 1px solid #D5E1ED;
+    background: #FFFFFF;
+    color: #50647B;
+}
+
+.bobot-page .bobot-btn-outline:hover {
+    background: #F1F6FB;
+}
+
+.bobot-page .bobot-info {
+    border: 1px solid #C9DFF1;
+    border-radius: 12px;
+    background: #EDF6FD;
+    padding: 16px;
+    color: #315C82;
+}
+
+.bobot-page .bobot-total {
+    font-weight: 800;
+}
+
+.bobot-page .bobot-status {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* DARK MODE */
+:is(html.dark, body.dark, html.dark-mode, body.dark-mode,
+html[data-theme="dark"], body[data-theme="dark"],
+html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+.dark, .dark-mode, [data-theme="dark"]) .bobot-page .bobot-page-header {
+    background: linear-gradient(120deg, #1D3149 0%, #223A55 100%) !important;
+    border-color: #405B78 !important;
+}
+
+:is(html.dark, body.dark, html.dark-mode, body.dark-mode,
+html[data-theme="dark"], body[data-theme="dark"],
+html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+.dark, .dark-mode, [data-theme="dark"]) .bobot-page .bobot-page-header h1 {
+    color: #F1F6FC !important;
+}
+
+:is(html.dark, body.dark, html.dark-mode, body.dark-mode,
+html[data-theme="dark"], body[data-theme="dark"],
+html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+.dark, .dark-mode, [data-theme="dark"]) .bobot-page .bobot-page-header p {
+    color: #C0D2E5 !important;
+}
+
+:is(html.dark, body.dark, html.dark-mode, body.dark-mode,
+html[data-theme="dark"], body[data-theme="dark"],
+html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+.dark, .dark-mode, [data-theme="dark"]) .bobot-page .bobot-card {
+    background: #192438 !important;
+    border-color: #34465F !important;
+}
+
+:is(html.dark, body.dark, html.dark-mode, body.dark-mode,
+html[data-theme="dark"], body[data-theme="dark"],
+html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+.dark, .dark-mode, [data-theme="dark"]) .bobot-page .bobot-card-header {
+    border-color: #34465F !important;
+}
+
+:is(html.dark, body.dark, html.dark-mode, body.dark-mode,
+html[data-theme="dark"], body[data-theme="dark"],
+html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+.dark, .dark-mode, [data-theme="dark"]) .bobot-page .bobot-heading {
+    color: #F1F6FC !important;
+}
+
+:is(html.dark, body.dark, html.dark-mode, body.dark-mode,
+html[data-theme="dark"], body[data-theme="dark"],
+html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+.dark, .dark-mode, [data-theme="dark"]) .bobot-page .bobot-muted {
+    color: #AFC0D4 !important;
+}
+
+:is(html.dark, body.dark, html.dark-mode, body.dark-mode,
+html[data-theme="dark"], body[data-theme="dark"],
+html[data-theme="dark"], body[data-theme="dark"],
+html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+.dark, .dark-mode, [data-theme="dark"]) .bobot-page .bobot-icon {
+    background: #263E59 !important;
+    border-color: #405B78 !important;
+    color: #D8E9FC !important;
+}
+
+:is(html.dark, body.dark, html.dark-mode, body.dark-mode,
+html[data-theme="dark"], body[data-theme="dark"],
+html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+.dark, .dark-mode, [data-theme="dark"]) .bobot-page .bobot-label {
+    color: #DCE7F4 !important;
+}
+
+:is(html.dark, body.dark, html.dark-mode, body.dark-mode,
+html[data-theme="dark"], body[data-theme="dark"],
+html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+.dark, .dark-mode, [data-theme="dark"]) .bobot-page .bobot-control {
+    background: #111D30 !important;
+    border-color: #40516A !important;
+    color: #E1EAF5 !important;
+}
+
+:is(html.dark, body.dark, html.dark-mode, body.dark-mode,
+html[data-theme="dark"], body[data-theme="dark"],
+html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+.dark, .dark-mode, [data-theme="dark"]) .bobot-page .bobot-weight-card {
+    background: #202D41 !important;
+    border-color: #40516A !important;
+}
+
+:is(html.dark, body.dark, html.dark-mode, body.dark-mode,
+html[data-theme="dark"], body[data-theme="dark"],
+html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+.dark, .dark-mode, [data-theme="dark"]) .bobot-page .bobot-number {
+    background: #111D30 !important;
+    border-color: #40516A !important;
+    color: #F1F6FC !important;
+}
+
+:is(html.dark, body.dark, html.dark-mode, body.dark-mode,
+html[data-theme="dark"], body[data-theme="dark"],
+html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+.dark, .dark-mode, [data-theme="dark"]) .bobot-page .bobot-percent {
+    color: #AFC0D4 !important;
+}
+
+:is(html.dark, body.dark, html.dark-mode, body.dark-mode,
+html[data-theme="dark"], body[data-theme="dark"],
+html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+.dark, .dark-mode, [data-theme="dark"]) .bobot-page .bobot-btn-outline {
+    background: #202D41 !important;
+    border-color: #40516A !important;
+    color: #E1EAF5 !important;
+}
+
+:is(html.dark, body.dark, html.dark-mode, body.dark-mode,
+html[data-theme="dark"], body[data-theme="dark"],
+html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+.dark, .dark-mode, [data-theme="dark"]) .bobot-page .bobot-info {
+    background: #1C3550 !important;
+    border-color: #365B7D !important;
+    color: #D5E9FC !important;
+}
+
+/* RESPONSIVE */
+@media(max-width:640px) {
+    .bobot-page .bobot-page-header {
+        padding: 17px;
+        gap: 12px;
+    }
+
+    .bobot-page .bobot-page-header .bobot-icon {
+        width: 44px;
+        height: 44px;
+    }
+
+    .bobot-page .bobot-page-header h1 {
+        font-size: 18px;
+    }
+
+    .bobot-page .bobot-card-header {
+        padding: 16px;
+    }
+
+    .bobot-page .bobot-btn {
+        width: 100%;
+    }
+
+    .bobot-page .bobot-weight-card {
+        padding: 15px;
+    }
+}
+</style>
+@endpush
+
+@section('content')
+<div class="bobot-page space-y-6">
+
+    {{-- HEADER --}}
+    <div class="bobot-page-header">
+        <div class="bobot-icon">
+            <i data-lucide="sliders-horizontal" class="h-6 w-6"></i>
         </div>
-        <div>
-            <h1 class="text-2xl font-bold tracking-tight text-gray-800 dark:text-white">
-                Pengaturan Bobot Nilai
-            </h1>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+
+        <div class="min-w-0">
+            <h1>Pengaturan Bobot Nilai</h1>
+            <p class="mt-1 text-sm">
                 Atur persentase nilai Harian, UTS, dan UAS untuk setiap periode rapor.
             </p>
         </div>
     </div>
 
-    {{-- Notifikasi berhasil --}}
+    {{-- NOTIFIKASI --}}
     @if (session('success'))
         <div class="flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800 dark:border-green-800/60 dark:bg-green-950/40 dark:text-green-300">
-            <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
+            <i data-lucide="circle-check" class="mt-0.5 h-5 w-5 shrink-0"></i>
             <p>{{ session('success') }}</p>
         </div>
     @endif
 
-    {{-- Error validasi --}}
+    {{-- ERROR --}}
     @if ($errors->any())
         <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-800/60 dark:bg-red-950/40 dark:text-red-300">
-            <p class="font-semibold">Periksa kembali pengaturan:</p>
+            <div class="flex items-center gap-2 font-semibold">
+                <i data-lucide="alert-circle" class="h-5 w-5"></i>
+                Periksa kembali pengaturan:
+            </div>
+
             <ul class="mt-2 list-inside list-disc space-y-1">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -43,24 +406,25 @@
         </div>
     @endif
 
-    {{-- Informasi mata pelajaran --}}
-    <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    {{-- INFORMASI MAPEL --}}
+    <div class="bobot-card p-5">
         <div class="flex items-start gap-4">
-            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.253" />
-                </svg>
+            <div class="bobot-icon">
+                <i data-lucide="book-open" class="h-6 w-6"></i>
             </div>
+
             <div class="min-w-0 flex-1">
-                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                <p class="bobot-muted text-sm font-medium">
                     Mata Pelajaran yang Diampu
                 </p>
-                <h2 class="mt-1 break-words text-xl font-bold text-gray-800 dark:text-white">
+
+                <h2 class="bobot-heading mt-1 break-words text-xl font-extrabold">
                     {{ $mapel->nama_mapel }}
                 </h2>
-                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+
+                <p class="bobot-muted mt-2 text-sm">
                     Guru:
-                    <span class="font-medium text-gray-700 dark:text-gray-300">
+                    <span class="bobot-heading font-semibold">
                         {{ $guru->nama_guru }}
                     </span>
                 </p>
@@ -68,61 +432,100 @@
         </div>
     </div>
 
-    {{-- Pilih periode rapor --}}
-    <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-        <div class="mb-4 flex items-center gap-3">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 011 1v14H4V6a1 1 0 011-1z" />
-                </svg>
+    {{-- PILIH PERIODE RAPOR --}}
+    <div class="bobot-card">
+        <div class="bobot-card-header">
+            <div class="bobot-icon">
+                <i data-lucide="calendar-days" class="h-5 w-5"></i>
             </div>
+
             <div>
-                <h2 class="font-semibold text-gray-800 dark:text-white">
-                    Pilih Periode Rapor
+                <h2 class="bobot-heading font-extrabold">
+                    Pilih Periode Bobot Nilai
                 </h2>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Tentukan semester dan tahun ajaran yang ingin diatur.
+                <p class="bobot-muted mt-1 text-sm">
+                    Pilih semester dan tahun ajaran yang ingin diatur.
                 </p>
             </div>
         </div>
 
-        @if ($raporList->isEmpty())
-            <div class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-800/60 dark:bg-amber-950/30 dark:text-amber-300">
-                Belum ada periode rapor. Tambahkan periode rapor terlebih dahulu.
-            </div>
-        @else
-            <form method="GET" action="{{ route('guru.bobot-nilai.index') }}" class="flex flex-col gap-4 sm:flex-row sm:items-end">
-                <div class="min-w-0 flex-1">
-                    <label for="id_rapor" class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                        Semester / Tahun Ajaran
-                    </label>
-
-                    <select name="id_rapor" id="id_rapor" required
-                            class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-800 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-                        @foreach ($raporList as $raporItem)
-                            <option value="{{ $raporItem->id_rapor }}"
-                                @selected(
-                                    $raporTerpilih &&
-                                    (int) $raporTerpilih->id_rapor === (int) $raporItem->id_rapor
-                                )>
-                                Semester {{ $raporItem->semester }} — {{ $raporItem->tahun_ajaran }}
-                            </option>
-                        @endforeach
-                    </select>
+        <div class="p-5">
+            @if ($raporList->isEmpty())
+                <div class="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-800/60 dark:bg-amber-950/30 dark:text-amber-300">
+                    <i data-lucide="info" class="mt-0.5 h-5 w-5 shrink-0"></i>
+                    <p>Belum ada periode rapor. Tambahkan periode rapor terlebih dahulu.</p>
                 </div>
+            @else
 
-                <button type="submit"
-                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7l7 7-7 7" />
-                    </svg>
-                    Pilih Periode
-                </button>
-            </form>
-        @endif
+                @php
+                    $periodeAwal = $raporTerpilih ?? $raporList->first();
+                    $semesterAwal = ucfirst(strtolower($periodeAwal->semester ?? 'Ganjil'));
+                @endphp
+
+                <form method="GET"
+                      action="{{ route('guru.bobot-nilai.index') }}"
+                      id="form-pilih-periode"
+                      class="space-y-5">
+
+                    {{-- DROPDOWN SEMESTER --}}
+                    <div>
+                        <label for="pilih_semester" class="bobot-label">
+                            Pilih Semester
+                        </label>
+
+                        <select id="pilih_semester"
+                                class="bobot-control">
+
+                            <option value="Ganjil"
+                                {{ $semesterAwal === 'Ganjil' ? 'selected' : '' }}>
+                                Semester Ganjil
+                            </option>
+
+                            <option value="Genap"
+                                {{ $semesterAwal === 'Genap' ? 'selected' : '' }}>
+                                Semester Genap
+                            </option>
+                        </select>
+                    </div>
+
+                    {{-- DROPDOWN TAHUN AJARAN --}}
+                    <div>
+                        <label for="id_rapor" class="bobot-label">
+                            Pilih Tahun Ajaran
+                        </label>
+
+                        <select name="id_rapor"
+                                id="id_rapor"
+                                required
+                                class="bobot-control">
+
+                            @foreach ($raporList as $raporItem)
+                                <option value="{{ $raporItem->id_rapor }}"
+                                        data-semester="{{ ucfirst(strtolower($raporItem->semester)) }}"
+                                        @selected(
+                                            $raporTerpilih &&
+                                            (int) $raporTerpilih->id_rapor === (int) $raporItem->id_rapor
+                                        )>
+                                    {{ $raporItem->tahun_ajaran }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <p class="bobot-muted mt-2 text-xs">
+                            Tahun ajaran akan menyesuaikan semester yang dipilih.
+                        </p>
+                    </div>
+
+                    <button type="submit" class="bobot-btn bobot-btn-primary">
+                        <i data-lucide="arrow-right" class="h-4 w-4"></i>
+                        Tampilkan Bobot
+                    </button>
+                </form>
+            @endif
+        </div>
     </div>
 
-    {{-- Form bobot nilai --}}
+    {{-- FORM BOBOT NILAI --}}
     @if ($raporTerpilih)
         @php
             $harian = old('bobot_harian', $bobot->bobot_harian ?? 30);
@@ -130,141 +533,169 @@
             $uas = old('bobot_uas', $bobot->bobot_uas ?? 40);
         @endphp
 
-        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <div class="bobot-card">
 
-            <div class="border-b border-gray-200 p-5 dark:border-gray-700">
-                <h2 class="text-lg font-bold text-gray-800 dark:text-white">
-                    Bobot Penilaian
-                </h2>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Periode: Semester {{ $raporTerpilih->semester }} — {{ $raporTerpilih->tahun_ajaran }}
-                </p>
+            <div class="bobot-card-header">
+                <div class="bobot-icon">
+                    <i data-lucide="chart-no-axes-combined" class="h-5 w-5"></i>
+                </div>
+
+                <div>
+                    <h2 class="bobot-heading text-lg font-extrabold">
+                        Bobot Penilaian
+                    </h2>
+                    <p class="bobot-muted mt-1 text-sm">
+                        Semester {{ $raporTerpilih->semester }}
+                        — {{ $raporTerpilih->tahun_ajaran }}
+                    </p>
+                </div>
             </div>
 
             <div class="p-5">
                 <form method="POST" action="{{ route('guru.bobot-nilai.update') }}">
                     @csrf
 
-                    <input type="hidden" name="id_rapor" value="{{ $raporTerpilih->id_rapor }}">
+                    <input type="hidden"
+                           name="id_rapor"
+                           value="{{ $raporTerpilih->id_rapor }}">
 
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 
-                        {{-- Nilai Harian --}}
-                        <div class="rounded-xl border border-gray-200 p-4 transition hover:border-blue-300 dark:border-gray-700 dark:hover:border-blue-500">
+                        {{-- HARIAN --}}
+                        <div class="bobot-weight-card">
                             <div class="mb-4 flex items-center gap-3">
-                                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
-                                    </svg>
+                                <div class="bobot-icon">
+                                    <i data-lucide="clipboard-list" class="h-5 w-5"></i>
                                 </div>
+
                                 <div>
-                                    <label for="bobot_harian" class="block font-semibold text-gray-800 dark:text-white">
+                                    <label for="bobot_harian" class="bobot-heading block font-bold">
                                         Nilai Harian
                                     </label>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    <p class="bobot-muted text-xs">
                                         Tugas dan penilaian harian
                                     </p>
                                 </div>
                             </div>
 
-                            <div class="relative">
-                                <input type="number" id="bobot_harian" name="bobot_harian" min="0" max="100" step="1" required value="{{ $harian }}"
-                                       class="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 pr-12 text-lg font-bold text-gray-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:bg-gray-700">
-                                <span class="absolute right-4 top-1/2 -translate-y-1/2 font-semibold text-gray-500 dark:text-gray-400">%</span>
+                            <div class="bobot-number-wrap">
+                                <input type="number"
+                                       id="bobot_harian"
+                                       name="bobot_harian"
+                                       min="0"
+                                       max="100"
+                                       step="1"
+                                       required
+                                       value="{{ $harian }}"
+                                       class="bobot-number">
+
+                                <span class="bobot-percent">%</span>
                             </div>
                         </div>
 
-                        {{-- Nilai UTS --}}
-                        <div class="rounded-xl border border-gray-200 p-4 transition hover:border-blue-300 dark:border-gray-700 dark:hover:border-blue-500">
+                        {{-- UTS --}}
+                        <div class="bobot-weight-card">
                             <div class="mb-4 flex items-center gap-3">
-                                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5h6m-7 4h8m-9 4h10m-9 4h8M6 3h12a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2z" />
-                                    </svg>
+                                <div class="bobot-icon">
+                                    <i data-lucide="file-pen-line" class="h-5 w-5"></i>
                                 </div>
+
                                 <div>
-                                    <label for="bobot_uts" class="block font-semibold text-gray-800 dark:text-white">
+                                    <label for="bobot_uts" class="bobot-heading block font-bold">
                                         Nilai UTS
                                     </label>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    <p class="bobot-muted text-xs">
                                         Ujian tengah semester
                                     </p>
                                 </div>
                             </div>
 
-                            <div class="relative">
-                                <input type="number" id="bobot_uts" name="bobot_uts" min="0" max="100" step="1" required value="{{ $uts }}"
-                                       class="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 pr-12 text-lg font-bold text-gray-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:bg-gray-700">
-                                <span class="absolute right-4 top-1/2 -translate-y-1/2 font-semibold text-gray-500 dark:text-gray-400">%</span>
+                            <div class="bobot-number-wrap">
+                                <input type="number"
+                                       id="bobot_uts"
+                                       name="bobot_uts"
+                                       min="0"
+                                       max="100"
+                                       step="1"
+                                       required
+                                       value="{{ $uts }}"
+                                       class="bobot-number">
+
+                                <span class="bobot-percent">%</span>
                             </div>
                         </div>
 
-                        {{-- Nilai UAS --}}
-                        <div class="rounded-xl border border-gray-200 p-4 transition hover:border-blue-300 dark:border-gray-700 dark:hover:border-blue-500">
+                        {{-- UAS --}}
+                        <div class="bobot-weight-card">
                             <div class="mb-4 flex items-center gap-3">
-                                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5-3.5A12 12 0 0112 3a12 12 0 01-8 3.5V12a12 12 0 008 9 12 12 0 008-9V7.5z" />
-                                    </svg>
+                                <div class="bobot-icon">
+                                    <i data-lucide="graduation-cap" class="h-5 w-5"></i>
                                 </div>
+
                                 <div>
-                                    <label for="bobot_uas" class="block font-semibold text-gray-800 dark:text-white">
+                                    <label for="bobot_uas" class="bobot-heading block font-bold">
                                         Nilai UAS
                                     </label>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    <p class="bobot-muted text-xs">
                                         Ujian akhir semester
                                     </p>
                                 </div>
                             </div>
 
-                            <div class="relative">
-                                <input type="number" id="bobot_uas" name="bobot_uas" min="0" max="100" step="1" required value="{{ $uas }}"
-                                       class="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 pr-12 text-lg font-bold text-gray-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:bg-gray-700">
-                                <span class="absolute right-4 top-1/2 -translate-y-1/2 font-semibold text-gray-500 dark:text-gray-400">%</span>
+                            <div class="bobot-number-wrap">
+                                <input type="number"
+                                       id="bobot_uas"
+                                       name="bobot_uas"
+                                       min="0"
+                                       max="100"
+                                       step="1"
+                                       required
+                                       value="{{ $uas }}"
+                                       class="bobot-number">
+
+                                <span class="bobot-percent">%</span>
                             </div>
                         </div>
 
                     </div>
 
-                    {{-- Total bobot --}}
-                    <div class="mt-5 rounded-xl border border-blue-100 bg-blue-50/80 p-4 dark:border-blue-900/70 dark:bg-blue-950/40">
+                    {{-- TOTAL BOBOT --}}
+                    <div class="bobot-info mt-5">
                         <div class="flex items-start gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M12 14a3 3 0 10-3-3m3 3v-1m0-10a10 10 0 100 20 10 10 0 000-20z" />
-                            </svg>
+                            <i data-lucide="info" class="mt-0.5 h-5 w-5 shrink-0"></i>
 
-                            <div>
-                                <p class="text-sm text-blue-900 dark:text-blue-200">
+                            <div class="min-w-0 flex-1">
+                                <p class="text-sm leading-6">
                                     <strong>Perhatian:</strong>
                                     Jumlah bobot Harian, UTS, dan UAS harus tepat 100%.
                                     Contoh: Harian 20%, UTS 30%, dan UAS 50%.
                                 </p>
 
-                                <p id="total-bobot" aria-live="polite" class="mt-3 font-bold text-blue-700 dark:text-blue-300">
+                                <p id="total-bobot"
+                                   aria-live="polite"
+                                   class="bobot-total mt-3">
                                     Total bobot: 100%
                                 </p>
-                                <p id="status-bobot" class="mt-1 text-xs text-blue-700 dark:text-blue-300">
+
+                                <p id="status-bobot" class="bobot-status mt-1">
                                     Total bobot sudah sesuai.
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    {{-- Tombol aksi --}}
+                    {{-- TOMBOL --}}
                     <div class="mt-6 flex flex-col gap-3 sm:flex-row">
                         <button type="submit"
-                                class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500/20">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                            </svg>
+                                id="simpan-bobot"
+                                class="bobot-btn bobot-btn-primary">
+                            <i data-lucide="save" class="h-5 w-5"></i>
                             Simpan Bobot
                         </button>
 
                         <a href="{{ route('guru.rekap.index') }}"
-                           class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
+                           class="bobot-btn bobot-btn-outline">
+                            <i data-lucide="arrow-left" class="h-5 w-5"></i>
                             Kembali ke Rekap
                         </a>
                     </div>
@@ -277,46 +708,135 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+
+    /* DROPDOWN SEMESTER DAN TAHUN AJARAN */
+    const semesterSelect = document.getElementById('pilih_semester');
+    const selectRapor = document.getElementById('id_rapor');
+
+    if (semesterSelect && selectRapor) {
+
+        function sesuaikanTahunAjaran() {
+
+            const semester = semesterSelect.value;
+
+            let opsiPertama = null;
+            let opsiTerpilih = null;
+
+            Array.from(selectRapor.options).forEach(function (opsi) {
+
+                const sesuai = opsi.dataset.semester === semester;
+
+                opsi.hidden = !sesuai;
+                opsi.disabled = !sesuai;
+
+                if (sesuai && !opsiPertama) {
+                    opsiPertama = opsi;
+                }
+
+                if (sesuai && opsi.selected) {
+                    opsiTerpilih = opsi;
+                }
+            });
+
+            if (opsiTerpilih) {
+                selectRapor.value = opsiTerpilih.value;
+            } else if (opsiPertama) {
+                selectRapor.value = opsiPertama.value;
+            } else {
+                selectRapor.value = '';
+            }
+
+            selectRapor.disabled = !opsiPertama;
+        }
+
+        semesterSelect.addEventListener('change', sesuaikanTahunAjaran);
+
+        sesuaikanTahunAjaran();
+    }
+
+    /* HITUNG TOTAL BOBOT */
     const harian = document.getElementById('bobot_harian');
     const uts = document.getElementById('bobot_uts');
     const uas = document.getElementById('bobot_uas');
     const total = document.getElementById('total-bobot');
     const status = document.getElementById('status-bobot');
+    const tombolSimpan = document.getElementById('simpan-bobot');
 
-    if (!harian || !uts || !uas || !total || !status) return;
+    if (!harian || !uts || !uas || !total || !status) {
+        return;
+    }
 
     function hitungTotal() {
-        const jumlah =
-            (Number(harian.value) || 0) +
-            (Number(uts.value) || 0) +
-            (Number(uas.value) || 0);
+
+        const nilaiHarian = Number(harian.value) || 0;
+        const nilaiUts = Number(uts.value) || 0;
+        const nilaiUas = Number(uas.value) || 0;
+
+        const jumlah = nilaiHarian + nilaiUts + nilaiUas;
+
+        const valid =
+            jumlah === 100 &&
+            [harian, uts, uas].every(function (input) {
+                return input.value !== '' &&
+                    input.checkValidity();
+            });
 
         total.textContent = 'Total bobot: ' + jumlah + '%';
 
         total.classList.remove(
-            'text-green-700', 'dark:text-green-300',
-            'text-red-600', 'dark:text-red-300',
-            'text-blue-700', 'dark:text-blue-300'
+            'text-green-700',
+            'dark:text-green-300',
+            'text-red-600',
+            'dark:text-red-300'
         );
 
         status.classList.remove(
-            'text-green-700', 'dark:text-green-300',
-            'text-red-600', 'dark:text-red-300',
-            'text-blue-700', 'dark:text-blue-300'
+            'text-green-700',
+            'dark:text-green-300',
+            'text-red-600',
+            'dark:text-red-300'
         );
 
-        if (jumlah === 100) {
-            total.classList.add('text-green-700', 'dark:text-green-300');
-            status.classList.add('text-green-700', 'dark:text-green-300');
-            status.textContent = 'Total bobot sudah sesuai dan siap disimpan.';
-        } else {
-            total.classList.add('text-red-600', 'dark:text-red-300');
-            status.classList.add('text-red-600', 'dark:text-red-300');
+        if (valid) {
 
-            status.textContent = 'Total harus tepat 100%. Saat ini ' +
-    (jumlah < 100
-        ? 'kurang ' + (100 - jumlah) + '%.'
-        : 'lebih ' + (jumlah - 100) + '%.');
+            total.classList.add(
+                'text-green-700',
+                'dark:text-green-300'
+            );
+
+            status.classList.add(
+                'text-green-700',
+                'dark:text-green-300'
+            );
+
+            status.textContent =
+                'Total bobot sudah sesuai dan siap disimpan.';
+
+            if (tombolSimpan) {
+                tombolSimpan.disabled = false;
+            }
+
+        } else {
+
+            total.classList.add(
+                'text-red-600',
+                'dark:text-red-300'
+            );
+
+            status.classList.add(
+                'text-red-600',
+                'dark:text-red-300'
+            );
+
+            status.textContent = jumlah === 100
+                ? 'Pastikan semua bobot berada di antara 0 sampai 100.'
+                : jumlah < 100
+                    ? 'Total bobot masih kurang ' + (100 - jumlah) + '%.'
+                    : 'Total bobot melebihi ' + (jumlah - 100) + '%.';
+
+            if (tombolSimpan) {
+                tombolSimpan.disabled = true;
+            }
         }
     }
 
@@ -325,6 +845,27 @@ document.addEventListener('DOMContentLoaded', function () {
     uas.addEventListener('input', hitungTotal);
 
     hitungTotal();
+
+    // ANTI DOUBLE CLICK SIMPAN BOBOT
+    const formBobot = tombolSimpan?.closest('form');
+    let sedangMemproses = false;
+
+    if (formBobot && tombolSimpan) {
+        formBobot.addEventListener('submit', function (event) {
+            if (sedangMemproses) {
+                event.preventDefault();
+                return;
+            }
+
+            if (!formBobot.checkValidity() || tombolSimpan.disabled) {
+                return;
+            }
+
+            sedangMemproses = true;
+            tombolSimpan.disabled = true;
+            tombolSimpan.innerHTML = 'Memproses...';
+        });
+    }
 });
 </script>
 @endsection

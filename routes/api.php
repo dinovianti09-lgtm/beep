@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Http\Request;
@@ -7,12 +8,18 @@ use App\Http\Controllers\Api\SiswaApiController;
 use App\Http\Controllers\Api\GuruApiController;
 use App\Http\Controllers\Api\MapelApiController;
 use App\Http\Controllers\Api\NilaiApiController;
+use App\Http\Middleware\EnsureApiAccountIsActive;
 
 // Login API tanpa token.
-Route::post('/login', [AuthApiController::class, 'login']);
+Route::post('/login', [AuthApiController::class, 'login'])
+    ->middleware('throttle:api-login');
 
-// Semua route berikut memerlukan token Sanctum.
-Route::middleware('auth:sanctum')->group(function () {
+// Semua route berikut memerlukan token Sanctum
+// dan pemeriksaan status akun terbaru.
+Route::middleware([
+    'auth:sanctum',
+    EnsureApiAccountIsActive::class,
+])->group(function () {
 
     Route::get('/user', function (Request $request) {
         return response()->json([

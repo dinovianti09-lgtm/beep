@@ -42,6 +42,14 @@ class NilaiController extends Controller
 
     /*
     |--------------------------------------------------------------------------
+    | BATAS IMPORT EXCEL
+    |--------------------------------------------------------------------------
+    */
+
+    private const MAX_BARIS_IMPORT = 500;
+
+    /*
+    |--------------------------------------------------------------------------
     | DATA NILAI ADMIN
     |--------------------------------------------------------------------------
     */
@@ -136,7 +144,7 @@ class NilaiController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | DATA GURU DAN BATAS KELAS/MAPEL
+    | DATA GURU DAN BATAS KELAS/MAPEL (DENGAN FILTER MAPEL AKTIF ADMIN)
     |--------------------------------------------------------------------------
     */
 
@@ -170,9 +178,33 @@ class NilaiController extends Controller
             'Mapel yang diampu tidak ditemukan.'
         );
 
+        // AMBIL KOMBINASI KELAS AKTIF SESUAI PENGATURAN ADMIN
+        $pengaturanMapel = $mapel->pengaturanKelas()
+            ->get(['tingkat', 'jurusan']);
+
+        // AMBIL KELAS GURU DAN FILTER SESUAI MAPEL AKTIF
         $kelasDiajar = $guru->kelasDiajar()
             ->orderBy('nama_kelas')
-            ->get();
+            ->get()
+            ->filter(function ($kelas) use ($pengaturanMapel) {
+
+                $namaKelas = strtoupper(
+                    trim(str_replace('-', ' ', (string) $kelas->nama_kelas))
+                );
+
+                $bagian = preg_split('/\s+/', $namaKelas);
+
+                $tingkat = $bagian[0] ?? '';
+                $jurusan = $bagian[1] ?? '';
+
+                return $pengaturanMapel->contains(
+                    function ($pengaturan) use ($tingkat, $jurusan) {
+                        return strtoupper(trim($pengaturan->tingkat)) === $tingkat
+                            && strtoupper(trim($pengaturan->jurusan)) === $jurusan;
+                    }
+                );
+            })
+            ->values();
 
         $namaKelasDiajar = $kelasDiajar
             ->pluck('nama_kelas')
@@ -410,275 +442,294 @@ class NilaiController extends Controller
             'file.max' => 'Ukuran file maksimal 5 MB.',
         ]);
 
+        $spreadsheet = null;
+
         try {
             $spreadsheet = IOFactory::load(
                 $request->file('file')->getRealPath()
             );
 
-            $sheetRows = $spreadsheet
-                ->getActiveSheet()
-                ->toArray(null, true, true, true);
-        } catch (\Throwable $e) {
-            return back()->withErrors([
-                'file' => 'File Excel tidak bisa dibaca. Periksa format file.',
-            ]);
-        }
+            $sheet = $spreadsheet->getActiveSheet();
 
-        if (empty($sheetRows)) {
-            return back()->withErrors([
-                'file' => 'File Excel masih kosong.',
-            ]);
-        }
+            $jumlahBaris = max(0, $sheet->getHighestDataRow() - 1);
 
-        $headerRow = reset($sheetRows);
-
-        $headerAktual = array_map(
-            fn ($value) => strtolower(trim((string) $value)),
-            array_values($headerRow)
-        );
-
-        $headerWajib = array_map(
-            fn ($value) => strtolower(trim($value)),
-            $this->headingExcel()
-        );
-
-        if ($headerAktual !== $headerWajib) {
-            return back()->withErrors([
-                'file' => 'Format kolom tidak sesuai. Gunakan Template Excel Nilai dari halaman Guru.',
-            ]);
-        }
-
-        $jumlahBerhasil = 0;
-        $jumlahDilewati = 0;
-        $errors = [];
-
-        $barisPertama = array_key_first($sheetRows);
-
-        foreach ($sheetRows as $nomorBaris => $row) {
-            if ((string) $nomorBaris === (string) $barisPertama) {
-                continue;
+            if ($jumlahBaris > self::MAX_BARIS_IMPORT) {
+                return back()->withErrors([
+                    'file' => 'Jumlah data maksimal 500 siswa dalam satu file Excel.',
+                ]);
             }
 
-            $values = [];
+            $sheetRows = $sheet->toArray(null, true, true, true);
 
-            foreach (range('A', 'I') as $column) {
-                $values[] = trim((string) ($row[$column] ?? ''));
+            if (empty($sheetRows)) {
+                return back()->withErrors([
+                    'file' => 'File Excel masih kosong.',
+                ]);
             }
 
-            if (count(array_filter(
-                $values,
-                fn ($value) => $value !== ''
-            )) === 0) {
-                continue;
+            $headerRow = reset($sheetRows);
+
+            $headerAktual = array_map(
+                fn ($value) => strtolower(trim((string) $value)),
+                array_values($headerRow)
+            );
+
+            $headerWajib = array_map(
+                fn ($value) => strtolower(trim($value)),
+                $this->headingExcel()
+            );
+
+            if ($headerAktual !== $headerWajib) {
+                return back()->withErrors([
+                    'file' => 'Format kolom tidak sesuai. Gunakan Template Excel Nilai dari halaman Guru.',
+                ]);
             }
 
-            [
-                $nis,
-                $namaSiswa,
-                $kelas,
-                $namaMapel,
-                $semesterText,
-                $tahunAjaran,
-                $nilaiHarian,
-                $nilaiUts,
-                $nilaiUas,
-            ] = $values;
+            $jumlahBerhasil = 0;
+            $jumlahDilewati = 0;
+            $errors = [];
 
-            $nomorExcel = $nomorBaris;
+            $barisPertama = array_key_first($sheetRows);
 
-            if (is_numeric($nis)) {
-                $nis = (string) (int) $nis;
-            }
+            foreach ($sheetRows as $nomorBaris => $row) {
+                if ((string) $nomorBaris === (string) $barisPertama) {
+                    continue;
+                }
 
-            $pesanError = [];
+                $values = [];
 
-            if (
-                $nis === '' ||
-                $namaSiswa === '' ||
-                $kelas === '' ||
-                $namaMapel === '' ||
-                $semesterText === '' ||
-                $tahunAjaran === '' ||
-                $nilaiHarian === '' ||
-                $nilaiUts === '' ||
-                $nilaiUas === ''
-            ) {
-                $pesanError[] = 'Ada kolom wajib yang masih kosong.';
-            }
+                foreach (range('A', 'I') as $column) {
+                    $values[] = trim((string) ($row[$column] ?? ''));
+                }
 
-            $semester = $this->jenisSemester($semesterText);
+                if (count(array_filter(
+                    $values,
+                    fn ($value) => $value !== ''
+                )) === 0) {
+                    continue;
+                }
 
-            if ($semester === null) {
-                $pesanError[] = 'Semester harus Ganjil atau Genap.';
-            }
+                [
+                    $nis,
+                    $namaSiswa,
+                    $kelas,
+                    $namaMapel,
+                    $semesterText,
+                    $tahunAjaran,
+                    $nilaiHarian,
+                    $nilaiUts,
+                    $nilaiUas,
+                ] = $values;
 
-            foreach ([
-                'Nilai Harian' => $nilaiHarian,
-                'Nilai UTS' => $nilaiUts,
-                'Nilai UAS' => $nilaiUas,
-            ] as $label => $nilai) {
+                $nomorExcel = $nomorBaris;
+
+                if (is_numeric($nis)) {
+                    $nis = (string) (int) $nis;
+                }
+
+                $pesanError = [];
+
                 if (
-                    $nilai !== '' &&
-                    (
-                        !is_numeric($nilai) ||
-                        (float) $nilai < 0 ||
-                        (float) $nilai > 100
-                    )
+                    $nis === '' ||
+                    $namaSiswa === '' ||
+                    $kelas === '' ||
+                    $namaMapel === '' ||
+                    $semesterText === '' ||
+                    $tahunAjaran === '' ||
+                    $nilaiHarian === '' ||
+                    $nilaiUts === '' ||
+                    $nilaiUas === ''
                 ) {
-                    $pesanError[] = $label .
-                        ' harus berupa angka 0 sampai 100.';
+                    $pesanError[] = 'Ada kolom wajib yang masih kosong.';
+                }
+
+                $semester = $this->jenisSemester($semesterText);
+
+                if ($semester === null) {
+                    $pesanError[] = 'Semester harus Ganjil atau Genap.';
+                }
+
+                foreach ([
+                    'Nilai Harian' => $nilaiHarian,
+                    'Nilai UTS' => $nilaiUts,
+                    'Nilai UAS' => $nilaiUas,
+                ] as $label => $nilai) {
+                    if (
+                        $nilai !== '' &&
+                        (
+                            !is_numeric($nilai) ||
+                            (float) $nilai < 0 ||
+                            (float) $nilai > 100
+                        )
+                    ) {
+                        $pesanError[] = $label .
+                            ' harus berupa angka 0 sampai 100.';
+                    }
+                }
+
+                if (!empty($pesanError)) {
+                    $jumlahDilewati++;
+                    $errors[] = 'Baris ' . $nomorExcel . ': ' .
+                        implode(' ', $pesanError);
+                    continue;
+                }
+
+                $siswa = Siswa::where('nis', $nis)->first();
+
+                if (!$siswa) {
+                    $jumlahDilewati++;
+                    $errors[] = 'Baris ' . $nomorExcel .
+                        ': NIS ' . $nis . ' tidak ditemukan.';
+                    continue;
+                }
+
+                if (
+                    strtolower(trim((string) $siswa->nama_siswa)) !==
+                    strtolower(trim($namaSiswa))
+                ) {
+                    $jumlahDilewati++;
+                    $errors[] = 'Baris ' . $nomorExcel .
+                        ': Nama siswa tidak sesuai dengan NIS ' . $nis . '.';
+                    continue;
+                }
+
+                $kelasExcel = strtolower(str_replace(
+                    '-',
+                    ' ',
+                    trim($kelas)
+                ));
+
+                $kelasDatabase = strtolower(str_replace(
+                    '-',
+                    ' ',
+                    trim((string) $siswa->kelas)
+                ));
+
+                if ($kelasExcel !== $kelasDatabase) {
+                    $jumlahDilewati++;
+                    $errors[] = 'Baris ' . $nomorExcel .
+                        ': Kelas tidak sesuai dengan data siswa ' .
+                        $siswa->nama_siswa . '.';
+                    continue;
+                }
+
+                if (!$this->siswaTermasukKelasGuru(
+                    $siswa,
+                    $namaKelasDiajar
+                )) {
+                    $jumlahDilewati++;
+                    $errors[] = 'Baris ' . $nomorExcel .
+                        ': Siswa ' . $siswa->nama_siswa .
+                        ' bukan dari kelas yang Anda ajar.';
+                    continue;
+                }
+
+                $namaMapelExcel = strtolower(trim($namaMapel));
+                $namaMapelGuru = strtolower(trim($guruMapel->nama_mapel));
+
+                if ($namaMapelExcel !== $namaMapelGuru) {
+                    $jumlahDilewati++;
+                    $errors[] = 'Baris ' . $nomorExcel .
+                        ': Mapel harus ' . $guruMapel->nama_mapel . '.';
+                    continue;
+                }
+
+                $rapor = Rapor::where(
+                    'tahun_ajaran',
+                    $tahunAjaran
+                )->get()->first(function ($item) use ($semester) {
+                    return $this->jenisSemester($item->semester) === $semester;
+                });
+
+                if (!$rapor) {
+                    $jumlahDilewati++;
+                    $errors[] = 'Baris ' . $nomorExcel .
+                        ': Periode rapor semester ' . $semesterText .
+                        ' tahun ajaran ' . $tahunAjaran .
+                        ' tidak ditemukan.';
+                    continue;
+                }
+
+                $nilaiSudahAda = Nilai::where(
+                    'id_siswa',
+                    $siswa->id_siswa
+                )
+                    ->where('id_mapel', $guruMapel->id_mapel)
+                    ->where('id_rapor', $rapor->id_rapor)
+                    ->where('semester', $semester)
+                    ->exists();
+
+                if ($nilaiSudahAda) {
+                    $jumlahDilewati++;
+                    $errors[] = 'Baris ' . $nomorExcel .
+                        ': Nilai siswa ' . $siswa->nama_siswa .
+                        ' untuk mapel dan periode tersebut sudah ada.';
+                    continue;
+                }
+
+                $dataNilai = [
+                    'id_siswa' => $siswa->id_siswa,
+                    'id_mapel' => $guruMapel->id_mapel,
+                    'id_rapor' => $rapor->id_rapor,
+                    'semester' => $semester,
+                    'nilai_harian' => (float) $nilaiHarian,
+                    'nilai_uts' => (float) $nilaiUts,
+                    'nilai_uas' => (float) $nilaiUas,
+                ];
+
+                $this->hitungNilaiAkhir($dataNilai);
+
+                try {
+                    DB::transaction(function () use ($dataNilai) {
+                        Nilai::create($dataNilai);
+
+                        RaporSiswa::firstOrCreate(
+                            [
+                                'id_siswa' => $dataNilai['id_siswa'],
+                                'id_rapor' => $dataNilai['id_rapor'],
+                            ],
+                            [
+                                'tgl_cetak' => now()->toDateString(),
+                                'file_pdf' => null,
+                            ]
+                        );
+                    });
+
+                    $jumlahBerhasil++;
+                } catch (\Throwable $e) {
+                    report($e);
+
+                    $jumlahDilewati++;
+                    $errors[] = 'Baris ' . $nomorExcel .
+                        ': Gagal menyimpan nilai atau membuat data rapor.';
                 }
             }
 
-            if (!empty($pesanError)) {
-                $jumlahDilewati++;
-                $errors[] = 'Baris ' . $nomorExcel . ': ' .
-                    implode(' ', $pesanError);
-                continue;
-            }
+            $pesan = 'Import selesai. Berhasil: ' . $jumlahBerhasil .
+                ' baris. Dilewati: ' . $jumlahDilewati . ' baris.';
 
-            $siswa = Siswa::where('nis', $nis)->first();
+            return back()
+                ->with('success', $pesan)
+                ->with('import_errors', array_slice($errors, 0, 30));
 
-            if (!$siswa) {
-                $jumlahDilewati++;
-                $errors[] = 'Baris ' . $nomorExcel .
-                    ': NIS ' . $nis . ' tidak ditemukan.';
-                continue;
-            }
+        } catch (\Throwable $e) {
+            report($e);
 
-            if (
-                strtolower(trim((string) $siswa->nama_siswa)) !==
-                strtolower(trim($namaSiswa))
-            ) {
-                $jumlahDilewati++;
-                $errors[] = 'Baris ' . $nomorExcel .
-                    ': Nama siswa tidak sesuai dengan NIS ' . $nis . '.';
-                continue;
-            }
+            return back()->withErrors([
+                'file' => 'File Excel tidak bisa diproses. Periksa kembali format dan isi file.',
+            ]);
 
-            $kelasExcel = strtolower(str_replace(
-                '-',
-                ' ',
-                trim($kelas)
-            ));
-
-            $kelasDatabase = strtolower(str_replace(
-                '-',
-                ' ',
-                trim((string) $siswa->kelas)
-            ));
-
-            if ($kelasExcel !== $kelasDatabase) {
-                $jumlahDilewati++;
-                $errors[] = 'Baris ' . $nomorExcel .
-                    ': Kelas tidak sesuai dengan data siswa ' .
-                    $siswa->nama_siswa . '.';
-                continue;
-            }
-
-            if (!$this->siswaTermasukKelasGuru(
-                $siswa,
-                $namaKelasDiajar
-            )) {
-                $jumlahDilewati++;
-                $errors[] = 'Baris ' . $nomorExcel .
-                    ': Siswa ' . $siswa->nama_siswa .
-                    ' bukan dari kelas yang Anda ajar.';
-                continue;
-            }
-
-            $namaMapelExcel = strtolower(trim($namaMapel));
-            $namaMapelGuru = strtolower(trim($guruMapel->nama_mapel));
-
-            if ($namaMapelExcel !== $namaMapelGuru) {
-                $jumlahDilewati++;
-                $errors[] = 'Baris ' . $nomorExcel .
-                    ': Mapel harus ' . $guruMapel->nama_mapel . '.';
-                continue;
-            }
-
-            $rapor = Rapor::where(
-                'tahun_ajaran',
-                $tahunAjaran
-            )->get()->first(function ($item) use ($semester) {
-                return $this->jenisSemester($item->semester) === $semester;
-            });
-
-            if (!$rapor) {
-                $jumlahDilewati++;
-                $errors[] = 'Baris ' . $nomorExcel .
-                    ': Periode rapor semester ' . $semesterText .
-                    ' tahun ajaran ' . $tahunAjaran .
-                    ' tidak ditemukan.';
-                continue;
-            }
-
-            $nilaiSudahAda = Nilai::where(
-                'id_siswa',
-                $siswa->id_siswa
-            )
-                ->where('id_mapel', $guruMapel->id_mapel)
-                ->where('id_rapor', $rapor->id_rapor)
-                ->where('semester', $semester)
-                ->exists();
-
-            if ($nilaiSudahAda) {
-                $jumlahDilewati++;
-                $errors[] = 'Baris ' . $nomorExcel .
-                    ': Nilai siswa ' . $siswa->nama_siswa .
-                    ' untuk mapel dan periode tersebut sudah ada.';
-                continue;
-            }
-
-            $dataNilai = [
-                'id_siswa' => $siswa->id_siswa,
-                'id_mapel' => $guruMapel->id_mapel,
-                'id_rapor' => $rapor->id_rapor,
-                'semester' => $semester,
-                'nilai_harian' => (float) $nilaiHarian,
-                'nilai_uts' => (float) $nilaiUts,
-                'nilai_uas' => (float) $nilaiUas,
-            ];
-
-            $this->hitungNilaiAkhir($dataNilai);
-
-            try {
-                DB::transaction(function () use ($dataNilai) {
-                    Nilai::create($dataNilai);
-
-                    RaporSiswa::firstOrCreate(
-                        [
-                            'id_siswa' => $dataNilai['id_siswa'],
-                            'id_rapor' => $dataNilai['id_rapor'],
-                        ],
-                        [
-                            'tgl_cetak' => now()->toDateString(),
-                            'file_pdf' => null,
-                        ]
-                    );
-                });
-
-                $jumlahBerhasil++;
-            } catch (\Throwable $e) {
-                report($e);
-
-                $jumlahDilewati++;
-                $errors[] = 'Baris ' . $nomorExcel .
-                    ': Gagal menyimpan nilai atau membuat data rapor.';
+        } finally {
+            if ($spreadsheet !== null) {
+                $spreadsheet->disconnectWorksheets();
+                unset($spreadsheet);
             }
         }
-
-        $pesan = 'Import selesai. Berhasil: ' . $jumlahBerhasil .
-            ' baris. Dilewati: ' . $jumlahDilewati . ' baris.';
-
-        return back()
-            ->with('success', $pesan)
-            ->with('import_errors', array_slice($errors, 0, 30));
     }
 
     /*
     |--------------------------------------------------------------------------
-    | FORM INPUT NILAI GURU
+    | FORM INPUT NILAI GURU (DENGAN FILTER KELAS AKTIF MAPEL ADMIN)
     |--------------------------------------------------------------------------
     */
 
@@ -720,9 +771,29 @@ class NilaiController extends Controller
                 ]);
         }
 
+        // AMBIL PENGATURAN KELAS UNTUK MAPEL INI DARI ADMIN
+        $pengaturanMapel = $mapel->pengaturanKelas()
+            ->get(['jurusan', 'tingkat']);
+
+        // FILTER KELAS DIAJAR HANYA YANG DIIZINKAN OLEH PENGATURAN MAPEL
         $kelasDiajar = $guru->kelasDiajar()
             ->orderBy('nama_kelas')
-            ->get();
+            ->get()
+            ->filter(function ($kelas) use ($pengaturanMapel) {
+                $bagian = preg_split(
+                    '/\s+/',
+                    strtoupper(trim($kelas->nama_kelas))
+                );
+
+                $tingkat = $bagian[0] ?? '';
+                $jurusan = $bagian[1] ?? '';
+
+                return $pengaturanMapel->contains(function ($pengaturan) use ($tingkat, $jurusan) {
+                    return $pengaturan->tingkat === $tingkat
+                        && $pengaturan->jurusan === $jurusan;
+                });
+            })
+            ->values();
 
         $namaKelasDiajar = $kelasDiajar
             ->pluck('nama_kelas')
@@ -747,10 +818,8 @@ class NilaiController extends Controller
                 ->get();
         }
 
-        // Ambil daftar periode rapor.
         $raporList = Rapor::orderByDesc('id_rapor')->get();
 
-        // BARU: Ambil bobot sesuai mapel guru dan periode rapor.
         $bobotList = BobotNilai::where(
             'id_mapel',
             $mapel->id_mapel
@@ -846,6 +915,28 @@ class NilaiController extends Controller
             $validated['id_kelas']
         )->firstOrFail();
 
+        // VALIDASI KOMBINASI KELAS SESUAI PENGATURAN MAPEL ADMIN
+        $bagianKelas = preg_split(
+            '/\s+/',
+            strtoupper(trim((string) $kelas->nama_kelas))
+        );
+
+        $tingkatKelas = $bagianKelas[0] ?? '';
+        $jurusanKelas = $bagianKelas[1] ?? '';
+
+        $mapelBerlaku = $mapel->pengaturanKelas()
+            ->where('tingkat', $tingkatKelas)
+            ->where('jurusan', $jurusanKelas)
+            ->exists();
+
+        if (!$mapelBerlaku) {
+            return back()
+                ->withErrors([
+                    'id_kelas' => 'Kelas ini tidak aktif untuk mata pelajaran yang Anda ampu.',
+                ])
+                ->withInput();
+        }
+
         $namaKelas = strtolower(str_replace(
             '-',
             ' ',
@@ -917,7 +1008,6 @@ class NilaiController extends Controller
 
         $validated['id_mapel'] = $mapel->id_mapel;
 
-        // Hitung nilai menggunakan bobot mapel dan periode rapor.
         $this->hitungNilaiAkhir($validated);
 
         DB::transaction(function () use ($validated) {
@@ -987,7 +1077,6 @@ class NilaiController extends Controller
                 ->first();
         }
 
-        // Bobot standar jika belum ada pengaturan khusus.
         $bobotHarian = (float) ($bobot->bobot_harian ?? 30);
         $bobotUts = (float) ($bobot->bobot_uts ?? 30);
         $bobotUas = (float) ($bobot->bobot_uas ?? 40);

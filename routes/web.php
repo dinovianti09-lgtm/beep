@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -42,6 +43,24 @@ Route::post('/register', [AuthController::class, 'register'])
 
 
 // ========================================
+// PREVIEW ERROR 500 - KHUSUS DEVELOPMENT
+// ========================================
+// Route ini digunakan untuk menguji tampilan
+// halaman Error 500 di desktop dan Mobile View.
+//
+// Hapus route ini setelah selesai pengujian.
+// ========================================
+
+if (app()->environment('local')) {
+
+    Route::get('/preview-error-500', function () {
+        return response()->view('errors.500', [], 500);
+    })->name('preview.error.500');
+
+}
+
+
+// ========================================
 // GANTI PASSWORD WAJIB GURU DAN SISWA
 // ========================================
 
@@ -64,6 +83,7 @@ Route::middleware(['auth', 'role:guru,siswa'])->group(function () {
 // ========================================
 
 Route::post('/logout', [AuthController::class, 'logout'])
+    ->middleware('auth')
     ->name('logout');
 
 
@@ -76,9 +96,7 @@ Route::middleware(['auth', 'role:admin'])
     ->name('admin.')
     ->group(function () {
 
-        // ========================================
         // DASHBOARD
-        // ========================================
 
         Route::get('/dashboard', [
             DashboardController::class,
@@ -86,9 +104,7 @@ Route::middleware(['auth', 'role:admin'])
         ])->name('dashboard');
 
 
-        // ========================================
         // PROFIL
-        // ========================================
 
         Route::get('/profil', function () {
             return view('admin.profil');
@@ -100,9 +116,7 @@ Route::middleware(['auth', 'role:admin'])
         ])->name('profil.password');
 
 
-        // ========================================
         // PENGATURAN SEKOLAH
-        // ========================================
 
         Route::get('/pengaturan-sekolah', [
             PengaturanSekolahController::class,
@@ -115,9 +129,7 @@ Route::middleware(['auth', 'role:admin'])
         ])->name('pengaturan-sekolah.update');
 
 
-        // ========================================
         // DATA SISWA
-        // ========================================
 
         Route::get('/siswa/template', [
             SiswaController::class,
@@ -147,9 +159,7 @@ Route::middleware(['auth', 'role:admin'])
         Route::resource('siswa', SiswaController::class);
 
 
-        // ========================================
         // DATA GURU
-        // ========================================
 
         Route::get('/guru/template', [
             GuruController::class,
@@ -179,19 +189,14 @@ Route::middleware(['auth', 'role:admin'])
         Route::resource('guru', GuruController::class);
 
 
-        // ========================================
         // DATA MAPEL DAN KELAS
-        // ========================================
 
         Route::resource('mapel', MapelController::class);
 
         Route::resource('kelas', KelasController::class);
 
 
-        // ========================================
         // DATA NILAI ADMIN
-        // ADMIN HANYA MELIHAT DATA NILAI
-        // ========================================
 
         Route::get('/nilai', [
             NilaiController::class,
@@ -199,11 +204,7 @@ Route::middleware(['auth', 'role:admin'])
         ])->name('nilai.index');
 
 
-        // ========================================
         // DATA RAPOR
-        // PENGELOLAAN PERIODE RAPOR
-        // TERMASUK HAPUS PERIODE
-        // ========================================
 
         Route::resource('rapor', RaporController::class)
             ->only([
@@ -216,11 +217,7 @@ Route::middleware(['auth', 'role:admin'])
             ]);
 
 
-        // ========================================
         // DATA RAPOR SISWA
-        // HANYA INDEX, SHOW, DAN DESTROY
-        // DATA DIBUAT OTOMATIS MELALUI INPUT NILAI GURU
-        // ========================================
 
         Route::resource('rapor_siswa', RaporSiswaController::class)
             ->only([
@@ -228,6 +225,13 @@ Route::middleware(['auth', 'role:admin'])
                 'show',
                 'destroy',
             ]);
+
+        // SIMPAN TANGGAL CETAK RAPOR SISWA
+
+        Route::post('/rapor_siswa/{id}/cetak', [
+            RaporSiswaController::class,
+            'cetak',
+        ])->name('rapor_siswa.cetak');
 
     });
 
@@ -241,9 +245,7 @@ Route::middleware(['auth', 'role:guru'])
     ->name('guru.')
     ->group(function () {
 
-        // ========================================
         // DASHBOARD
-        // ========================================
 
         Route::get('/dashboard', [
             DashboardController::class,
@@ -251,9 +253,7 @@ Route::middleware(['auth', 'role:guru'])
         ])->name('dashboard');
 
 
-        // ========================================
         // PROFIL
-        // ========================================
 
         Route::get('/profil', function () {
             return view('guru.profil');
@@ -265,9 +265,7 @@ Route::middleware(['auth', 'role:guru'])
         ])->name('profil.password');
 
 
-        // ========================================
         // DATA SISWA GURU
-        // ========================================
 
         Route::get('/siswa', [
             GuruSiswaController::class,
@@ -275,9 +273,7 @@ Route::middleware(['auth', 'role:guru'])
         ])->name('siswa.index');
 
 
-        // ========================================
         // INPUT NILAI MANUAL
-        // ========================================
 
         Route::get('/nilai/input', [
             NilaiController::class,
@@ -290,9 +286,7 @@ Route::middleware(['auth', 'role:guru'])
         ])->name('nilai.store');
 
 
-        // ========================================
         // TEMPLATE, IMPORT, EXPORT NILAI GURU
-        // ========================================
 
         Route::get('/nilai/template', [
             NilaiController::class,
@@ -310,9 +304,7 @@ Route::middleware(['auth', 'role:guru'])
         ])->name('nilai.import');
 
 
-        // ========================================
         // PENGATURAN BOBOT NILAI
-        // ========================================
 
         Route::get('/bobot-nilai', [
             BobotNilaiController::class,
@@ -325,9 +317,7 @@ Route::middleware(['auth', 'role:guru'])
         ])->name('bobot-nilai.update');
 
 
-        // ========================================
         // REKAP NILAI GURU
-        // ========================================
 
         Route::get('/rekap', [
             RekapController::class,
@@ -350,17 +340,12 @@ Route::middleware(['auth', 'role:guru'])
         ])->name('rekap.destroy');
 
 
-        // ========================================
         // RAPOR KHUSUS GURU WALI KELAS
-        // ========================================
 
         Route::get('/rapor', [
             GuruRaporController::class,
             'index',
         ])->name('rapor.index');
-
-
-        // DETAIL RAPOR
 
         Route::get('/rapor/{id}', [
             GuruRaporController::class,
@@ -368,9 +353,7 @@ Route::middleware(['auth', 'role:guru'])
         ])->name('rapor.show');
 
 
-        // ========================================
-        // KEHADIRAN DAN EKSTRAKURIKULER RAPOR
-        // ========================================
+        // KEHADIRAN DAN EKSTRAKURIKULER
 
         Route::post('/rapor/kehadiran', [
             GuruRaporTambahanController::class,
@@ -394,9 +377,7 @@ Route::middleware(['auth', 'role:siswa'])
     ->name('siswa.')
     ->group(function () {
 
-        // ========================================
         // DASHBOARD
-        // ========================================
 
         Route::get('/dashboard', [
             DashboardController::class,
@@ -404,9 +385,7 @@ Route::middleware(['auth', 'role:siswa'])
         ])->name('dashboard');
 
 
-        // ========================================
         // NILAI
-        // ========================================
 
         Route::get('/nilai', [
             SiswaNilaiController::class,
@@ -414,9 +393,7 @@ Route::middleware(['auth', 'role:siswa'])
         ])->name('nilai.index');
 
 
-        // ========================================
         // TRANSKRIP / RAPOR SISWA
-        // ========================================
 
         Route::get('/transkrip', [
             SiswaNilaiController::class,
@@ -424,9 +401,7 @@ Route::middleware(['auth', 'role:siswa'])
         ])->name('rapor.index');
 
 
-        // ========================================
         // PROFIL
-        // ========================================
 
         Route::get('/profil', function () {
             return view('siswa.profil');
@@ -438,3 +413,10 @@ Route::middleware(['auth', 'role:siswa'])
         ])->name('profil.password');
 
     });
+
+    // Preview Error 403 (khusus pengujian lokal)
+if (app()->environment('local')) {
+    Route::get('/preview-error-403', function () {
+        return response()->view('errors.403', [], 403);
+    });
+}

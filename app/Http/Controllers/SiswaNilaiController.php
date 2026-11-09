@@ -11,6 +11,7 @@ use App\Models\MapelKelas;
 use App\Models\KehadiranSiswa;
 use App\Models\EkstrakurikulerSiswa;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SiswaNilaiController extends Controller
 {
@@ -128,7 +129,7 @@ class SiswaNilaiController extends Controller
     }
 
     /**
-     * Menampilkan nilai siswa, termasuk mapel yang belum diinput.
+     * Menampilkan nilai siswa dengan pagination.
      */
     public function index()
     {
@@ -149,6 +150,7 @@ class SiswaNilaiController extends Controller
                 );
         }
 
+        // Ambil daftar periode rapor.
         $semesterList = Rapor::orderByDesc('id_rapor')->get();
 
         $pilihanPeriode = $this->getPeriode($semesterList);
@@ -156,17 +158,18 @@ class SiswaNilaiController extends Controller
         $semesterDipilih = $pilihanPeriode['semesterDipilih'];
         $periodeAktif = $pilihanPeriode['periodeAktif'];
 
-        // Gunakan data kelas yang sama seperti halaman transkrip.
+        // Ambil data kelas siswa.
         $kelas = $this->getKelasSiswa($siswa);
 
         $infoKelas = $this->getInfoKelas($siswa, $kelas);
 
+        // Ambil daftar mata pelajaran wajib.
         $pengaturanMapel = $this->getMapelWajib(
             $infoKelas['tingkat'],
             $infoKelas['jurusan']
         );
 
-        // Ambil nilai milik siswa yang login dan periode terpilih.
+        // Ambil nilai siswa sesuai periode yang dipilih.
         $nilaiPeriode = collect();
 
         if ($periodeAktif) {
@@ -177,7 +180,7 @@ class SiswaNilaiController extends Controller
                 ->keyBy('id_mapel');
         }
 
-        // Gabungkan semua mapel wajib dengan nilai yang tersedia.
+        // Gabungkan mapel wajib dengan nilai yang tersedia.
         $nilais = $pengaturanMapel->map(
             function ($mapel) use ($nilaiPeriode, $periodeAktif) {
                 $nilai = $nilaiPeriode->get($mapel->id_mapel);
@@ -203,15 +206,15 @@ class SiswaNilaiController extends Controller
             }
         );
 
-        // Statistik hanya menggunakan nilai yang komponennya lengkap.
-        $nilaiTerisi = $nilais->filter(
-            function ($item) {
-                return is_numeric($item->nilai_harian)
-                    && is_numeric($item->nilai_uts)
-                    && is_numeric($item->nilai_uas)
-                    && is_numeric($item->nilai_akhir);
-            }
-        );
+        // Statistik dihitung dari seluruh mata pelajaran.
+        $totalMapel = $nilais->count();
+
+        $nilaiTerisi = $nilais->filter(function ($item) {
+            return is_numeric($item->nilai_harian)
+                && is_numeric($item->nilai_uts)
+                && is_numeric($item->nilai_uas)
+                && is_numeric($item->nilai_akhir);
+        });
 
         $totalNilaiTerisi = $nilaiTerisi->count();
 
@@ -221,6 +224,25 @@ class SiswaNilaiController extends Controller
             )
             : null;
 
+        // Pagination: 8 mata pelajaran setiap halaman.
+        $perPage = 8;
+
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+
+        $pagination = new LengthAwarePaginator(
+            $nilais->forPage($currentPage, $perPage)->values(),
+            $totalMapel,
+            $perPage,
+            $currentPage,
+            [
+                'path' => request()->url(),
+                'query' => request()->query(),
+            ]
+        );
+
+        // Tampilkan hanya data untuk halaman yang sedang dibuka.
+        $nilais = $pagination->getCollection();
+
         return view('siswa.nilai.index', compact(
             'siswa',
             'nilais',
@@ -228,7 +250,9 @@ class SiswaNilaiController extends Controller
             'semesterDipilih',
             'periodeAktif',
             'totalNilaiTerisi',
-            'nilaiTerbaik'
+            'nilaiTerbaik',
+            'totalMapel',
+            'pagination'
         ));
     }
 
@@ -311,7 +335,6 @@ class SiswaNilaiController extends Controller
         // Ambil data cetak rapor jika tersedia.
         $raporSiswa = null;
 
-        // Variabel default agar view tetap aman jika belum ada periode.
         $kehadiran = null;
         $ekstrakurikulerList = collect();
 
@@ -326,7 +349,7 @@ class SiswaNilaiController extends Controller
                 ->where('id_rapor', $idRapor)
                 ->first();
 
-            // Ambil kehadiran sesuai siswa dan periode rapor terpilih.
+            // Ambil kehadiran sesuai siswa dan periode rapor.
             $kehadiran = KehadiranSiswa::where(
                 'id_siswa',
                 $idSiswa
@@ -334,7 +357,7 @@ class SiswaNilaiController extends Controller
                 ->where('id_rapor', $idRapor)
                 ->first();
 
-            // Ambil semua ekstrakurikuler siswa untuk periode tersebut.
+            // Ambil ekstrakurikuler siswa untuk periode tersebut.
             $ekstrakurikulerList = EkstrakurikulerSiswa::where(
                 'id_siswa',
                 $idSiswa

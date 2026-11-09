@@ -21,3 +21,14 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+# File konfigurasi rahasia dan backup
+.env.*
+!.env.example
+.files.env
+.env_*
+-files .env
+# File backup pengembangan
+*.bak
+*.backup*
+*.before-*
+/backup-tampilan-2026-10-30/

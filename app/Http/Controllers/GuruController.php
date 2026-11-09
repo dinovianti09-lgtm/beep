@@ -18,6 +18,8 @@ use Throwable;
 
 class GuruController extends Controller
 {
+    private const MAX_BARIS_IMPORT = 500;
+
     // ========================================
     // DAFTAR GURU
     // ========================================
@@ -37,18 +39,10 @@ class GuruController extends Controller
             });
         }
 
-        /*
-         * PAGINATION
-         * Maksimal 10 guru setiap halaman.
-         * Kata kunci pencarian tetap dibawa saat pindah halaman.
-         */
         $guruList = $guruQuery
             ->paginate(10)
             ->withQueryString();
 
-        /*
-         * STATUS AKUN GURU
-         */
         foreach ($guruList as $guru) {
             $user = $guru->user;
 
@@ -63,9 +57,6 @@ class GuruController extends Controller
             }
         }
 
-        /*
-         * MENENTUKAN GURU YANG MENJADI WALI KELAS
-         */
         $waliKelasMap = Kelas::whereNotNull('wali_kelas')
             ->where('wali_kelas', '!=', '')
             ->get(['id', 'nama_kelas', 'wali_kelas'])
@@ -266,18 +257,31 @@ class GuruController extends Controller
         $berhasil = 0;
         $gagal = 0;
         $errors = [];
+        $spreadsheet = null;
 
         try {
             $spreadsheet = IOFactory::load(
                 $request->file('file')->getRealPath()
             );
 
-            $rows = $spreadsheet->getActiveSheet()
-                ->toArray(null, true, true, false);
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Periksa jumlah baris sebelum membaca seluruh isi file.
+            $jumlahBarisData = max(
+                0,
+                $sheet->getHighestDataRow() - 1
+            );
+
+            if ($jumlahBarisData > self::MAX_BARIS_IMPORT) {
+                return back()->with(
+                    'error',
+                    'Import maksimal 500 baris data guru dalam satu file.'
+                );
+            }
+
+            $rows = $sheet->toArray(null, true, true, false);
 
             if (empty($rows) || count($rows) < 2) {
-                $spreadsheet->disconnectWorksheets();
-
                 return back()->with(
                     'error',
                     'File Excel belum memiliki data guru untuk diimpor.'
@@ -298,8 +302,6 @@ class GuruController extends Controller
 
             foreach ($requiredHeaders as $requiredHeader) {
                 if (!in_array($requiredHeader, $header, true)) {
-                    $spreadsheet->disconnectWorksheets();
-
                     return back()->with(
                         'error',
                         'Kolom Excel harus berisi: nip, nama_guru, mapel_diampu, dan kelas.'
@@ -308,8 +310,6 @@ class GuruController extends Controller
             }
 
             if (count($header) !== count(array_unique($header))) {
-                $spreadsheet->disconnectWorksheets();
-
                 return back()->with(
                     'error',
                     'Nama kolom Excel tidak boleh ada yang duplikat.'
@@ -453,9 +453,6 @@ class GuruController extends Controller
                 }
             }
 
-            $spreadsheet->disconnectWorksheets();
-            unset($spreadsheet);
-
             $pesan = "Import selesai. {$berhasil} guru berhasil ditambahkan.";
 
             if ($gagal > 0) {
@@ -466,6 +463,7 @@ class GuruController extends Controller
                 ->route('admin.guru.index')
                 ->with('success', $pesan)
                 ->with('import_errors', $errors);
+
         } catch (Throwable $e) {
             report($e);
 
@@ -473,6 +471,12 @@ class GuruController extends Controller
                 'error',
                 'File gagal dibaca. Pastikan file Excel sesuai template dan tidak rusak.'
             );
+
+        } finally {
+            if ($spreadsheet !== null) {
+                $spreadsheet->disconnectWorksheets();
+                unset($spreadsheet);
+            }
         }
     }
 
@@ -564,7 +568,6 @@ class GuruController extends Controller
                 'mapel_diampu' => $validated['mapel_diampu'],
             ]);
 
-            // Jika NIP berubah, username akun yang sudah terhubung ikut diperbarui.
             if ($guru->user_id) {
                 $user = User::where('id', $guru->user_id)
                     ->where('role', 'guru')
@@ -617,6 +620,11 @@ class GuruController extends Controller
         DB::transaction(function () use ($user, $statusBaru) {
             $user->status = $statusBaru;
             $user->save();
+
+            // Cabut seluruh token API jika akun dinonaktifkan.
+            if ($statusBaru === 'nonaktif') {
+                $user->tokens()->delete();
+            }
         });
 
         $pesan = $statusBaru === 'aktif'
@@ -652,16 +660,17 @@ class GuruController extends Controller
                 ->with('error', 'Akun Guru tidak ditemukan.');
         }
 
-        // Password sementara hanya menggunakan huruf dan angka.
         $passwordSementara = Str::upper(Str::random(4))
             . random_int(1000, 9999)
             . Str::lower(Str::random(2));
 
         DB::transaction(function () use ($user, $passwordSementara) {
-            // Model User otomatis melakukan hashing pada password.
             $user->password = $passwordSementara;
             $user->must_change_password = true;
             $user->save();
+
+            // Cabut seluruh token API lama setelah reset password.
+            $user->tokens()->delete();
         });
 
         return redirect()
@@ -693,9 +702,16 @@ class GuruController extends Controller
             $guru->delete();
 
             if ($userId) {
-                User::where('id', $userId)
+                $user = User::where('id', $userId)
                     ->where('role', 'guru')
-                    ->delete();
+                    ->first();
+
+                if ($user) {
+                    // Cabut seluruh token API sebelum akun dihapus.
+                    $user->tokens()->delete();
+
+                    $user->delete();
+                }
             }
         });
 

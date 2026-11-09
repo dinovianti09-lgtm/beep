@@ -34,9 +34,7 @@ class ErrorHandlingTest extends TestCase
 
         $response->assertStatus(500);
         $response->assertViewIs('errors.500');
-        $response->assertSee(
-            'Terjadi kendala koneksi server. Silakan hubungi admin.'
-        );
+        $response->assertSee('Terjadi kendala internal pada sistem');
         $response->assertDontSee('Tes error 500 EDUVIA');
     }
 
@@ -52,9 +50,7 @@ class ErrorHandlingTest extends TestCase
 
         $response->assertStatus(500);
         $response->assertViewIs('errors.500');
-        $response->assertSee(
-            'Terjadi kendala koneksi server. Silakan hubungi admin.'
-        );
+        $response->assertSee('Terjadi kendala internal pada sistem');
         $response->assertDontSee(
             'Tes koneksi database gagal EDUVIA'
         );

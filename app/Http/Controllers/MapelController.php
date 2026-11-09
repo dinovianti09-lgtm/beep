@@ -177,6 +177,14 @@ class MapelController extends Controller
     {
         $mapel = Mapel::findOrFail($id);
 
+        $kombinasiValid = [];
+
+        foreach ($this->daftarTingkat() as $tingkat) {
+            foreach ($this->daftarJurusan() as $jurusan) {
+                $kombinasiValid[] = $tingkat . '|' . $jurusan;
+            }
+        }
+
         $validated = $request->validate([
             'nama_mapel' => [
                 'required',
@@ -186,17 +194,12 @@ class MapelController extends Controller
                     ->ignore($mapel->id_mapel, 'id_mapel'),
             ],
             'kkm' => 'required|integer|min:0|max:100',
-            'jurusan' => 'required|array|min:1',
-            'jurusan.*' => [
+            'kombinasi' => 'required|array|min:1',
+            'kombinasi.*' => [
                 'required',
                 'string',
-                Rule::in($this->daftarJurusan()),
-            ],
-            'tingkat' => 'required|array|min:1',
-            'tingkat.*' => [
-                'required',
-                'string',
-                Rule::in($this->daftarTingkat()),
+                'distinct',
+                Rule::in($kombinasiValid),
             ],
         ], [
             'nama_mapel.required' => 'Nama mata pelajaran wajib diisi.',
@@ -206,12 +209,10 @@ class MapelController extends Controller
             'kkm.integer' => 'KKM harus berupa angka bulat.',
             'kkm.min' => 'KKM minimal 0.',
             'kkm.max' => 'KKM maksimal 100.',
-            'jurusan.required' => 'Pilih minimal satu jurusan.',
-            'jurusan.min' => 'Pilih minimal satu jurusan.',
-            'jurusan.*.in' => 'Pilihan jurusan tidak valid.',
-            'tingkat.required' => 'Pilih minimal satu tingkat kelas.',
-            'tingkat.min' => 'Pilih minimal satu tingkat kelas.',
-            'tingkat.*.in' => 'Pilihan tingkat kelas tidak valid.',
+            'kombinasi.required' => 'Pilih minimal satu kombinasi kelas.',
+            'kombinasi.min' => 'Pilih minimal satu kombinasi kelas.',
+            'kombinasi.*.in' => 'Kombinasi kelas tidak valid.',
+            'kombinasi.*.distinct' => 'Kombinasi kelas tidak boleh duplikat.',
         ]);
 
         DB::transaction(function () use ($mapel, $validated) {
@@ -220,19 +221,18 @@ class MapelController extends Controller
                 'kkm' => $validated['kkm'],
             ]);
 
-            $mapel->pengaturanKelas()->delete();
-
             $pengaturan = [];
 
-            foreach (array_unique($validated['jurusan']) as $jurusan) {
-                foreach (array_unique($validated['tingkat']) as $tingkat) {
-                    $pengaturan[] = [
-                        'jurusan' => $jurusan,
-                        'tingkat' => $tingkat,
-                    ];
-                }
+            foreach ($validated['kombinasi'] as $kode) {
+                [$tingkat, $jurusan] = explode('|', $kode, 2);
+
+                $pengaturan[] = [
+                    'tingkat' => $tingkat,
+                    'jurusan' => $jurusan,
+                ];
             }
 
+            $mapel->pengaturanKelas()->delete();
             $mapel->pengaturanKelas()->createMany($pengaturan);
         });
 

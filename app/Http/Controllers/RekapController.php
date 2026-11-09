@@ -224,7 +224,7 @@ class RekapController extends Controller
                 });
             })
 
-            // Filter semester dapat dikombinasikan dengan pencarian.
+            // Filter semester.
             ->when($semesterTerpilih !== null, function ($query) use ($semesterTerpilih) {
                 $query->where(
                     'nilai.semester',
@@ -258,7 +258,10 @@ class RekapController extends Controller
             })
 
             ->orderByDesc('nilai.id_nilai')
-            ->get();
+
+            // Pagination 10 data per halaman.
+            ->paginate(10)
+            ->withQueryString();
 
         return view('guru.rekap.index', compact(
             'rekaps',
@@ -298,13 +301,22 @@ class RekapController extends Controller
                 );
         }
 
+        // Mengambil siswa dari kelas yang diajar Guru.
         $siswaList = Siswa::where(function ($query) use ($namaKelasDiajar) {
             $this->siswaDiKelasGuru($query, $namaKelasDiajar);
         })
             ->orderBy('nama_siswa')
             ->get();
 
+        // Mengambil seluruh periode rapor.
         $raporList = Rapor::orderByDesc('id_rapor')->get();
+
+        // Mengambil bobot nilai sesuai mapel Guru dan periode rapor.
+        // Data ini digunakan untuk preview perhitungan di halaman edit.
+        $bobotNilai = BobotNilai::where('id_mapel', $mapel->id_mapel)
+            ->whereIn('id_rapor', $raporList->pluck('id_rapor'))
+            ->get()
+            ->keyBy('id_rapor');
 
         return view('guru.rekap.edit', compact(
             'nilai',
@@ -312,7 +324,8 @@ class RekapController extends Controller
             'mapel',
             'siswaList',
             'raporList',
-            'kelasDiajar'
+            'kelasDiajar',
+            'bobotNilai'
         ));
     }
 

@@ -91,6 +91,7 @@ class DashboardController extends Controller
                 ]);
         }
 
+        // DATA WALI KELAS (TETAP DIPERTAHANKAN)
         $kelasWali = Kelas::where(
             'wali_kelas',
             $guru->nama_guru
@@ -115,11 +116,58 @@ class DashboardController extends Controller
 
         $jumlahSiswaWali = $siswaWali->count();
 
+        // CARI MATA PELAJARAN YANG DIAMPU GURU
+        $mapel = null;
+
+        if (!empty($guru->mapel_diampu)) {
+            $mapel = Mapel::whereRaw(
+                'LOWER(TRIM(nama_mapel)) = ?',
+                [strtolower(trim($guru->mapel_diampu))]
+            )->first();
+        }
+
+        // AMBIL KELAS YANG DITUGASKAN ADMIN
+        $kelasDiajar = $guru->kelasDiajar()
+            ->orderBy('nama_kelas')
+            ->get();
+
+        // FILTER BERDASARKAN KOMBINASI MAPEL AKTIF
+        if ($mapel) {
+            $pengaturanMapel = $mapel->pengaturanKelas()
+                ->get(['tingkat', 'jurusan']);
+
+            $kelasDiajar = $kelasDiajar
+                ->filter(function ($kelas) use ($pengaturanMapel) {
+                    $bagian = preg_split(
+                        '/\s+/',
+                        strtoupper(trim($kelas->nama_kelas))
+                    );
+
+                    $tingkat = $bagian[0] ?? '';
+                    $jurusan = $bagian[1] ?? '';
+
+                    return $pengaturanMapel->contains(
+                        function ($pengaturan) use ($tingkat, $jurusan) {
+                            return $pengaturan->tingkat === $tingkat
+                                && $pengaturan->jurusan === $jurusan;
+                        }
+                    );
+                })
+                ->values();
+        } else {
+            $kelasDiajar = collect();
+        }
+
+        $jumlahKelasDiajar = $kelasDiajar->count();
+
         return view('guru.dashboard', compact(
             'guru',
             'kelasWali',
             'siswaWali',
-            'jumlahSiswaWali'
+            'jumlahSiswaWali',
+            'mapel',
+            'kelasDiajar',
+            'jumlahKelasDiajar'
         ));
     }
 

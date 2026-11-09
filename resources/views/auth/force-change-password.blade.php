@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -12,13 +13,196 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        * {
+        :root {
+            --edu-blue-1: #E3F0FA;
+            --edu-blue-2: #C3E0F4;
+            --edu-blue-3: #BAD1EC;
+            --edu-blue-4: #A4BFDF;
+            --edu-blue-5: #89AAD7;
+
+            --edu-blue: #89AAD7;
+            --edu-blue-dark: #527BA9;
+            --edu-page: #F3F6FA;
+            --edu-card: #F8FAFC;
+            --edu-text: #293F57;
+            --edu-muted: #60758B;
+            --edu-border: #D7E3EF;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
-        .password-input {
-            padding-right: 3.25rem;
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--edu-text);
+            background:
+                radial-gradient(
+                    circle at 10% 12%,
+                    rgba(195, 224, 244, 0.55),
+                    transparent 32%
+                ),
+                radial-gradient(
+                    circle at 90% 85%,
+                    rgba(186, 209, 236, 0.4),
+                    transparent 35%
+                ),
+                linear-gradient(
+                    135deg,
+                    #F3F6FA 0%,
+                    #EDF4FA 55%,
+                    #F6F5F0 100%
+                );
+            -webkit-font-smoothing: antialiased;
         }
+
+        .auth-container {
+            width: 100%;
+            max-width: 470px;
+            margin: 0 auto;
+        }
+
+        /* IDENTITAS EDUVIA */
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 18px;
+            padding: 9px;
+            background: #FFFFFF;
+            border: 1px solid #D7E3EF;
+            border-radius: 20px;
+            box-shadow:
+                0 5px 14px rgba(70, 113, 160, 0.08),
+                0 12px 28px rgba(70, 113, 160, 0.06);
+        }
+
+        .brand-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+
+        .brand-title {
+            color: #244B79;
+            font-size: 25px;
+            font-weight: 800;
+            line-height: 1.35;
+            letter-spacing: -0.8px;
+        }
+
+        .brand-subtitle {
+            margin-top: 8px;
+            color: #60758B;
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 1.7;
+        }
+
+        /* KARTU FORM */
+
+        .auth-card {
+            position: relative;
+            overflow: hidden;
+            background: rgba(248, 250, 252, 0.98);
+            border: 1px solid #D7E3EF;
+            border-radius: 22px;
+            box-shadow:
+                0 6px 18px rgba(47, 82, 124, 0.045),
+                0 20px 45px rgba(47, 82, 124, 0.055);
+        }
+
+        .auth-card-top {
+            height: 5px;
+            background: linear-gradient(
+                90deg,
+                #89AAD7 0%,
+                #A4BFDF 50%,
+                #C3E0F4 100%
+            );
+        }
+
+        .security-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+            margin-bottom: 18px;
+            color: #527BA9;
+            background: #E3F0FA;
+            border: 1px solid #C3E0F4;
+            border-radius: 14px;
+        }
+
+        .form-title {
+            color: #29435F;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.6px;
+            line-height: 1.4;
+        }
+
+        .form-description {
+            margin-top: 9px;
+            color: #60758B;
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 1.85;
+        }
+
+        /* LABEL DAN INPUT */
+
+        .form-label {
+            display: block;
+            margin-bottom: 9px;
+            color: #344F6D;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .password-input {
+            display: block;
+            width: 100%;
+            height: 51px;
+            padding: 0 3.25rem 0 15px;
+            color: #293F57;
+            background: #FFFFFF;
+            border: 1px solid #C9D8E8;
+            border-radius: 12px;
+            outline: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                background-color 0.2s ease;
+        }
+
+        .password-input::placeholder {
+            color: #91A2B6;
+            font-weight: 400;
+        }
+
+        .password-input:hover {
+            border-color: #A4BFDF;
+        }
+
+        .password-input:focus {
+            background: #FFFFFF;
+            border-color: #89AAD7;
+            box-shadow: 0 0 0 4px rgba(137, 170, 215, 0.18);
+        }
+
+        /* TOMBOL MATA */
 
         .eye-button {
             position: absolute;
@@ -30,66 +214,240 @@
             justify-content: center;
             width: 2rem;
             height: 2rem;
-            color: #64748b;
+            color: #60758B;
             border-radius: 0.5rem;
-            transition: background-color 0.2s, color 0.2s;
+            transition:
+                background-color 0.2s,
+                color 0.2s;
         }
 
         .eye-button:hover {
-            background-color: #eef2ff;
-            color: #4f46e5;
+            background-color: #E3F0FA;
+            color: #294F79;
         }
 
         .eye-button:focus-visible {
-            outline: 2px solid #6366f1;
+            outline: 2px solid #89AAD7;
             outline-offset: 2px;
+        }
+
+        .input-hint {
+            margin-top: 8px;
+            color: #71869B;
+            font-size: 11px;
+            font-weight: 500;
+            line-height: 1.7;
+        }
+
+        /* KETENTUAN PASSWORD */
+
+        .password-rules {
+            padding: 17px;
+            background: linear-gradient(
+                135deg,
+                #E3F0FA 0%,
+                #EDF5FC 100%
+            );
+            border: 1px solid #C3E0F4;
+            border-radius: 13px;
+        }
+
+        .rules-title {
+            margin-bottom: 11px;
+            color: #294F79;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .rules-list {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            color: #526B85;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.7;
+        }
+
+        .rule-check {
+            flex-shrink: 0;
+            color: #527BA9;
+            font-weight: 800;
+        }
+
+        /* TOMBOL SIMPAN */
+
+        .submit-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            min-height: 51px;
+            padding: 13px 20px;
+            color: #233B55;
+            background: #89AAD7;
+            border: 1px solid #89AAD7;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 5px 13px rgba(82, 123, 169, 0.15);
+            transition:
+                background-color 0.2s ease,
+                box-shadow 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .submit-button:hover {
+            background: #A4BFDF;
+            box-shadow: 0 7px 17px rgba(82, 123, 169, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
+        }
+
+        .submit-button:focus-visible {
+            outline: 3px solid rgba(137, 170, 215, 0.45);
+            outline-offset: 3px;
+        }
+
+        /* TOMBOL KELUAR */
+
+        .logout-area {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #DCE6F0;
+            text-align: center;
+        }
+
+        .logout-description {
+            margin-bottom: 9px;
+            color: #8293A5;
+            font-size: 11px;
+        }
+
+        .logout-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 10px 15px;
+            color: #60758B;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition:
+                background-color 0.2s,
+                color 0.2s;
+        }
+
+        .logout-button:hover {
+            color: #29435F;
+            background: #E3F0FA;
+        }
+
+        .logout-button:focus-visible {
+            outline: 2px solid #89AAD7;
+            outline-offset: 2px;
+        }
+
+        /* FOOTER */
+
+        .auth-footer {
+            margin-top: 23px;
+            color: #8293A5;
+            font-size: 11px;
+            font-weight: 500;
+            line-height: 1.8;
+            text-align: center;
+        }
+
+        /* RESPONSIVE HP */
+
+        @media (max-width: 640px) {
+            body {
+                padding: 20px 14px;
+            }
+
+            .brand-logo {
+                width: 68px;
+                height: 68px;
+                margin-bottom: 15px;
+            }
+
+            .brand-title {
+                font-size: 21px;
+            }
+
+            .brand-subtitle {
+                font-size: 12px;
+            }
+
+            .auth-card {
+                border-radius: 18px;
+            }
+
+            .auth-card-content {
+                padding: 23px 20px;
+            }
+
+            .form-title {
+                font-size: 22px;
+            }
+
+            .form-description {
+                font-size: 12px;
+            }
+
+            .password-input {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 
-<body class="min-h-screen bg-slate-100 px-4 py-8 text-slate-800">
+<body class="min-h-screen px-4 py-8">
 
     <main class="flex min-h-[calc(100vh-4rem)] items-center justify-center">
 
-        <div class="w-full max-w-md">
+        <div class="auth-container">
 
-            {{-- LOGO / IDENTITAS --}}
-            <div class="mb-6 text-center">
-                <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-200">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         width="34"
-                         height="34"
-                         viewBox="0 0 24 24"
-                         fill="none"
-                         stroke="currentColor"
-                         stroke-width="1.8"
-                         stroke-linecap="round"
-                         stroke-linejoin="round"
-                         aria-hidden="true">
-                        <path d="M12 3 3 8l9 5 9-5-9-5Z"/>
-                        <path d="m7 10.2 0 5.3c3.3 2.4 6.7 2.4 10 0v-5.3"/>
-                        <path d="M21 8v6"/>
-                    </svg>
+            {{-- LOGO / IDENTITAS EDUVIA --}}
+            <div class="mb-7 text-center">
+
+                <div class="brand-logo">
+                    <img
+                        src="{{ asset('images/Logo sistem akademik mini.jpeg') }}"
+                        alt="Logo Sistem Akademik Mini"
+                    >
                 </div>
 
-                <h1 class="text-2xl font-extrabold tracking-tight text-slate-800">
+                <h1 class="brand-title">
                     Sistem Akademik Mini
                 </h1>
 
-                <p class="mt-2 text-sm text-slate-500">
+                <p class="brand-subtitle">
                     Satu langkah lagi untuk mengamankan akunmu.
                 </p>
+
             </div>
 
             {{-- KARTU GANTI PASSWORD --}}
-            <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-200/70">
+            <section class="auth-card">
 
-                <div class="h-1.5 bg-indigo-600"></div>
+                <div class="auth-card-top"></div>
 
-                <div class="p-6 sm:p-8">
+                <div class="auth-card-content p-6 sm:p-8">
 
                     <div class="mb-7">
-                        <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+
+                        <div class="security-icon">
                             <svg xmlns="http://www.w3.org/2000/svg"
                                  width="25"
                                  height="25"
@@ -106,19 +464,23 @@
                             </svg>
                         </div>
 
-                        <h2 class="text-2xl font-extrabold text-slate-800">
+                        <h2 class="form-title">
                             Ganti Password
                         </h2>
 
-                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                        <p class="form-description">
                             Password akunmu sudah direset oleh Admin.
                             Buat password baru untuk melanjutkan ke dashboard.
                         </p>
+
                     </div>
 
                     {{-- PESAN ERROR --}}
                     @if ($errors->any())
-                        <div class="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">
+                        <div
+                            class="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+                            role="alert"
+                        >
                             <div class="mb-2 flex items-center gap-2 font-bold">
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                      width="18"
@@ -131,6 +493,7 @@
                                     <circle cx="12" cy="12" r="10"/>
                                     <path d="M12 8v4m0 4h.01"/>
                                 </svg>
+
                                 Password belum berhasil disimpan
                             </div>
 
@@ -142,17 +505,19 @@
                         </div>
                     @endif
 
-                    {{-- FORM --}}
+                    {{-- FORM GANTI PASSWORD --}}
                     <form method="POST" action="{{ route('password.force-change.process') }}">
                         @csrf
 
                         {{-- PASSWORD BARU --}}
                         <div class="mb-5">
-                            <label for="password" class="mb-2 block text-sm font-bold text-slate-700">
+
+                            <label for="password" class="form-label">
                                 Password Baru
                             </label>
 
                             <div class="relative">
+
                                 <input
                                     type="password"
                                     id="password"
@@ -160,7 +525,7 @@
                                     required
                                     minlength="8"
                                     autocomplete="new-password"
-                                    class="password-input w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100"
+                                    class="password-input"
                                     placeholder="Masukkan password baru"
                                 >
 
@@ -186,20 +551,24 @@
                                         <circle cx="12" cy="12" r="3"/>
                                     </svg>
                                 </button>
+
                             </div>
 
-                            <p class="mt-2 text-xs text-slate-500">
+                            <p class="input-hint">
                                 Gunakan minimal 8 karakter, huruf besar, huruf kecil, dan angka.
                             </p>
+
                         </div>
 
                         {{-- KONFIRMASI PASSWORD --}}
                         <div class="mb-5">
-                            <label for="password_confirmation" class="mb-2 block text-sm font-bold text-slate-700">
+
+                            <label for="password_confirmation" class="form-label">
                                 Konfirmasi Password Baru
                             </label>
 
                             <div class="relative">
+
                                 <input
                                     type="password"
                                     id="password_confirmation"
@@ -207,7 +576,7 @@
                                     required
                                     minlength="8"
                                     autocomplete="new-password"
-                                    class="password-input w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100"
+                                    class="password-input"
                                     placeholder="Ulangi password baru"
                                 >
 
@@ -233,39 +602,48 @@
                                         <circle cx="12" cy="12" r="3"/>
                                     </svg>
                                 </button>
+
                             </div>
+
                         </div>
 
                         {{-- PETUNJUK PASSWORD --}}
-                        <div class="mb-6 rounded-xl border border-indigo-100 bg-indigo-50/70 p-4">
-                            <p class="mb-2 text-xs font-extrabold uppercase tracking-wide text-indigo-800">
+                        <div class="password-rules mb-6">
+
+                            <p class="rules-title">
                                 Ketentuan Password
                             </p>
 
-                            <ul class="space-y-2 text-xs leading-5 text-slate-600">
+                            <ul class="rules-list">
+
                                 <li class="flex items-start gap-2">
-                                    <span class="mt-0.5 font-bold text-indigo-600">✓</span>
+                                    <span class="rule-check">✓</span>
                                     Minimal 8 karakter
                                 </li>
+
                                 <li class="flex items-start gap-2">
-                                    <span class="mt-0.5 font-bold text-indigo-600">✓</span>
+                                    <span class="rule-check">✓</span>
                                     Mengandung huruf besar dan huruf kecil
                                 </li>
+
                                 <li class="flex items-start gap-2">
-                                    <span class="mt-0.5 font-bold text-indigo-600">✓</span>
+                                    <span class="rule-check">✓</span>
                                     Mengandung angka
                                 </li>
+
                                 <li class="flex items-start gap-2">
-                                    <span class="mt-0.5 font-bold text-indigo-600">✓</span>
+                                    <span class="rule-check">✓</span>
                                     Kedua kolom harus berisi password yang sama
                                 </li>
+
                             </ul>
+
                         </div>
 
                         {{-- TOMBOL SIMPAN --}}
                         <button
                             type="submit"
-                            class="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-indigo-200 transition hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-indigo-200 active:translate-y-0"
+                            class="submit-button"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg"
                                  width="19"
@@ -283,11 +661,13 @@
 
                             Simpan Password Baru
                         </button>
+
                     </form>
 
                     {{-- KELUAR --}}
-                    <div class="mt-6 border-t border-slate-100 pt-5 text-center">
-                        <p class="mb-2 text-xs text-slate-400">
+                    <div class="logout-area">
+
+                        <p class="logout-description">
                             Tidak ingin melanjutkan sekarang?
                         </p>
 
@@ -296,7 +676,7 @@
 
                             <button
                                 type="submit"
-                                class="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
+                                class="logout-button"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                      width="17"
@@ -316,13 +696,14 @@
                                 Keluar dari Akun
                             </button>
                         </form>
+
                     </div>
 
                 </div>
             </section>
 
             {{-- FOOTER --}}
-            <p class="mt-6 text-center text-xs text-slate-400">
+            <p class="auth-footer">
                 &copy; {{ date('Y') }} Sistem Akademik Mini
                 <span class="mx-1">·</span>
                 Semua hak dilindungi

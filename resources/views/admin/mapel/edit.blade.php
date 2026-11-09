@@ -364,85 +364,6 @@
 }
 
 /* =====================================================
-   PILIHAN JURUSAN DAN TINGKAT KELAS
-===================================================== */
-
-.me-choice-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-}
-
-.me-choice {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    min-height: 48px;
-    padding: 10px 13px;
-    border: 1px solid #D5E1ED;
-    border-radius: 9px;
-    background: #F8FAFC;
-    cursor: pointer;
-    transition:
-        border-color .18s ease,
-        background .18s ease,
-        box-shadow .18s ease;
-}
-
-.me-choice:hover {
-    background: #EAF3FC;
-    border-color: #A4BFDF;
-}
-
-.me-choice:has(input:checked) {
-    background: #E3F0FA;
-    border-color: #89AAD7;
-    box-shadow: inset 0 0 0 1px rgba(137, 170, 215, .2);
-}
-
-.me-choice input {
-    width: 17px;
-    height: 17px;
-    flex-shrink: 0;
-    accent-color: #3478BD;
-    cursor: pointer;
-}
-
-.me-choice-text {
-    color: #3D526A;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1.5;
-}
-
-.me-choice:has(input:checked) .me-choice-text {
-    color: #285F96;
-}
-
-.dark .me-choice {
-    background: #202F45;
-    border-color: #40536B;
-}
-
-.dark .me-choice:hover {
-    background: #263B54;
-    border-color: #597DA4;
-}
-
-.dark .me-choice:has(input:checked) {
-    background: #263E59;
-    border-color: #639BD0;
-}
-
-.dark .me-choice-text {
-    color: #DCEBFC;
-}
-
-.dark .me-choice:has(input:checked) .me-choice-text {
-    color: #FFFFFF;
-}
-
-/* =====================================================
    INFORMASI PENGATURAN
 ===================================================== */
 
@@ -567,12 +488,6 @@
    RESPONSIVE
 ===================================================== */
 
-@media (max-width: 900px) {
-    .me-choice-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
 @media (max-width: 640px) {
     .me-hero {
         border-radius: 14px;
@@ -595,10 +510,6 @@
 
     .me-form-body {
         padding: 18px !important;
-    }
-
-    .me-choice-grid {
-        grid-template-columns: minmax(0, 1fr);
     }
 
     .me-form-actions {
@@ -849,103 +760,82 @@
                 <div class="border-t border-slate-200 dark:border-slate-700"></div>
 
 
-                {{-- PILIH JURUSAN --}}
+                {{-- TABEL KOMBINASI JURUSAN DAN TINGKAT --}}
                 <section>
-
                     <div class="mb-4">
-
                         <h3 class="me-label mb-1">
-                            Pilih Jurusan
+                            Pengaturan Kelas Mata Pelajaran
                             <span class="me-required">*</span>
                         </h3>
 
                         <p class="me-help">
-                            Centang semua jurusan yang menggunakan mata pelajaran ini.
+                            Centang kombinasi tingkat dan jurusan yang menggunakan
+                            mata pelajaran ini.
                         </p>
-
                     </div>
 
-                    <div class="me-choice-grid">
+                    @php
+                        $kombinasiTersimpan = $mapel->pengaturanKelas
+                            ->map(fn ($item) => $item->tingkat . '|' . $item->jurusan)
+                            ->all();
 
-                        @foreach($jurusanList as $jurusan)
+                        $kombinasiTerpilih = old('kombinasi', $kombinasiTersimpan);
+                    @endphp
 
-                            <label class="me-choice">
+                    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+                        <table class="w-full text-sm text-center">
+                            <thead class="bg-blue-50 dark:bg-slate-800">
+                                <tr>
+                                    <th class="p-4 text-left text-slate-700 dark:text-slate-200">
+                                        Tingkat
+                                    </th>
 
-                                <input
-                                    type="checkbox"
-                                    name="jurusan[]"
-                                    value="{{ $jurusan }}"
-                                    {{ in_array($jurusan, old('jurusan', $jurusanTerpilih)) ? 'checked' : '' }}
-                                >
+                                    @foreach($jurusanList as $jurusan)
+                                        <th class="p-4 text-slate-700 dark:text-slate-200">
+                                            {{ $jurusan }}
+                                        </th>
+                                    @endforeach
+                                </tr>
+                            </thead>
 
-                                <span class="me-choice-text">
-                                    {{ $jurusan }}
-                                </span>
+                            <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                                @foreach($tingkatList as $tingkat)
+                                    <tr class="bg-white dark:bg-slate-900">
+                                        <th class="p-4 text-left font-bold text-slate-700 dark:text-slate-200">
+                                            Kelas {{ $tingkat }}
+                                        </th>
 
-                            </label>
+                                        @foreach($jurusanList as $jurusan)
+                                            @php
+                                                $kode = $tingkat . '|' . $jurusan;
+                                            @endphp
 
-                        @endforeach
-
+                                            <td class="p-4">
+                                                <label class="inline-flex items-center justify-center cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="kombinasi[]"
+                                                        value="{{ $kode }}"
+                                                        aria-label="Kelas {{ $tingkat }} {{ $jurusan }}"
+                                                        @checked(in_array($kode, $kombinasiTerpilih))
+                                                        class="w-5 h-5 cursor-pointer accent-blue-600"
+                                                    >
+                                                </label>
+                                            </td>
+                                        @endforeach
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
 
-                    @error('jurusan')
+                    @error('kombinasi')
                         <p class="me-field-error">{{ $message }}</p>
                     @enderror
 
-                    @error('jurusan.*')
+                    @error('kombinasi.*')
                         <p class="me-field-error">{{ $message }}</p>
                     @enderror
-
-                </section>
-
-
-                {{-- PILIH TINGKAT KELAS --}}
-                <section>
-
-                    <div class="mb-4">
-
-                        <h3 class="me-label mb-1">
-                            Pilih Tingkat Kelas
-                            <span class="me-required">*</span>
-                        </h3>
-
-                        <p class="me-help">
-                            Centang semua tingkat yang menggunakan mata pelajaran ini.
-                        </p>
-
-                    </div>
-
-                    <div class="me-choice-grid">
-
-                        @foreach($tingkatList as $tingkat)
-
-                            <label class="me-choice">
-
-                                <input
-                                    type="checkbox"
-                                    name="tingkat[]"
-                                    value="{{ $tingkat }}"
-                                    {{ in_array($tingkat, old('tingkat', $tingkatTerpilih)) ? 'checked' : '' }}
-                                >
-
-                                <span class="me-choice-text">
-                                    Kelas {{ $tingkat }}
-                                </span>
-
-                            </label>
-
-                        @endforeach
-
-                    </div>
-
-                    @error('tingkat')
-                        <p class="me-field-error">{{ $message }}</p>
-                    @enderror
-
-                    @error('tingkat.*')
-                        <p class="me-field-error">{{ $message }}</p>
-                    @enderror
-
                 </section>
 
 
@@ -1032,4 +922,45 @@
 
 </div>
 
+
+{{-- S3-07 ANTI DOUBLE CLICK EDIT MAPEL --}}
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector(
+        'form[action="{{ route('admin.mapel.update', $mapel->id_mapel) }}"]'
+    );
+
+    if (!form) return;
+
+    const button = form.querySelector('button[type="submit"]');
+    if (!button) return;
+
+    const originalHTML = button.innerHTML;
+
+    form.addEventListener('submit', function (event) {
+        if (event.defaultPrevented) return;
+
+        if (form.dataset.s3Submitting === 'true') {
+            event.preventDefault();
+            return;
+        }
+
+        form.dataset.s3Submitting = 'true';
+        button.setAttribute('aria-disabled', 'true');
+        button.style.pointerEvents = 'none';
+        button.style.opacity = '0.7';
+        button.innerHTML = 'Memproses...';
+    });
+
+    window.addEventListener('pageshow', function () {
+        form.dataset.s3Submitting = 'false';
+        button.removeAttribute('aria-disabled');
+        button.style.pointerEvents = '';
+        button.style.opacity = '';
+        button.innerHTML = originalHTML;
+    });
+});
+</script>
+@endpush
 @endsection

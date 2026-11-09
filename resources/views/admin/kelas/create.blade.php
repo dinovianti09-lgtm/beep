@@ -1273,6 +1273,39 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // S3-07 ANTI DOUBLE CLICK TAMBAH KELAS
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalButtonHTML = submitButton ? submitButton.innerHTML : '';
+
+    form.addEventListener('submit', function (event) {
+        if (event.defaultPrevented) return;
+
+        if (form.dataset.s3Submitting === 'true') {
+            event.preventDefault();
+            return;
+        }
+
+        form.dataset.s3Submitting = 'true';
+
+        if (submitButton) {
+            submitButton.setAttribute('aria-disabled', 'true');
+            submitButton.style.pointerEvents = 'none';
+            submitButton.style.opacity = '0.7';
+            submitButton.innerHTML = 'Memproses...';
+        }
+    });
+
+    window.addEventListener('pageshow', function () {
+        form.dataset.s3Submitting = 'false';
+
+        if (submitButton) {
+            submitButton.removeAttribute('aria-disabled');
+            submitButton.style.pointerEvents = '';
+            submitButton.style.opacity = '';
+            submitButton.innerHTML = originalButtonHTML;
+        }
+    });
+
     updatePreview();
 });
 </script>

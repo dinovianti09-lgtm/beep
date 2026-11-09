@@ -870,7 +870,7 @@
 .sp-action {
     display: flex;
     width: 100%;
-    min-height: 36px;
+    min-height: 44px;
     align-items: center;
     justify-content: center;
     gap: 6px;

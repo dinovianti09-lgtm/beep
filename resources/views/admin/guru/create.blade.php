@@ -1328,6 +1328,20 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
+    // S3-07: Pulihkan tombol saat kembali melalui riwayat browser.
+    const guruSubmitButton = form.querySelector('button[type="submit"]');
+    const guruSubmitOriginalHTML = guruSubmitButton ? guruSubmitButton.innerHTML : '';
+
+    window.addEventListener('pageshow', function () {
+        form.dataset.s3Submitting = 'false';
+
+        if (guruSubmitButton) {
+            guruSubmitButton.removeAttribute('aria-disabled');
+            guruSubmitButton.style.pointerEvents = '';
+            guruSubmitButton.style.opacity = '';
+            guruSubmitButton.innerHTML = guruSubmitOriginalHTML;
+        }
+    });
     const MAX_HISTORY = 6;
 
     /*
@@ -1800,6 +1814,26 @@ document.addEventListener('DOMContentLoaded', function () {
         /*
          * Simpan riwayat NIP.
          */
+        // S3-07: Cegah pengiriman formulir berulang.
+        if (form.dataset.s3Submitting === 'true') {
+            event.preventDefault();
+            return;
+        }
+
+        if (event.defaultPrevented) {
+            return;
+        }
+
+        form.dataset.s3Submitting = 'true';
+
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        if (submitButton) {
+            submitButton.setAttribute('aria-disabled', 'true');
+            submitButton.style.pointerEvents = 'none';
+            submitButton.style.opacity = '0.7';
+            submitButton.innerHTML = 'Memproses...';
+        }
         const nipInput = document.getElementById('nip');
 
         if (nipInput && nipInput.value.trim()) {

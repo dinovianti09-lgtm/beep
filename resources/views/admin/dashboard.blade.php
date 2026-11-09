@@ -71,7 +71,6 @@
     box-shadow: 0 5px 14px rgba(48, 105, 166, .07);
 }
 
-/* Hilangkan dekorasi lingkaran pada sambutan */
 .dashboard-page .dashboard-hero::before,
 .dashboard-page .dashboard-hero::after {
     display: none !important;
@@ -138,7 +137,6 @@
     box-shadow: 0 7px 16px rgba(42,91,143,.08);
 }
 
-/* Kartu statistik seragam biru pastel */
 .dashboard-page .dashboard-card.stat-card {
     background: #F8FAFC;
     border-color: #D5E1ED;
@@ -154,7 +152,6 @@
     background: #89AAD7;
 }
 
-/* Hilangkan dekorasi lingkaran pada kartu statistik */
 .dashboard-page .dashboard-card.stat-card::after {
     display: none !important;
 }
@@ -168,7 +165,6 @@
     --card-icon-bg: #E3F0FA;
 }
 
-/* Teks kartu */
 .dashboard-page .card-title {
     color: #26374A;
 }
@@ -190,7 +186,6 @@
     color: #60748B;
 }
 
-/* Kotak ikon */
 .dashboard-page .stat-icon {
     position: relative;
     z-index: 1;
@@ -276,7 +271,6 @@
     color: #60748B;
 }
 
-/* Tombol lihat semua */
 .dashboard-page .dashboard-see-all {
     display: inline-flex;
     align-items: center;
@@ -348,7 +342,6 @@
     color: #30445B;
 }
 
-/* Ikon pengguna tabel */
 .dashboard-page .table-user-icon {
     display: flex;
     align-items: center;
@@ -363,7 +356,7 @@
 }
 
 /* =====================================================
-   BADGE
+   BADGE UMUM
 ===================================================== */
 
 .dashboard-page .table-badge {
@@ -405,23 +398,56 @@
     border-color: #F6D1DD;
 }
 
-/* Warna predikat nilai */
+/* =====================================================
+   PREDIKAT NILAI
+   A = Hijau
+   B = Biru
+   C = Kuning
+   D = Merah
+===================================================== */
+
 .dashboard-page .grade-badge.badge-emerald {
-    color: #246B45;
-    background: #E6F4EA;
-    border-color: #B7E4C7;
+    color: #218454;
+    background: #E8F7EF;
+    border-color: #B9E5CB;
+}
+
+.dashboard-page .grade-badge.badge-blue {
+    color: #3478BD;
+    background: #EAF4FF;
+    border-color: #C8DCEE;
 }
 
 .dashboard-page .grade-badge.badge-amber {
-    color: #875B11;
-    background: #FFF4DB;
-    border-color: #F1D38A;
+    color: #A66B12;
+    background: #FFF7DF;
+    border-color: #F5DFA5;
 }
 
 .dashboard-page .grade-badge.badge-rose {
-    color: #9B3030;
-    background: #FCE8E8;
-    border-color: #F3B3B3;
+    color: #C24A4A;
+    background: #FDECEC;
+    border-color: #F3C5C5;
+}
+
+/* =====================================================
+   NILAI AKHIR - BIRU PASTEL
+===================================================== */
+
+.dashboard-page .final-value-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 55px;
+    padding: 6px 10px;
+    border: 1px solid #C8DCEE;
+    border-radius: 8px;
+    background: #EAF4FF;
+    color: #3478BD;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
 }
 
 /* =====================================================
@@ -491,6 +517,7 @@
 }
 
 /* Sambutan */
+
 :is(
     html.dark,
     body.dark,
@@ -631,6 +658,7 @@
 }
 
 /* Kartu dashboard */
+
 :is(
     html.dark,
     body.dark,
@@ -682,7 +710,8 @@
     background: #89AAD7 !important;
 }
 
-/* Teks dan ikon kartu */
+/* Teks kartu */
+
 :is(
     html.dark,
     body.dark,
@@ -719,7 +748,7 @@
     html[data-theme="dark"],
     body[data-theme="dark"],
     html[data-admin-theme="dark"],
-    body[data-admin-theme="dark"],
+    body[data-theme="dark"],
     .dark,
     .dark-mode,
     [data-theme="dark"]
@@ -764,8 +793,8 @@
     body.dark-mode,
     html[data-theme="dark"],
     body[data-theme="dark"],
-    html[data-admin-theme="dark"],
-    body[data-admin-theme="dark"],
+    html[data-theme="dark"],
+    body[data-theme="dark"],
     .dark,
     .dark-mode,
     [data-theme="dark"]
@@ -791,7 +820,8 @@
     color: #D8E9FC !important;
 }
 
-/* Header dan isi tabel */
+/* Header tabel */
+
 :is(
     html.dark,
     body.dark,
@@ -840,6 +870,8 @@
 ) .dashboard-page .section-description {
     color: #AFC0D4 !important;
 }
+
+/* Tabel dark mode */
 
 :is(
     html.dark,
@@ -936,7 +968,8 @@
     color: #E1EAF5 !important;
 }
 
-/* Ikon dan badge tabel */
+/* Ikon pengguna tabel */
+
 :is(
     html.dark,
     body.dark,
@@ -954,6 +987,8 @@
     border-color: #405B78 !important;
     color: #D8E9FC !important;
 }
+
+/* Badge umum dark mode */
 
 :is(
     html.dark,
@@ -1001,7 +1036,8 @@
     color: #DFECFB !important;
 }
 
-/* Predikat nilai tetap hijau, kuning, merah */
+/* Predikat A - hijau */
+
 :is(
     html.dark,
     body.dark,
@@ -1015,10 +1051,32 @@
     .dark-mode,
     [data-theme="dark"]
 ) .dashboard-page .grade-badge.badge-emerald {
-    background: #193D30 !important;
-    border-color: #32694F !important;
-    color: #B9E8CC !important;
+    background: #12372F !important;
+    border-color: #23604D !important;
+    color: #86EFAC !important;
 }
+
+/* Predikat B - biru */
+
+:is(
+    html.dark,
+    body.dark,
+    html.dark-mode,
+    body.dark-mode,
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html[data-admin-theme="dark"],
+    body[data-admin-theme="dark"],
+    .dark,
+    .dark-mode,
+    [data-theme="dark"]
+) .dashboard-page .grade-badge.badge-blue {
+    background: #243E59 !important;
+    border-color: #3A5876 !important;
+    color: #A9D2F5 !important;
+}
+
+/* Predikat C - kuning */
 
 :is(
     html.dark,
@@ -1033,10 +1091,12 @@
     .dark-mode,
     [data-theme="dark"]
 ) .dashboard-page .grade-badge.badge-amber {
-    background: #46371C !important;
-    border-color: #78602C !important;
-    color: #F6D991 !important;
+    background: #493A20 !important;
+    border-color: #80652F !important;
+    color: #FDE7A3 !important;
 }
+
+/* Predikat D - merah */
 
 :is(
     html.dark,
@@ -1051,12 +1111,33 @@
     .dark-mode,
     [data-theme="dark"]
 ) .dashboard-page .grade-badge.badge-rose {
-    background: #482A32 !important;
-    border-color: #79434E !important;
-    color: #F4C2CA !important;
+    background: #3B2028 !important;
+    border-color: #693541 !important;
+    color: #FCA5A5 !important;
+}
+
+/* Nilai Akhir - biru dark mode */
+
+:is(
+    html.dark,
+    body.dark,
+    html.dark-mode,
+    body.dark-mode,
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html[data-admin-theme="dark"],
+    body[data-admin-theme="dark"],
+    .dark,
+    .dark-mode,
+    [data-theme="dark"]
+) .dashboard-page .final-value-badge {
+    background: #243E59 !important;
+    border-color: #3A5876 !important;
+    color: #A9D2F5 !important;
 }
 
 /* Data kosong */
+
 :is(
     html.dark,
     body.dark,
@@ -1092,6 +1173,7 @@
 }
 
 /* Tombol lihat semua */
+
 :is(
     html.dark,
     body.dark,
@@ -1809,7 +1891,7 @@
                             </td>
 
                             <td>
-                                @if((string) $nilai->semester === '1')
+                                @if ((string) $nilai->semester === '1')
                                     <span class="table-badge badge-blue">
                                         Semester 1
                                     </span>
@@ -1820,15 +1902,26 @@
                                 @endif
                             </td>
 
+                            {{-- NILAI AKHIR BIRU --}}
                             <td>
-                                <span class="text-lg font-extrabold table-text">
-                                    {{ number_format($nilai->nilai_akhir, 2) }}
-                                </span>
+                                @if (is_numeric($nilai->nilai_akhir))
+                                    <span class="final-value-badge">
+                                        {{ number_format((float) $nilai->nilai_akhir, 2) }}
+                                    </span>
+                                @else
+                                    <span class="table-badge badge-blue">
+                                        Belum diinput
+                                    </span>
+                                @endif
                             </td>
 
+                            {{-- PREDIKAT --}}
                             <td>
+
                                 @php
-                                    $predikat = strtoupper($nilai->predikat ?? '-');
+                                    $predikat = strtoupper(
+                                        trim((string) ($nilai->predikat ?? ''))
+                                    );
 
                                     $predikatClass = match ($predikat) {
                                         'A' => 'badge-emerald',
@@ -1839,9 +1932,16 @@
                                     };
                                 @endphp
 
-                                <span class="table-badge grade-badge {{ $predikatClass ?: 'badge-blue' }}">
-                                    {{ $predikat }}
-                                </span>
+                                @if (in_array($predikat, ['A', 'B', 'C', 'D'], true))
+                                    <span class="table-badge grade-badge {{ $predikatClass }}">
+                                        {{ $predikat }}
+                                    </span>
+                                @else
+                                    <span class="table-badge badge-blue">
+                                        Belum ada
+                                    </span>
+                                @endif
+
                             </td>
 
                         </tr>

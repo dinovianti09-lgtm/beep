@@ -26,8 +26,7 @@ class AuthController extends Controller
             'role' => ['required', 'in:admin,guru,siswa'],
         ]);
 
-        $user = User::where('username', $validated['username'])
-            ->first();
+        $user = User::where('username', $validated['username'])->first();
 
         if (!$user || !Hash::check($validated['password'], $user->password)) {
             return back()
@@ -46,6 +45,7 @@ class AuthController extends Controller
         }
 
         if (in_array($user->role, ['guru', 'siswa'], true)) {
+            // Perbaikan syntax error pada pemeriksaan status akun
             if (strtolower((string) $user->status) !== 'aktif') {
                 return back()
                     ->withInput($request->only('username', 'role'))
@@ -104,10 +104,6 @@ class AuthController extends Controller
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
-        /*
-         * Mendukung nama input identitas yang umum digunakan.
-         * Sesuaikan dengan nama input pada halaman Register jika diperlukan.
-         */
         $identifier = trim((string) (
             $request->input('identifier')
             ?? $request->input('nip')
@@ -138,8 +134,7 @@ class AuthController extends Controller
             return back()
                 ->withInput($request->except('password', 'password_confirmation'))
                 ->withErrors([
-                    'identifier' => $jenisIdentitas .
-                        ' tidak ditemukan. Pastikan data sudah dimasukkan Admin.',
+                    'identifier' => $jenisIdentitas . ' tidak ditemukan. Pastikan data sudah dimasukkan Admin.',
                 ]);
         }
 
@@ -166,10 +161,6 @@ class AuthController extends Controller
                 $profil,
                 $request
             ) {
-                /*
-                 * Model User menggunakan cast hashed,
-                 * sehingga password akan di-hash secara otomatis.
-                 */
                 $user = User::create([
                     'username' => $identifier,
                     'password' => $request->input('password'),
@@ -235,6 +226,8 @@ class AuthController extends Controller
         $user->must_change_password = false;
         $user->save();
 
+        $user->tokens()->delete();
+
         return $this->redirectToDashboard($user->role)
             ->with('success', 'Password berhasil diperbarui.');
     }
@@ -266,6 +259,8 @@ class AuthController extends Controller
         $user->password = $request->input('password');
         $user->must_change_password = false;
         $user->save();
+
+        $user->tokens()->delete();
 
         return back()->with('success', 'Password berhasil diperbarui.');
     }

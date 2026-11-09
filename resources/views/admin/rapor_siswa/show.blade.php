@@ -1,3 +1,4 @@
+
 @extends('layouts.admin')
 
 @section('title', 'Detail Rapor Siswa - Sistem Akademik Mini')
@@ -7,7 +8,6 @@
 @php
     use Illuminate\Support\Facades\DB;
 
-    // Identitas kelas dan wali kelas.
     $namaKelasSiswa = strtolower(
         str_replace('-', ' ', trim($siswa->kelas ?? ''))
     );
@@ -22,7 +22,6 @@
     $waliKelas = $kelasData->wali_kelas ?? null;
     $nipWaliKelas = null;
 
-    // Ambil NIP berdasarkan nama wali kelas.
     if (!empty($waliKelas)) {
         $guruWaliKelas = DB::table('guru')
             ->whereRaw('TRIM(nama_guru) = ?', [trim($waliKelas)])
@@ -34,7 +33,6 @@
         }
     }
 
-    // Identitas kepala sekolah.
     $pengaturanSekolah = DB::table('pengaturan_sekolah')->first();
 
     $kepalaSekolah = $pengaturanSekolah->nama_kepala_sekolah
@@ -43,7 +41,6 @@
     $nipKepalaSekolah = $pengaturanSekolah->nip_kepala_sekolah
         ?? '';
 
-    // Mata pelajaran wajib berdasarkan jurusan dan tingkat kelas.
     $mapelWajib = collect();
 
     if ($kelasData) {
@@ -72,7 +69,6 @@
             ->get();
     }
 
-    // Cocokkan mata pelajaran wajib dengan nilai siswa.
     $daftarNilai = collect($nilais ?? []);
 
     if ($mapelWajib->isNotEmpty()) {
@@ -90,7 +86,6 @@
             ];
         });
     } else {
-        // Fallback jika pemetaan mata pelajaran wajib belum tersedia.
         $barisRapor = $daftarNilai
             ->unique('id_mapel')
             ->map(function ($nilai) {
@@ -104,7 +99,6 @@
             ->values();
     }
 
-    // Periksa kelengkapan komponen nilai.
     $nilaiLengkap = function ($nilai) {
         return $nilai
             && is_numeric($nilai->nilai_harian)
@@ -127,7 +121,6 @@
         }
     )->count();
 
-    // Rata-rata menggunakan nilai akhir yang lengkap.
     $rataRataRapor = $jumlahMapel > 0
         ? round(
             $nilaiTerisi->avg(
@@ -143,7 +136,6 @@
         && $jumlahSeluruhMapel > 0
         && $jumlahMapelBelumLengkap === 0;
 
-    // Status berdasarkan nilai akhir dan KKM.
     $statusNilai = function ($baris) {
         $nilai = $baris->nilai;
         $kkm = $baris->kkm;
@@ -161,7 +153,6 @@
             : 'Remedial';
     };
 
-    // Format angka nilai.
     $formatNilai = function ($nilai, $kolom) {
         if (!$nilai || !is_numeric($nilai->{$kolom} ?? null)) {
             return 'Belum diinput';
@@ -193,15 +184,15 @@
     $daftarEkstrakurikuler = collect($ekstrakurikulerList ?? []);
 @endphp
 
-
 @push('styles')
 <style>
     /* =========================================
-       HALAMAN DETAIL RAPOR
+       TAMPILAN HALAMAN
     ========================================= */
 
     .rs-show-page {
         color: #293F57;
+        min-width: 0;
     }
 
     .rs-show-hero {
@@ -255,19 +246,23 @@
         transform: translateY(-1px);
     }
 
+    /* =========================================
+       WADAH RAPOR
+    ========================================= */
+
     .rs-document-shell {
-        overflow: hidden;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
         border: 1px solid #D5E1ED;
         border-radius: 16px;
         background: #FFFFFF;
         padding: 22px;
         box-shadow: 0 4px 18px rgba(41, 63, 87, .05);
     }
-
-    /* =========================================
-       LEMBAR RAPOR
-       Tetap putih agar cocok untuk hasil cetak.
-    ========================================= */
 
     .print-card {
         background: #FFFFFF !important;
@@ -284,15 +279,14 @@
         box-sizing: border-box;
         opacity: 1 !important;
         text-shadow: none !important;
-        -webkit-text-fill-color: currentColor;
     }
 
-    .print-card p,
-    .print-card span,
-    .print-card div,
-    .print-card td,
-    .print-card th {
-        color: #111111 !important;
+    .print-card p:not(.text-remedial),
+    .print-card span:not(.text-remedial),
+    .print-card div:not(.text-remedial),
+    .print-card td:not(.text-remedial),
+    .print-card th:not(.text-remedial) {
+        color: #111111;
     }
 
     .print-card h1,
@@ -406,7 +400,7 @@
     }
 
     /* =========================================
-       TABEL RAPOR
+       TABEL LAPTOP DAN HP
     ========================================= */
 
     .report-table {
@@ -421,7 +415,6 @@
     .report-table td {
         padding: 8px 6px !important;
         border: 1px solid #555555 !important;
-        color: #000000 !important;
         vertical-align: middle !important;
         background: #FFFFFF !important;
         font-size: 12px !important;
@@ -429,23 +422,7 @@
     }
 
     .report-table th {
-        background: #E5E7EB !important;
         font-weight: 900 !important;
-    }
-
-    /* BARIS REMEDIAL */
-
-    .report-table tbody tr.baris-remedial > td {
-        background-color: #FEE2E2 !important;
-        color: #DC2626 !important;
-        font-weight: 700 !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
-
-    .report-table tbody tr.baris-remedial > td span {
-        color: #DC2626 !important;
-        -webkit-text-fill-color: #DC2626 !important;
     }
 
     .summary-table th {
@@ -455,32 +432,25 @@
     .summary-table td,
     .grade-value,
     .final-value {
+        font-weight: 800 !important;
+    }
+
+    .text-remedial,
+    td.text-remedial,
+    span.text-remedial {
+        color: #DC2626 !important;
         font-weight: 900 !important;
     }
 
-    /* STATUS NILAI */
-
-    .print-card .status-tuntas {
-        color: #15803D !important;
-        -webkit-text-fill-color: #15803D !important;
-        font-weight: 800 !important;
-    }
-
-    .print-card .status-remedial {
-        color: #DC2626 !important;
-        -webkit-text-fill-color: #DC2626 !important;
-        font-weight: 800 !important;
-    }
-
-    .print-card .status-belum {
-        color: #64748B !important;
-        -webkit-text-fill-color: #64748B !important;
+    .text-tuntas {
+        color: #111111 !important;
         font-weight: 700 !important;
     }
 
-    /* =========================================
-       TANDA TANGAN
-    ========================================= */
+    .text-belum {
+        color: #64748B !important;
+        font-weight: 600 !important;
+    }
 
     .signature-name {
         font-size: 14px !important;
@@ -494,51 +464,131 @@
     }
 
     /* =========================================
-       TAMPILAN RESPONSIVE
+       RESPONSIVE HP - TULISAN LEBIH JELAS
     ========================================= */
 
-    @media (max-width: 640px) {
-        .rs-document-shell {
-            padding: 12px;
+    @media screen and (max-width: 640px) {
+
+        .rs-show-page {
+            width: 100%;
+            min-width: 0;
+            padding: 12px !important;
         }
 
+        .rs-show-hero {
+            padding: 16px !important;
+        }
+
+        .rs-document-shell {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            padding: 12px !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 12px;
+        }
+
+        /*
+         * Lembar rapor tidak dipaksa mengecil
+         * mengikuti lebar layar HP.
+         * Pengguna bisa menggeser secara horizontal.
+         */
         .print-card {
-            padding: 20px !important;
+            width: 760px !important;
+            min-width: 760px !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 24px !important;
+            font-size: 14px !important;
+            line-height: 1.5 !important;
         }
 
         .report-school-header {
-            min-height: 180px;
-            padding-top: 105px;
+            min-height: 115px !important;
+            padding: 10px 10px 16px !important;
         }
 
         .school-logo {
-            top: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 78px;
-            height: 78px;
+            position: absolute !important;
+            left: 10px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            width: 80px !important;
+            height: 80px !important;
+        }
+
+        .school-heading-content {
+            width: 100% !important;
+            padding: 0 10px !important;
+            text-align: center !important;
+        }
+
+        .school-heading {
+            font-size: 14px !important;
         }
 
         .school-name {
+            font-size: 23px !important;
+        }
+
+        .school-subheading {
+            font-size: 13px !important;
+        }
+
+        .report-title {
             font-size: 21px !important;
         }
 
+        .report-subtitle {
+            font-size: 14px !important;
+        }
+
         .identity-grid {
-            grid-template-columns: 1fr !important;
-            gap: 8px !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 8px 16px !important;
+        }
+
+        .identity-row {
+            grid-template-columns: 110px 10px minmax(0, 1fr) !important;
+            font-size: 13px !important;
+        }
+
+        .identity-label,
+        .identity-colon,
+        .identity-value {
+            font-size: 13px !important;
+        }
+
+        .section-heading {
+            font-size: 15px !important;
         }
 
         .report-table {
-            min-width: 760px;
+            width: 100% !important;
+            min-width: 0 !important;
+            font-size: 13px !important;
+        }
+
+        .report-table th,
+        .report-table td {
+            font-size: 13px !important;
+            padding: 8px 6px !important;
+            line-height: 1.4 !important;
         }
 
         .summary-table {
             min-width: 0 !important;
         }
+
+        .signature-section {
+            grid-template-columns: 1fr 1fr !important;
+        }
     }
 
     /* =========================================
-       DARK MODE HALAMAN
+       DARK MODE
     ========================================= */
 
     .dark .rs-show-page {
@@ -575,20 +625,30 @@
         border-color: #354962;
     }
 
+    .dark .text-remedial {
+        color: #EF4444 !important;
+    }
+
     /* =========================================
-       CETAK RAPOR
+       CETAK RAPOR A4
+       TETAP SEPERTI VERSI YANG SUDAH BENAR
     ========================================= */
 
     @media print {
+
         @page {
             size: A4 portrait;
-            margin: 10mm;
+            margin: 8mm 10mm;
         }
 
         html,
         body {
             margin: 0 !important;
             padding: 0 !important;
+            width: 100% !important;
+            height: auto !important;
+            min-height: 0 !important;
+            overflow: visible !important;
             background: #FFFFFF !important;
             color: #000000 !important;
             -webkit-print-color-adjust: exact !important;
@@ -604,11 +664,38 @@
             visibility: visible !important;
         }
 
+        .rs-show-page {
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+        }
+
+        .rs-document-shell {
+            display: block !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            height: auto !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            background: #FFFFFF !important;
+        }
+
         .print-card {
             position: absolute !important;
             top: 0 !important;
             left: 0 !important;
+            display: block !important;
             width: 100% !important;
+            min-width: 0 !important;
             max-width: none !important;
             margin: 0 !important;
             padding: 0 !important;
@@ -617,83 +704,115 @@
             box-shadow: none !important;
             background: #FFFFFF !important;
             color: #000000 !important;
+            font-family: Arial, Helvetica, sans-serif !important;
             font-size: 9pt !important;
+            line-height: 1.3 !important;
         }
 
         .print-card,
         .print-card * {
             opacity: 1 !important;
+            text-shadow: none !important;
         }
 
-        .print-card .report-table tbody tr.baris-remedial > td {
-            background-color: #FEE2E2 !important;
-            color: #DC2626 !important;
-            -webkit-text-fill-color: #DC2626 !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-
-        .print-card .report-table tbody tr.baris-remedial > td span {
-            color: #DC2626 !important;
-            -webkit-text-fill-color: #DC2626 !important;
-        }
-
-        .print-card .status-tuntas {
-            color: #15803D !important;
-            -webkit-text-fill-color: #15803D !important;
-        }
-
-        .print-card .status-remedial {
-            color: #DC2626 !important;
-            -webkit-text-fill-color: #DC2626 !important;
-        }
-
-        .print-card .status-belum {
-            color: #64748B !important;
-            -webkit-text-fill-color: #64748B !important;
-        }
-
-        .rs-document-shell {
-            display: block !important;
-            overflow: visible !important;
-            border: none !important;
-            border-radius: 0 !important;
-            padding: 0 !important;
-            background: #FFFFFF !important;
-            box-shadow: none !important;
-        }
+        /* KOP SEKOLAH */
 
         .report-school-header {
-            min-height: 95px !important;
-            padding: 5px 5px 12px !important;
+            position: relative !important;
+            min-height: 100px !important;
+            padding: 6px 8px 10px !important;
+            margin: 0 !important;
+            border-bottom: 3px double #111111 !important;
+            background: #FFFFFF !important;
+            break-inside: avoid;
         }
 
         .school-logo {
-            left: 5px !important;
-            width: 65px !important;
-            height: 65px !important;
+            position: absolute !important;
+            left: 8px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            width: 85px !important;
+            height: 85px !important;
+            object-fit: contain !important;
         }
 
         .school-heading-content {
-            padding-left: 55px !important;
+            width: 100% !important;
+            padding-left: 85px !important;
+            padding-right: 5px !important;
+        }
+
+        .school-heading {
+            font-size: 9pt !important;
+            line-height: 1.25 !important;
         }
 
         .school-name {
+            margin-top: 3px !important;
             font-size: 16pt !important;
+            line-height: 1.2 !important;
         }
 
-        .school-heading,
         .school-subheading {
+            margin-top: 3px !important;
             font-size: 9pt !important;
+            line-height: 1.25 !important;
         }
+
+        /* JUDUL */
 
         .report-title {
             font-size: 14pt !important;
+            line-height: 1.2 !important;
         }
 
+        .report-subtitle {
+            font-size: 9pt !important;
+            line-height: 1.2 !important;
+        }
+
+        /* JARAK ANTARBAGIAN */
+
+        .print-card > .mb-7,
+        .print-card > .mb-8 {
+            margin-bottom: 8px !important;
+        }
+
+        .print-card > .mt-6,
+        .print-card > .mt-12 {
+            margin-top: 8px !important;
+        }
+
+        .print-card > .mb-7.mt-6 {
+            margin-top: 8px !important;
+            margin-bottom: 9px !important;
+        }
+
+        .section-heading {
+            width: 100% !important;
+            box-sizing: border-box !important;
+            margin-bottom: 6px !important;
+            padding-bottom: 3px !important;
+            border-bottom: 1px solid #333333 !important;
+            font-size: 10pt !important;
+            line-height: 1.3 !important;
+            break-after: avoid;
+        }
+
+        /* IDENTITAS */
+
         .identity-grid {
+            display: grid !important;
             grid-template-columns: 1fr 1fr !important;
-            gap: 5px 10px !important;
+            gap: 3px 10px !important;
+        }
+
+        .identity-row {
+            display: grid !important;
+            grid-template-columns: 75px 8px minmax(0, 1fr) !important;
+            gap: 3px !important;
+            line-height: 1.35 !important;
         }
 
         .identity-row,
@@ -703,21 +822,132 @@
             font-size: 8pt !important;
         }
 
-        .report-table {
+        /* =========================================
+           TABEL CETAK
+           GARIS TIDAK TERPOTONG
+        ========================================= */
+
+        .print-card .report-table {
+            display: table !important;
+
+            width: 99.5% !important;
+            max-width: 99.5% !important;
             min-width: 0 !important;
+
+            margin-left: 0 !important;
+            margin-right: auto !important;
+
+            table-layout: fixed !important;
+            border-collapse: collapse !important;
+            border-spacing: 0 !important;
+
+            border: 1px solid #222222 !important;
+            box-sizing: border-box !important;
+
+            background: #FFFFFF !important;
+            color: #000000 !important;
+            font-size: 8pt !important;
+        }
+
+        .print-card .report-table th,
+        .print-card .report-table td {
+            border: 1px solid #222222 !important;
+
+            padding: 3px 4px !important;
+            box-sizing: border-box !important;
+
+            background: #FFFFFF !important;
+            color: #000000 !important;
+
+            font-size: 8pt !important;
+            line-height: 1.25 !important;
+            vertical-align: middle !important;
+
+            overflow-wrap: anywhere !important;
+            word-break: normal !important;
+        }
+
+        .print-card .report-table thead,
+        .print-card .report-table tbody,
+        .print-card .report-table tr {
+            background: #FFFFFF !important;
+        }
+
+        .print-card .overflow-x-auto {
             width: 100% !important;
-            font-size: 7pt !important;
+            max-width: 100% !important;
+            overflow: visible !important;
         }
 
-        .report-table th,
-        .report-table td {
-            padding: 4px 3px !important;
-            font-size: 7pt !important;
+        .print-card .report-table thead {
+            display: table-header-group !important;
         }
 
-        .signature-section,
-        .report-table tr {
+        .print-card .report-table tr {
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+        }
+
+        .print-card .summary-table th {
+            width: 65% !important;
+        }
+
+        /* STATUS NILAI */
+
+        .print-card .text-remedial,
+        .print-card td.text-remedial,
+        .print-card span.text-remedial {
+            color: #DC2626 !important;
+            -webkit-text-fill-color: #DC2626 !important;
+        }
+
+        .print-card .text-tuntas {
+            color: #111111 !important;
+            -webkit-text-fill-color: #111111 !important;
+        }
+
+        /* KETERANGAN */
+
+        .print-card p.mt-2 {
+            margin-top: 3px !important;
+            font-size: 7.5pt !important;
+            line-height: 1.25 !important;
+        }
+
+        /* TANDA TANGAN */
+
+        .signature-section {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 16px !important;
+            margin-top: 10px !important;
             break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        .signature-section > div {
+            font-size: 8pt !important;
+            line-height: 1.3 !important;
+        }
+
+        .signature-section div[style*="height: 80px"] {
+            height: 38px !important;
+        }
+
+        .signature-name {
+            font-size: 9pt !important;
+        }
+
+        .signature-role {
+            font-size: 8pt !important;
+        }
+
+        /* FOOTER */
+
+        .print-card > .mt-8.border-t {
+            margin-top: 8px !important;
+            padding-top: 5px !important;
+            font-size: 7pt !important;
         }
 
         .no-print {
@@ -726,7 +956,6 @@
     }
 </style>
 @endpush
-
 
 @section('content')
 
@@ -772,7 +1001,6 @@
 
         </div>
 
-        {{-- TOMBOL AKSI --}}
         <div class="flex flex-wrap gap-2">
 
             <a
@@ -794,32 +1022,38 @@
                 Kembali
             </a>
 
-            <button
-                type="button"
-                onclick="window.print()"
-                class="rs-show-btn rs-show-print"
+            <form
+                action="{{ route('admin.rapor_siswa.cetak', $raporSiswa->id_rapor_siswa) }}"
+                method="POST"
+                id="formCetakRapor"
             >
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    width="17"
-                    height="17"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round">
-                    <path d="M6 9V2h12v7"/>
-                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-                    <path d="M6 14h12v8H6z"/>
-                </svg>
+                @csrf
 
-                Cetak Rapor
-            </button>
+                <button
+                    type="submit"
+                    class="rs-show-btn rs-show-print"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M6 9V2h12v7"/>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2 2h-2"/>
+                        <path d="M6 14h12v8H6z"/>
+                    </svg>
+
+                    Cetak Rapor
+                </button>
+            </form>
 
         </div>
 
     </div>
-
 
     {{-- LEMBAR RAPOR --}}
     <div class="rs-document-shell">
@@ -855,7 +1089,6 @@
 
             </div>
 
-
             {{-- JUDUL RAPOR --}}
             <div class="mb-7 mt-6 text-center">
 
@@ -868,7 +1101,6 @@
                 </p>
 
             </div>
-
 
             {{-- A. IDENTITAS SISWA --}}
             <div class="identity-section mb-7">
@@ -931,7 +1163,6 @@
 
             </div>
 
-
             {{-- B. CAPAIAN HASIL BELAJAR --}}
             <div class="mb-8">
 
@@ -971,9 +1202,14 @@
                                 @php
                                     $nilai = $baris->nilai;
                                     $status = $statusNilai($baris);
+                                    $isRemedial = ($status === 'Remedial');
+
+                                    $predikat = strtoupper(
+                                        trim((string) ($nilai->predikat ?? ''))
+                                    );
                                 @endphp
 
-                                <tr class="{{ $status === 'Remedial' ? 'baris-remedial' : '' }}">
+                                <tr>
 
                                     <td class="text-center">
                                         {{ $index + 1 }}
@@ -995,26 +1231,14 @@
                                         {{ $formatNilai($nilai, 'nilai_uas') }}
                                     </td>
 
-                                    <td class="text-center final-value">
+                                    <td class="text-center final-value {{ $isRemedial ? 'text-remedial' : 'text-tuntas' }}">
 
-                                        @if ($status === 'Remedial')
-
-                                            <span class="status-remedial">
-                                                {{ $formatNilai($nilai, 'nilai_akhir') }}
-                                            </span>
-
-                                        @elseif ($status === 'Tuntas')
-
-                                            <span class="status-tuntas">
-                                                {{ $formatNilai($nilai, 'nilai_akhir') }}
-                                            </span>
-
+                                        @if ($nilai && is_numeric($nilai->nilai_akhir))
+                                            {{ $formatNilai($nilai, 'nilai_akhir') }}
                                         @else
-
-                                            <span class="status-belum">
-                                                {{ $formatNilai($nilai, 'nilai_akhir') }}
+                                            <span class="text-belum">
+                                                Belum diinput
                                             </span>
-
                                         @endif
 
                                     </td>
@@ -1023,34 +1247,20 @@
                                         {{ $formatKKM($baris->kkm) }}
                                     </td>
 
-                                    <td class="text-center grade-value">
-                                        {{ $nilai && filled($nilai->predikat)
-                                            ? $nilai->predikat
-                                            : 'Belum diinput' }}
-                                    </td>
+                                    <td class="text-center grade-value {{ $isRemedial ? 'text-remedial' : 'text-tuntas' }}">
 
-                                    <td class="text-center">
-
-                                        @if ($status === 'Tuntas')
-
-                                            <span class="status-tuntas">
-                                                {{ $status }}
-                                            </span>
-
-                                        @elseif ($status === 'Remedial')
-
-                                            <span class="status-remedial">
-                                                {{ $status }}
-                                            </span>
-
+                                        @if (in_array($predikat, ['A', 'B', 'C', 'D'], true))
+                                            {{ $predikat }}
                                         @else
-
-                                            <span class="status-belum">
-                                                {{ $status }}
+                                            <span class="text-belum">
+                                                Belum diinput
                                             </span>
-
                                         @endif
 
+                                    </td>
+
+                                    <td class="text-center {{ $isRemedial ? 'text-remedial' : ($status === 'Tuntas' ? 'text-tuntas' : 'text-belum') }}">
+                                        {{ $status }}
                                     </td>
 
                                 </tr>
@@ -1072,7 +1282,6 @@
                 </div>
 
             </div>
-
 
             {{-- C. RINGKASAN HASIL BELAJAR --}}
             <div class="mb-8 mt-6">
@@ -1125,9 +1334,15 @@
                             </th>
 
                             <td class="text-center final-value">
-                                {{ $rataRataRapor !== null
-                                    ? number_format($rataRataRapor, 2, ',', '.')
-                                    : 'Belum tersedia' }}
+
+                                @if ($rataRataRapor !== null)
+                                    {{ number_format($rataRataRapor, 2, ',', '.') }}
+                                @else
+                                    <span class="text-belum">
+                                        Belum tersedia
+                                    </span>
+                                @endif
+
                             </td>
                         </tr>
 
@@ -1139,17 +1354,17 @@
                             <td class="text-center">
 
                                 @if (!$daftarMapelTersedia)
-
-                                    Pemetaan mapel belum tersedia
-
+                                    <span class="text-belum">
+                                        Pemetaan mapel belum tersedia
+                                    </span>
                                 @elseif ($raporLengkap)
-
-                                    Lengkap
-
+                                    <span class="text-tuntas">
+                                        Lengkap
+                                    </span>
                                 @else
-
-                                    Belum Lengkap
-
+                                    <span class="text-remedial">
+                                        Belum Lengkap
+                                    </span>
                                 @endif
 
                             </td>
@@ -1160,12 +1375,11 @@
                 </table>
 
                 <p class="mt-2 text-xs text-slate-500">
-                    Rata-rata dihitung dari mata pelajaran yang memiliki nilai harian,
-                    UTS, UAS, dan nilai akhir lengkap.
+                    Rata-rata dihitung dari mata pelajaran yang memiliki
+                    nilai harian, UTS, UAS, dan nilai akhir lengkap.
                 </p>
 
             </div>
-
 
             {{-- D. KEHADIRAN SISWA --}}
             <div class="mb-8">
@@ -1192,7 +1406,6 @@
 
                         <tr>
                             <td>Sakit</td>
-
                             <td class="text-center">
                                 {{ $formatJumlah($dataKehadiran, 'sakit') }}
                             </td>
@@ -1200,7 +1413,6 @@
 
                         <tr>
                             <td>Izin</td>
-
                             <td class="text-center">
                                 {{ $formatJumlah($dataKehadiran, 'izin') }}
                             </td>
@@ -1208,7 +1420,6 @@
 
                         <tr>
                             <td>Tanpa Keterangan</td>
-
                             <td class="text-center">
                                 {{ $formatJumlah($dataKehadiran, 'tanpa_keterangan') }}
                             </td>
@@ -1219,13 +1430,12 @@
                 </table>
 
                 @if (!$dataKehadiran)
-                    <p class="mt-2 text-sm">
+                    <p class="mt-2 text-sm text-slate-500">
                         Data kehadiran belum diinput oleh Guru.
                     </p>
                 @endif
 
             </div>
-
 
             {{-- E. EKSTRAKURIKULER --}}
             <div class="mb-8">
@@ -1238,23 +1448,16 @@
 
                     <thead>
                         <tr>
-
-                            <th class="text-center">
-                                No.
-                            </th>
-
+                            <th class="text-center">No.</th>
                             <th class="text-left">
                                 Kegiatan Ekstrakurikuler
                             </th>
-
                             <th class="text-center">
                                 Predikat
                             </th>
-
                             <th class="text-left">
                                 Keterangan
                             </th>
-
                         </tr>
                     </thead>
 
@@ -1298,11 +1501,9 @@
 
             </div>
 
-
             {{-- TANDA TANGAN --}}
             <div class="signature-section mt-12 grid grid-cols-2 gap-6">
 
-                {{-- KEPALA SEKOLAH --}}
                 <div class="w-full text-center">
 
                     <p>Mengetahui,</p>
@@ -1323,8 +1524,6 @@
 
                 </div>
 
-
-                {{-- WALI KELAS --}}
                 <div class="w-full text-center">
 
                     <p>
@@ -1349,7 +1548,6 @@
 
             </div>
 
-
             {{-- FOOTER DOKUMEN --}}
             <div class="mt-8 border-t border-slate-300 pt-4 text-center text-xs">
                 Dokumen ini dibuat melalui Sistem Akademik Mini.
@@ -1360,5 +1558,15 @@
     </div>
 
 </div>
+
+@if (session('cetak_rapor'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
+                window.print();
+            }, 500);
+        });
+    </script>
+@endif
 
 @endsection

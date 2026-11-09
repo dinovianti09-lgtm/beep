@@ -333,36 +333,44 @@
         }
 
         .logout-btn form {
-            display: none;
+            display: block;
+            width: 100%;
         }
 
-        .logout-btn a {
+        .logout-btn button {
             display: flex;
             align-items: center;
             gap: 12px;
 
-            padding: 12px 14px;
+            width: 100%;
             min-height: 44px;
+            padding: 12px 14px;
 
             border: 1px solid transparent;
             border-radius: 11px;
 
+            background: transparent;
             color: #38536F;
+
+            cursor: pointer;
+            text-align: left;
+
+            font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 13px;
             font-weight: 700;
-
-            text-decoration: none;
 
             transition: all .2s ease;
         }
 
-        .logout-btn a i {
+        .logout-btn button i {
             width: 20px;
+            flex-shrink: 0;
+
             font-size: 17px;
             text-align: center;
         }
 
-        .logout-btn a:hover {
+        .logout-btn button:hover {
             background: rgba(248, 250, 252, .82);
             border-color: #B7D5F3;
             color: #24466A;
@@ -1042,13 +1050,13 @@
             border-color: #34445C;
         }
 
-        html.dark .logout-btn a,
-        body.dark-mode .logout-btn a {
+        html.dark .logout-btn button,
+        body.dark-mode .logout-btn button {
             color: #C3D1E3;
         }
 
-        html.dark .logout-btn a:hover,
-        body.dark-mode .logout-btn a:hover {
+        html.dark .logout-btn button:hover,
+        body.dark-mode .logout-btn button:hover {
             background: #263A54;
             border-color: #3A5270;
             color: #FFFFFF;
@@ -1829,18 +1837,18 @@
             <form
                 action="{{ route('logout') }}"
                 method="POST"
-                id="logout-form"
             >
                 @csrf
-            </form>
 
-            <a
-                href="{{ route('logout') }}"
-                onclick="event.preventDefault(); if (confirm('Yakin ingin keluar dari akun?')) document.getElementById('logout-form').submit();"
-            >
-                <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
-                <span>Keluar</span>
-            </a>
+                <button
+                    type="submit"
+                    onclick="return confirm('Yakin ingin keluar dari akun?')"
+                >
+                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                    <span>Keluar</span>
+                </button>
+
+            </form>
 
         </li>
 

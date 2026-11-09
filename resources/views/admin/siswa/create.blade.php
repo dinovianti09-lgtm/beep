@@ -978,3 +978,36 @@
 </div>
 
 @endsection
+
+{{-- S3-07 ANTI DOUBLE CLICK TAMBAH SISWA --}}
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form[action="{{ route('admin.siswa.store') }}"]');
+    if (!form) return;
+
+    const button = form.querySelector('button[type="submit"]');
+    if (!button) return;
+
+    form.addEventListener('submit', function (event) {
+        if (form.dataset.s3Submitting === 'true') {
+            event.preventDefault();
+            return;
+        }
+
+        form.dataset.s3Submitting = 'true';
+        button.setAttribute('aria-disabled', 'true');
+        button.style.pointerEvents = 'none';
+        button.style.opacity = '0.7';
+        button.innerHTML = 'Memproses...';
+    });
+
+    window.addEventListener('pageshow', function () {
+        form.dataset.s3Submitting = 'false';
+        button.removeAttribute('aria-disabled');
+        button.style.pointerEvents = '';
+        button.style.opacity = '';
+    });
+});
+</script>
+@endpush

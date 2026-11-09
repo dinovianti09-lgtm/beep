@@ -945,6 +945,44 @@
 </div>
 
 
+{{-- S3-07 ANTI DOUBLE CLICK PROFIL ADMIN --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector(
+        'form[action="{{ route('admin.profil.password') }}"]'
+    );
+
+    if (!form) return;
+
+    const button = form.querySelector('button[type="submit"]');
+    if (!button) return;
+
+    const originalHTML = button.innerHTML;
+
+    form.addEventListener('submit', function (event) {
+        if (event.defaultPrevented) return;
+
+        if (form.dataset.s3Submitting === 'true') {
+            event.preventDefault();
+            return;
+        }
+
+        form.dataset.s3Submitting = 'true';
+        button.setAttribute('aria-disabled', 'true');
+        button.style.pointerEvents = 'none';
+        button.style.opacity = '0.7';
+        button.innerHTML = 'Memproses...';
+    });
+
+    window.addEventListener('pageshow', function () {
+        form.dataset.s3Submitting = 'false';
+        button.removeAttribute('aria-disabled');
+        button.style.pointerEvents = '';
+        button.style.opacity = '';
+        button.innerHTML = originalHTML;
+    });
+});
+</script>
 {{-- SCRIPT TAMPIL / SEMBUNYIKAN PASSWORD --}}
 <script>
 function togglePassword(inputId, button) {
