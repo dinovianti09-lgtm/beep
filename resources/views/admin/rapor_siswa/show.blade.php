@@ -1,4 +1,3 @@
-
 @extends('layouts.admin')
 
 @section('title', 'Detail Rapor Siswa - Sistem Akademik Mini')
@@ -462,121 +461,231 @@
 
     @media screen and (max-width: 640px) {
 
+        /* Area halaman admin mengikuti lebar layar HP */
         .rs-show-page {
-            width: 100%;
-            min-width: 0;
-            padding: 12px !important;
-        }
-
-        .rs-show-hero {
-            padding: 16px !important;
-        }
-
-        .rs-document-shell {
             width: 100%;
             max-width: 100%;
             min-width: 0;
             padding: 12px !important;
-            overflow-x: auto !important;
-            overflow-y: hidden !important;
-            -webkit-overflow-scrolling: touch;
+            overflow-x: hidden;
+        }
+
+        .rs-show-hero {
+            padding: 15px !important;
+            gap: 14px !important;
+            border-radius: 14px;
+        }
+
+        .rs-show-hero > div:first-child {
+            min-width: 0;
+            align-items: flex-start;
+        }
+
+        .rs-show-hero h2 {
+            font-size: 18px !important;
+            line-height: 1.3 !important;
+        }
+
+        .rs-show-hero p {
+            line-height: 1.5;
+        }
+
+        .rs-show-hero > div:last-child {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .rs-show-hero > div:last-child form,
+        .rs-show-hero > div:last-child form button,
+        .rs-show-hero > div:last-child > a,
+        .rs-show-hero > div:last-child > button {
+            width: 100%;
+        }
+
+        .rs-show-btn {
+            min-height: 42px;
+            padding: 10px 9px;
+            font-size: 11px;
+            white-space: normal;
+            text-align: center;
+        }
+
+        /* Kartu rapor tidak lagi memaksa seluruh halaman melebar */
+        .rs-document-shell {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            padding: 10px !important;
+            overflow: hidden !important;
             border-radius: 12px;
         }
 
-        /*
-         * Lembar rapor tidak dipaksa mengecil
-         * mengikuti lebar layar HP.
-         * Pengguna bisa menggeser secara horizontal.
-         */
         .print-card {
-            width: 760px !important;
-            min-width: 760px !important;
-            max-width: none !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
             margin: 0 !important;
-            padding: 24px !important;
-            font-size: 14px !important;
-            line-height: 1.5 !important;
+            padding: 14px !important;
+            border-radius: 10px !important;
+            font-size: 11px !important;
+            line-height: 1.45 !important;
         }
 
+        /* Kop sekolah tetap seimbang dan logo tidak menimpa judul */
         .report-school-header {
-            min-height: 115px !important;
-            padding: 10px 10px 16px !important;
+            min-height: 88px !important;
+            padding: 8px 5px 12px 58px !important;
         }
 
         .school-logo {
             position: absolute !important;
-            left: 10px !important;
+            left: 2px !important;
             top: 50% !important;
             transform: translateY(-50%) !important;
-            width: 80px !important;
-            height: 80px !important;
+            width: 48px !important;
+            height: 48px !important;
         }
 
         .school-heading-content {
             width: 100% !important;
-            padding: 0 10px !important;
+            padding: 0 !important;
             text-align: center !important;
         }
 
         .school-heading {
-            font-size: 14px !important;
+            font-size: 8px !important;
+            line-height: 1.25 !important;
         }
 
         .school-name {
-            font-size: 23px !important;
+            margin-top: 3px !important;
+            font-size: 13px !important;
+            line-height: 1.2 !important;
+            overflow-wrap: anywhere;
         }
 
         .school-subheading {
-            font-size: 13px !important;
+            margin-top: 3px !important;
+            font-size: 8px !important;
+            line-height: 1.25 !important;
         }
 
         .report-title {
-            font-size: 21px !important;
+            font-size: 16px !important;
+            line-height: 1.25 !important;
         }
 
         .report-subtitle {
-            font-size: 14px !important;
+            font-size: 10px !important;
+            line-height: 1.3 !important;
         }
 
+        .print-card > .mb-7,
+        .print-card > .mb-8 {
+            margin-bottom: 16px !important;
+        }
+
+        .print-card > .mt-6,
+        .print-card > .mt-12 {
+            margin-top: 16px !important;
+        }
+
+        .section-heading {
+            margin-bottom: 9px !important;
+            padding-bottom: 5px !important;
+            font-size: 11px !important;
+            line-height: 1.35 !important;
+        }
+
+        /* Identitas dibuat satu kolom agar tidak bertumpuk di layar sempit */
         .identity-grid {
-            grid-template-columns: 1fr 1fr !important;
-            gap: 8px 16px !important;
+            grid-template-columns: minmax(0, 1fr) !important;
+            gap: 5px !important;
         }
 
         .identity-row {
-            grid-template-columns: 110px 10px minmax(0, 1fr) !important;
-            font-size: 13px !important;
+            grid-template-columns: 92px 8px minmax(0, 1fr) !important;
+            gap: 3px !important;
+            font-size: 10px !important;
+            line-height: 1.5 !important;
         }
 
         .identity-label,
         .identity-colon,
         .identity-value {
-            font-size: 13px !important;
+            font-size: 10px !important;
         }
 
-        .section-heading {
-            font-size: 15px !important;
+        .identity-value {
+            overflow-wrap: anywhere;
+        }
+
+        /* Tabel nilai dapat digeser sendiri, bukan membuat seluruh halaman melebar */
+        .print-card .overflow-x-auto {
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            -webkit-overflow-scrolling: touch;
         }
 
         .report-table {
             width: 100% !important;
             min-width: 0 !important;
-            font-size: 13px !important;
+            table-layout: fixed !important;
+            font-size: 9px !important;
         }
 
         .report-table th,
         .report-table td {
-            font-size: 13px !important;
-            padding: 8px 6px !important;
-            line-height: 1.4 !important;
+            padding: 5px 3px !important;
+            font-size: 9px !important;
+            line-height: 1.3 !important;
+            overflow-wrap: anywhere !important;
+        }
+
+        /* Tabel capaian memiliki sembilan kolom; geser bagian tabelnya saja */
+        .print-card .overflow-x-auto > .report-table {
+            min-width: 610px !important;
+            table-layout: auto !important;
         }
 
         .summary-table {
+            width: 100% !important;
             min-width: 0 !important;
+            table-layout: fixed !important;
+        }
+
+        .summary-table th {
+            width: 65% !important;
         }
 
         .signature-section {
-            grid-template-columns: 1fr 1fr !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 10px !important;
+            margin-top: 22px !important;
+        }
+
+        .signature-section > div {
+            min-width: 0;
+            font-size: 9px !important;
+            overflow-wrap: anywhere;
+        }
+
+        .signature-name {
+            font-size: 10px !important;
+        }
+
+        .signature-role {
+            font-size: 9px !important;
+        }
+
+        .print-card > .mt-8.border-t {
+            margin-top: 18px !important;
+            padding-top: 8px !important;
+            font-size: 8px !important;
         }
     }
 
