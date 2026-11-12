@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -10,11 +11,7 @@ return new class extends Migration
     {
         Schema::create('mapel_kelas', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('id_mapel')
-                ->constrained('mapel', 'id_mapel')
-                ->cascadeOnDelete();
-
+            $table->unsignedBigInteger('id_mapel')->index();
             $table->string('jurusan', 50);
             $table->enum('tingkat', ['X', 'XI', 'XII']);
 

@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -10,10 +11,9 @@ return new class extends Migration
     {
         Schema::create('guru', function (Blueprint $table) {
             $table->id('id_guru');
-            $table->foreignId('id_user')->constrained('users')->onDelete('cascade');
+            $table->unsignedBigInteger('user_id')->nullable()->index();
             $table->string('nip')->unique();
             $table->string('nama_guru');
-            $table->string('no_hp')->nullable();
             $table->timestamps();
         });
     }

@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -10,8 +11,8 @@ return new class extends Migration
     {
         Schema::create('siswa', function (Blueprint $table) {
             $table->id('id_siswa');
-            $table->foreignId('id_user')->constrained('users')->onDelete('cascade');
-            $table->string('nisn')->unique();
+            $table->unsignedBigInteger('user_id')->nullable()->index();
+            $table->string('nis')->unique();
             $table->string('nama_siswa');
             $table->string('kelas');
             $table->enum('jenis_kelamin', ['L', 'P']);

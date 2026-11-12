@@ -33,14 +33,6 @@
         }
     }
 
-    $pengaturanSekolah = DB::table('pengaturan_sekolah')->first();
-
-    $kepalaSekolah = $pengaturanSekolah->nama_kepala_sekolah
-        ?? 'Ahmad Fadilah';
-
-    $nipKepalaSekolah = $pengaturanSekolah->nip_kepala_sekolah
-        ?? '';
-
     $mapelWajib = collect();
 
     if ($kelasData) {
@@ -136,12 +128,13 @@
         && $jumlahSeluruhMapel > 0
         && $jumlahMapelBelumLengkap === 0;
 
-    $statusNilai = function ($baris) {
+    // Status nilai: komponen harus lengkap sebelum dibandingkan dengan KKM.
+    $statusNilai = function ($baris) use ($nilaiLengkap) {
         $nilai = $baris->nilai;
         $kkm = $baris->kkm;
 
-        if (!$nilai || !is_numeric($nilai->nilai_akhir)) {
-            return 'Belum dinilai';
+        if (!$nilaiLengkap($nilai)) {
+            return 'Belum lengkap';
         }
 
         if (!is_numeric($kkm)) {
@@ -1022,34 +1015,46 @@
                 Kembali
             </a>
 
-            <form
-                action="{{ route('admin.rapor_siswa.cetak', $raporSiswa->id_rapor_siswa) }}"
-                method="POST"
-                id="formCetakRapor"
-            >
-                @csrf
-
-                <button
-                    type="submit"
-                    class="rs-show-btn rs-show-print"
+            @if ($raporLengkap)
+                <form
+                    action="{{ route('admin.rapor_siswa.cetak', $raporSiswa->id_rapor_siswa) }}"
+                    method="POST"
+                    id="formCetakRapor"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        width="17"
-                        height="17"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M6 9V2h12v7"/>
-                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2 2h-2"/>
-                        <path d="M6 14h12v8H6z"/>
-                    </svg>
+                    @csrf
 
-                    Cetak Rapor
+                    <button
+                        type="submit"
+                        class="rs-show-btn rs-show-print"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            width="17"
+                            height="17"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M6 9V2h12v7"/>
+                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h2"/>
+                            <path d="M6 14h12v8H6z"/>
+                        </svg>
+
+                        Cetak Rapor
+                    </button>
+                </form>
+            @else
+                <button
+                    type="button"
+                    class="rs-show-btn"
+                    disabled
+                    title="Lengkapi seluruh nilai mata pelajaran terlebih dahulu."
+                    style="background:#94A3B8; border:1px solid #94A3B8; color:#FFFFFF; cursor:not-allowed;"
+                >
+                    Rapor Belum Lengkap
                 </button>
-            </form>
+            @endif
 
         </div>
 

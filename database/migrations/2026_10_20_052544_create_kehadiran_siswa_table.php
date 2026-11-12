@@ -12,14 +12,16 @@ return new class extends Migration
         Schema::create('kehadiran_siswa', function (Blueprint $table) {
             $table->id('id_kehadiran');
 
-            $table->unsignedBigInteger('id_siswa');
-            $table->unsignedBigInteger('id_rapor');
+            $table->unsignedBigInteger('id_siswa')->index();
+            $table->unsignedBigInteger('id_rapor')->index();
 
-            $table->integer('sakit')->default(0);
-            $table->integer('izin')->default(0);
-            $table->integer('tanpa_keterangan')->default(0);
+            $table->unsignedInteger('sakit')->default(0);
+            $table->unsignedInteger('izin')->default(0);
+            $table->unsignedInteger('tanpa_keterangan')->default(0);
 
             $table->timestamps();
+
+            $table->unique(['id_siswa', 'id_rapor']);
         });
     }
 

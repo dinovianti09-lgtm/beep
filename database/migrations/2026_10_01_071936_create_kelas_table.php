@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -9,10 +10,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('kelas', function (Blueprint $table) {
-            $table->id('id_kelas');
+            $table->id();
             $table->string('nama_kelas');
-            $table->string('tingkat');
+            $table->enum('tingkat', ['X', 'XI', 'XII']);
             $table->string('jurusan')->nullable();
+            $table->string('wali_kelas')->nullable();
             $table->timestamps();
         });
     }

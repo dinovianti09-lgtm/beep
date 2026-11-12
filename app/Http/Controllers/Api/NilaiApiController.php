@@ -18,7 +18,7 @@ class NilaiApiController extends Controller
     {
         return Nilai::query()
             ->with([
-                'siswa:id_siswa,nis,nama_siswa,kelas,user_id',
+                'siswa:id_siswa,nis,nama_siswa,kelas',
                 'mapel:id_mapel,nama_mapel,kkm',
             ])
             ->select([

@@ -20,6 +20,8 @@ return new class extends Migration
             $table->text('keterangan')->nullable();
 
             $table->timestamps();
+
+            $table->index(['id_siswa', 'id_rapor']);
         });
     }
 

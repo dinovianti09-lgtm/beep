@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -10,10 +11,9 @@ return new class extends Migration
     {
         Schema::create('nilai', function (Blueprint $table) {
             $table->id('id_nilai');
-            $table->foreignId('id_siswa')->constrained('siswa', 'id_siswa')->onDelete('cascade');
-            $table->foreignId('id_guru')->constrained('guru', 'id_guru')->onDelete('cascade');
-            $table->foreignId('id_mapel')->constrained('mapel', 'id_mapel')->onDelete('cascade');
-            $table->enum('semester', ['Ganjil', 'Genap']);
+            $table->unsignedBigInteger('id_siswa')->index();
+            $table->unsignedBigInteger('id_mapel')->index();
+            $table->unsignedBigInteger('id_rapor')->index();
             $table->decimal('nilai_harian', 5, 2)->nullable();
             $table->decimal('nilai_uts', 5, 2)->nullable();
             $table->decimal('nilai_uas', 5, 2)->nullable();

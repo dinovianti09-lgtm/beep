@@ -214,7 +214,7 @@ class SiswaController extends Controller
     }
 
     // ========================================
-    // IMPORT SISWA DARI EXCEL
+    // IMPORT SISWA DARI EXCEL (UPDATE IF EXISTS)
     // ========================================
 
     public function import(Request $request)
@@ -360,12 +360,16 @@ class SiswaController extends Controller
                         continue;
                     }
 
-                    if (Siswa::where('nis', $nis)->exists()) {
-                        $dilewati++;
+                    $siswa = Siswa::where('nis', $nis)->first();
 
-                        $importErrors[] = 'Baris ' . $nomorBaris
-                            . ': NIS ' . $nis . ' sudah terdaftar.';
+                    if ($siswa) {
+                        $siswa->update([
+                            'nama_siswa' => $nama,
+                            'kelas' => $kelas,
+                            'jenis_kelamin' => $jenisKelamin,
+                        ]);
 
+                        $berhasil++;
                         continue;
                     }
 
@@ -380,7 +384,7 @@ class SiswaController extends Controller
                 }
             });
 
-            $message = "Import selesai. {$berhasil} data berhasil ditambahkan.";
+            $message = "Import selesai. {$berhasil} data berhasil diproses (ditambahkan / diperbarui).";
 
             if ($dilewati > 0) {
                 $message .= " {$dilewati} baris dilewati.";

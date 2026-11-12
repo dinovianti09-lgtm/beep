@@ -2,16 +2,22 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        // Kolom semester sudah dibuat di migration create_nilai_table.
+        Schema::table('nilai', function (Blueprint $table) {
+            $table->integer('semester')->nullable();
+        });
     }
 
     public function down(): void
     {
-        // Tidak menghapus kolom semester karena dimiliki migration utama.
+        Schema::table('nilai', function (Blueprint $table) {
+            $table->dropColumn('semester');
+        });
     }
 };

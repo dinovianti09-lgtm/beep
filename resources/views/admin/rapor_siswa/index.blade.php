@@ -183,6 +183,11 @@
         color: #218454;
     }
 
+    .rs-status-warning {
+        background: #FFF4DB;
+        color: #A66A08;
+    }
+
     .rs-status-incomplete {
         background: #FDECEC;
         color: #C24A4A;
@@ -400,6 +405,11 @@
     .dark .rs-status-complete {
         background: #12372F;
         color: #86EFAC;
+    }
+
+    .dark .rs-status-warning {
+        background: #3F3116;
+        color: #FCD34D;
     }
 
     .dark .rs-status-incomplete {
@@ -987,22 +997,28 @@
                             {{-- STATUS RAPOR --}}
                             <td>
 
-                                @if($item->status_rapor === 'Rapor Lengkap')
+                                @if($item->status_rapor === 'Rapor Lengkap - Tuntas')
 
                                     <span class="rs-status rs-status-complete">
-                                        {{ $item->status_rapor }}
+                                        Rapor Lengkap - Tuntas
+                                    </span>
+
+                                @elseif($item->status_rapor === 'Rapor Lengkap - Belum Tuntas')
+
+                                    <span class="rs-status rs-status-warning">
+                                        Rapor Lengkap - Belum Tuntas
                                     </span>
 
                                 @elseif($item->status_rapor === 'Rapor Belum Lengkap')
 
                                     <span class="rs-status rs-status-incomplete">
-                                        {{ $item->status_rapor }}
+                                        Rapor Belum Lengkap
                                     </span>
 
                                 @elseif($item->status_rapor === 'Belum Ada Nilai Lengkap')
 
                                     <span class="rs-status rs-status-empty">
-                                        {{ $item->status_rapor }}
+                                        Belum Ada Nilai Lengkap
                                     </span>
 
                                 @else

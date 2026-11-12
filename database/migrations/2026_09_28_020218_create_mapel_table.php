@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -10,8 +11,8 @@ return new class extends Migration
     {
         Schema::create('mapel', function (Blueprint $table) {
             $table->id('id_mapel');
-            $table->string('kode_mapel')->unique();
             $table->string('nama_mapel');
+            $table->integer('kkm')->default(75);
             $table->timestamps();
         });
     }

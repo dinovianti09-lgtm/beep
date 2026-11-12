@@ -7,6 +7,7 @@ use App\Models\Siswa;
 use App\Models\Rapor;
 use App\Models\Nilai;
 use App\Models\Kelas;
+use App\Models\PengaturanSekolah;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -234,20 +235,22 @@ class RaporSiswaController extends Controller
 
                     /*
                     |--------------------------------------------------------------------------
-                    | HITUNG KELENGKAPAN NILAI
+                    | HITUNG KELENGKAPAN NILAI & STATUS KKM
                     |--------------------------------------------------------------------------
                     */
 
                     $jumlahMapelWajib = $mapelWajib->count();
-
                     $jumlahNilaiLengkap = 0;
+                    $jumlahDiBawahKkm = 0;
+
+                    $kkmMapel = DB::table('mapel')
+                        ->whereIn('id_mapel', $mapelWajib)
+                        ->get()
+                        ->keyBy('id_mapel');
 
                     foreach ($mapelWajib as $idMapel) {
 
-                        $nilai = $nilaiSiswa->firstWhere(
-                            'id_mapel',
-                            $idMapel
-                        );
+                        $nilai = $nilaiSiswa->firstWhere('id_mapel', $idMapel);
 
                         if (
                             $nilai &&
@@ -257,16 +260,19 @@ class RaporSiswaController extends Controller
                             is_numeric($nilai->nilai_akhir)
                         ) {
                             $jumlahNilaiLengkap++;
+
+                            $kkm = $kkmMapel->get($idMapel)?->kkm;
+
+                            if (
+                                is_numeric($kkm) &&
+                                (float) $nilai->nilai_akhir < (float) $kkm
+                            ) {
+                                $jumlahDiBawahKkm++;
+                            }
                         }
                     }
 
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | STATUS RAPOR
-                    |--------------------------------------------------------------------------
-                    */
-
+                    // STATUS RAPOR
                     if (!$dataRapor) {
 
                         $statusRapor = 'Belum Ada Rapor';
@@ -283,9 +289,13 @@ class RaporSiswaController extends Controller
 
                         $statusRapor = 'Rapor Belum Lengkap';
 
+                    } elseif ($jumlahDiBawahKkm > 0) {
+
+                        $statusRapor = 'Rapor Lengkap - Belum Tuntas';
+
                     } else {
 
-                        $statusRapor = 'Rapor Lengkap';
+                        $statusRapor = 'Rapor Lengkap - Tuntas';
                     }
 
 
@@ -303,7 +313,10 @@ class RaporSiswaController extends Controller
 
                     if (
                         $dataRapor &&
-                        $statusRapor === 'Rapor Lengkap'
+                        in_array($statusRapor, [
+                            'Rapor Lengkap - Tuntas',
+                            'Rapor Lengkap - Belum Tuntas'
+                        ])
                     ) {
                         $tanggalCetak = $dataRapor->tgl_cetak;
                     }
@@ -523,9 +536,14 @@ class RaporSiswaController extends Controller
             }
         }
 
-        // Data kepala sekolah.
-        $kepalaSekolah = 'Ahmad Fadilah';
-        $nipKepalaSekolah = null;
+        // Mengambil data kepala sekolah dari pengaturan sekolah.
+        $pengaturanSekolah = PengaturanSekolah::first();
+
+        $kepalaSekolah = $pengaturanSekolah?->nama_kepala_sekolah
+            ?? 'Nama Kepala Sekolah';
+
+        $nipKepalaSekolah = $pengaturanSekolah?->nip_kepala_sekolah
+            ?? '';
 
         return view(
             'admin.rapor_siswa.show',

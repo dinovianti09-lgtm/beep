@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -11,13 +12,8 @@ return new class extends Migration
         Schema::create('bobot_nilai', function (Blueprint $table) {
             $table->id('id_bobot');
 
-            $table->foreignId('id_mapel')
-                ->constrained('mapel', 'id_mapel')
-                ->cascadeOnDelete();
-
-            $table->foreignId('id_rapor')
-                ->constrained('rapor', 'id_rapor')
-                ->cascadeOnDelete();
+            $table->unsignedBigInteger('id_mapel')->index();
+            $table->unsignedBigInteger('id_rapor')->index();
 
             $table->unsignedTinyInteger('bobot_harian')->default(30);
             $table->unsignedTinyInteger('bobot_uts')->default(30);

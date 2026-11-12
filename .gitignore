@@ -32,3 +32,7 @@ yarn-error.log
 *.backup*
 *.before-*
 /backup-tampilan-2026-10-30/
+# Backup database lokal
+*.sql
+
+/backup/
