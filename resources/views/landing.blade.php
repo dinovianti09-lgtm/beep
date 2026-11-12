@@ -111,6 +111,113 @@
         body, header, section, footer, nav, a, p, h1, h2, h3, h4, div, span, button {
             transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
+
+
+        /* RESPONSIVE REFINEMENT: laptop, tablet, and mobile */
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { max-width: 100%; overflow-x: clip; }
+        img, svg { max-width: 100%; }
+
+        /* Keep the main content balanced on wide laptop screens. */
+        @media (min-width: 1280px) {
+            .max-w-7xl { max-width: 1240px; }
+            #tentang h1 { max-width: 680px; }
+        }
+
+        /* Tablet: give the header room and prevent the desktop menu from crowding. */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            header > div:first-child { padding-left: 22px; padding-right: 22px; }
+            header nav { display: none !important; }
+            header button[onclick="toggleMenu()"] { display: flex !important; }
+            #mobileMenu:not(.hidden) { display: block !important; }
+            #tentang .grid { gap: 2.5rem; }
+            #tentang h1 { font-size: clamp(2.6rem, 5vw, 3.6rem); }
+        }
+
+        /* Phones: simplify spacing, typography, and decorative elements. */
+        @media (max-width: 767px) {
+            header > div:first-child {
+                min-height: 68px;
+                padding: 10px 14px;
+                gap: 8px;
+            }
+            header a.group { min-width: 0; gap: 8px; }
+            header a.group .w-10.h-10 { width: 36px; height: 36px; }
+            header a.group span { font-size: 13px; line-height: 1.2; }
+            header a.group p { font-size: 8px; }
+            header > div:first-child > div:last-child { gap: 7px; }
+            header .theme-toggle { width: 34px; height: 34px; }
+            header a[href*="register"] { padding: 8px 12px; font-size: 12px; border-radius: 10px; }
+            header a[href*="login"] { display: none !important; }
+            header button[onclick="toggleMenu()"] { display: flex !important; width: 34px; height: 34px; }
+            #mobileMenu { padding: 12px 16px 16px; }
+            #mobileMenu:not(.hidden) { display: block !important; }
+            #mobileMenu a { font-size: 13px; }
+
+            #tentang { overflow: hidden; }
+            #tentang > div.max-w-7xl {
+                padding: 42px 18px 64px;
+            }
+            #tentang .grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 34px; }
+            #tentang .lg\:col-span-6 { grid-column: auto; min-width: 0; }
+            #tentang h1 {
+                font-size: clamp(2.15rem, 9vw, 3rem);
+                line-height: 1.08;
+                letter-spacing: -0.045em;
+                overflow-wrap: anywhere;
+            }
+            #tentang p { font-size: 14px; line-height: 1.7; }
+            #tentang .flex.flex-col.sm\:flex-row { gap: 10px; }
+            #tentang .flex.flex-col.sm\:flex-row a { width: 100%; min-height: 46px; }
+            #tentang .perspective-1000 { width: 100%; min-width: 0; }
+            #tentang .rotate-y-6 { transform: none; }
+            #tentang .perspective-1000 > div.relative.bg-white {
+                padding: 16px;
+                border-radius: 20px;
+            }
+            #tentang .perspective-1000 .space-y-2\.5 > div { padding: 11px; gap: 10px; }
+            #tentang .perspective-1000 .space-y-2\.5 .w-10.h-10 { width: 36px; height: 36px; }
+            #tentang .perspective-1000 .absolute.-top-3.-right-3 { top: -12px; right: 2px; }
+            #tentang .perspective-1000 .absolute.-bottom-3.-left-3 { display: none; }
+            #tentang .absolute.top-32, #tentang .absolute.bottom-40 { opacity: .45; }
+
+            section.py-20 { padding-top: 54px; padding-bottom: 54px; }
+            #fitur .max-w-7xl, #cara-kerja .max-w-7xl,
+            footer .max-w-7xl { padding-left: 18px; padding-right: 18px; }
+            #fitur h2, #cara-kerja h2 { font-size: clamp(1.8rem, 7vw, 2.35rem); line-height: 1.15; }
+            #fitur .grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+            #fitur .grid > div { grid-column: auto !important; padding: 20px; border-radius: 20px; }
+            #fitur .grid > div h3 { font-size: 17px; }
+            #fitur .grid > div p { font-size: 13px; }
+
+            #cara-kerja .grid { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+            #cara-kerja .grid > div { max-width: 420px; width: 100%; margin-left: auto; margin-right: auto; }
+            #cara-kerja .grid > div .mb-5 { margin-bottom: 10px; }
+
+            #tentang-sistem .max-w-7xl { padding-left: 18px; padding-right: 18px; }
+            #tentang-sistem .grid { gap: 28px; }
+            #tentang-sistem .grid > div:first-child > div.relative { padding: 24px; }
+            #tentang-sistem h2 { font-size: 1.8rem; line-height: 1.2; }
+
+            section.py-20 .max-w-4xl { padding-left: 18px; padding-right: 18px; }
+            section.py-20 .max-w-4xl h2 { font-size: clamp(1.8rem, 7vw, 2.4rem); line-height: 1.15; }
+            footer { padding-top: 48px; padding-bottom: 30px; }
+            footer .grid { gap: 28px; }
+        }
+
+        @media (max-width: 380px) {
+            header a.group span { font-size: 12px; }
+            header a[href*="register"] { padding: 8px 9px; }
+            #tentang > div.max-w-7xl { padding-left: 15px; padding-right: 15px; }
+            #tentang h1 { font-size: 2.05rem; }
+            #tentang .perspective-1000 .space-y-2\.5 > div { padding: 9px; }
+        }
+
+        /* Respect users who prefer reduced motion. */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+        }
+
     </style>
 
     <script>
@@ -506,7 +613,7 @@
     </section>
 
     <!-- ABOUT -->
-    <section class="py-20 bg-white dark:bg-dark-surface">
+    <section id="tentang-sistem" class="py-20 bg-white dark:bg-dark-surface">
         <div class="max-w-7xl mx-auto px-6">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div class="relative">
