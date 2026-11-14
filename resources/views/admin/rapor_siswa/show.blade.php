@@ -128,6 +128,27 @@
         && $jumlahSeluruhMapel > 0
         && $jumlahMapelBelumLengkap === 0;
 
+    // Hitung jumlah mata pelajaran yang nilainya di bawah KKM.
+    // Hanya nilai yang komponennya lengkap dan KKM-nya tersedia yang dihitung.
+    $jumlahDiBawahKkm = $barisRapor->filter(function ($baris) use ($nilaiLengkap) {
+        return $nilaiLengkap($baris->nilai)
+            && is_numeric($baris->kkm)
+            && (float) $baris->nilai->nilai_akhir < (float) $baris->kkm;
+    })->count();
+
+    // Samakan status pada halaman detail dengan status di daftar rapor.
+    if (!$daftarMapelTersedia) {
+        $statusRaporDetail = 'Daftar Mapel Belum Diatur';
+    } elseif ($jumlahMapel === 0) {
+        $statusRaporDetail = 'Belum Ada Nilai Lengkap';
+    } elseif ($jumlahMapel < $jumlahSeluruhMapel) {
+        $statusRaporDetail = 'Rapor Belum Lengkap';
+    } elseif ($jumlahDiBawahKkm > 0) {
+        $statusRaporDetail = 'Rapor Lengkap - Belum Tuntas';
+    } else {
+        $statusRaporDetail = 'Rapor Lengkap - Tuntas';
+    }
+
     // Status nilai: komponen harus lengkap sebelum dibandingkan dengan KKM.
     $statusNilai = function ($baris) use ($nilaiLengkap) {
         $nilai = $baris->nilai;
@@ -1353,22 +1374,27 @@
 
                         <tr>
                             <th class="text-left">
-                                Status Kelengkapan Rapor
+                                Status Rapor
                             </th>
 
                             <td class="text-center">
 
-                                @if (!$daftarMapelTersedia)
-                                    <span class="text-belum">
-                                        Pemetaan mapel belum tersedia
-                                    </span>
-                                @elseif ($raporLengkap)
+                                @if ($statusRaporDetail === 'Rapor Lengkap - Tuntas')
                                     <span class="text-tuntas">
-                                        Lengkap
+                                        {{ $statusRaporDetail }}
+                                    </span>
+                                @elseif ($statusRaporDetail === 'Rapor Lengkap - Belum Tuntas')
+                                    <span class="text-remedial">
+                                        {{ $statusRaporDetail }}
+                                    </span>
+                                @elseif ($statusRaporDetail === 'Rapor Belum Lengkap'
+                                    || $statusRaporDetail === 'Belum Ada Nilai Lengkap')
+                                    <span class="text-remedial">
+                                        {{ $statusRaporDetail }}
                                     </span>
                                 @else
-                                    <span class="text-remedial">
-                                        Belum Lengkap
+                                    <span class="text-belum">
+                                        {{ $statusRaporDetail }}
                                     </span>
                                 @endif
 

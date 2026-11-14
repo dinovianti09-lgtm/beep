@@ -101,6 +101,8 @@ class GuruRaporController extends Controller
         $totalMapel = 0;
         $rataRataRapor = null;
         $belumLengkapMapel = collect();
+        $jumlahDiBawahKkm = 0;
+        $statusRapor = null;
 
         // Data tambahan rapor.
         $kehadiran = null;
@@ -189,7 +191,6 @@ class GuruRaporController extends Controller
 
             $totalMapel = $daftarMapel->count();
 
-            // Periksa kelengkapan nilai untuk setiap mapel wajib.
             $nilaiLengkap = collect();
 
             foreach ($daftarMapel as $mapel) {
@@ -206,6 +207,13 @@ class GuruRaporController extends Controller
 
                 if ($lengkap) {
                     $nilaiLengkap->push($nilai);
+
+                    if (
+                        is_numeric($mapel->kkm)
+                        && (float) $nilai->nilai_akhir < (float) $mapel->kkm
+                    ) {
+                        $jumlahDiBawahKkm++;
+                    }
                 } else {
                     $belumLengkapMapel->push($mapel->nama_mapel);
                 }
@@ -213,10 +221,16 @@ class GuruRaporController extends Controller
 
             $jumlahMapel = $nilaiLengkap->count();
 
-            /*
-             * Rata-rata rapor hanya dihitung jika semua
-             * mata pelajaran wajib sudah memiliki nilai lengkap.
-             */
+            if ($totalMapel === 0) {
+                $statusRapor = 'Daftar Mapel Belum Diatur';
+            } elseif ($belumLengkapMapel->isNotEmpty()) {
+                $statusRapor = 'Rapor Belum Lengkap';
+            } elseif ($jumlahDiBawahKkm > 0) {
+                $statusRapor = 'Rapor Lengkap - Belum Tuntas';
+            } else {
+                $statusRapor = 'Rapor Lengkap - Tuntas';
+            }
+
             if (
                 $totalMapel > 0
                 && $belumLengkapMapel->isEmpty()
@@ -242,6 +256,8 @@ class GuruRaporController extends Controller
             'totalMapel',
             'rataRataRapor',
             'belumLengkapMapel',
+            'jumlahDiBawahKkm',
+            'statusRapor',
             'kehadiran',
             'ekstrakurikulerList'
         ));

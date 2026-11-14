@@ -257,28 +257,31 @@
 
             </div>
 
-        @elseif($totalMapel > 0 && $jumlahMapel === $totalMapel)
 
-            <div class="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 rounded-2xl p-4 mb-6">
+@elseif($totalMapel > 0 && $belumLengkapMapel->isEmpty())
 
-                <div class="flex items-center gap-2">
+    @if($jumlahDiBawahKkm > 0)
 
-                    <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400"
-                         fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                         stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M5 13l4 4L19 7"/>
-                    </svg>
+        <div class="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-2xl p-4 mb-6">
+            <p class="text-sm font-semibold text-amber-700 dark:text-amber-300">
+                Rapor Lengkap - Belum Tuntas.
+                Ada {{ $jumlahDiBawahKkm }} mata pelajaran di bawah KKM.
+            </p>
+        </div>
 
-                    <p class="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
-                        Nilai seluruh mata pelajaran wajib sudah lengkap.
-                    </p>
+    @else
 
-                </div>
+        <div class="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 rounded-2xl p-4 mb-6">
+            <p class="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+                Rapor Lengkap - Tuntas.
+                Seluruh mata pelajaran sudah mencapai KKM.
+            </p>
+        </div>
 
-            </div>
+    @endif
 
-        @endif
+@endif
+
 
 
         {{-- RINGKASAN NILAI --}}
