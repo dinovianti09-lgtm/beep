@@ -1,4 +1,3 @@
-
 @extends('layouts.guru')
 
 @section('title', 'Edit Nilai - Sistem Akademik')
@@ -469,14 +468,15 @@
                 </div>
 
                 <p class="mb-4 text-sm text-slate-500 dark:text-slate-400">
-                    Masukkan nilai pada rentang 0 sampai 100.
+                    Masukkan nilai antara 0 sampai 100. Nilai Harian, UTS, atau UAS boleh dikosongkan jika belum tersedia. Minimal satu komponen nilai harus diisi.
                 </p>
 
                 <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
 
+                    {{-- NILAI HARIAN --}}
                     <div>
                         <label for="nilai_harian" class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                            Nilai Harian <span class="text-red-500">*</span>
+                            Nilai Harian
                         </label>
 
                         <input type="number"
@@ -485,14 +485,19 @@
                                min="0"
                                max="100"
                                step="0.01"
-                               required
                                value="{{ old('nilai_harian', $nilai->nilai_harian) }}"
+                               placeholder="Kosongkan jika belum ada"
                                class="nilai-input en-input w-full rounded-xl border px-4 py-3 text-sm outline-none transition">
+
+                        @error('nilai_harian')
+                            <p class="mt-2 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
                     </div>
 
+                    {{-- NILAI UTS --}}
                     <div>
                         <label for="nilai_uts" class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                            Nilai UTS <span class="text-red-500">*</span>
+                            Nilai UTS
                         </label>
 
                         <input type="number"
@@ -501,14 +506,19 @@
                                min="0"
                                max="100"
                                step="0.01"
-                               required
                                value="{{ old('nilai_uts', $nilai->nilai_uts) }}"
+                               placeholder="Kosongkan jika belum ada"
                                class="nilai-input en-input w-full rounded-xl border px-4 py-3 text-sm outline-none transition">
+
+                        @error('nilai_uts')
+                            <p class="mt-2 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
                     </div>
 
+                    {{-- NILAI UAS --}}
                     <div>
                         <label for="nilai_uas" class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                            Nilai UAS <span class="text-red-500">*</span>
+                            Nilai UAS
                         </label>
 
                         <input type="number"
@@ -517,9 +527,13 @@
                                min="0"
                                max="100"
                                step="0.01"
-                               required
                                value="{{ old('nilai_uas', $nilai->nilai_uas) }}"
+                               placeholder="Kosongkan jika belum ada"
                                class="nilai-input en-input w-full rounded-xl border px-4 py-3 text-sm outline-none transition">
+
+                        @error('nilai_uas')
+                            <p class="mt-2 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
                     </div>
 
                 </div>
@@ -570,7 +584,7 @@
 
                         <div class="mt-3">
                             <span id="nilai_akhir_preview" class="en-final-badge">
-                                {{ number_format((float) $nilai->nilai_akhir, 2) }}
+                                {{ is_numeric($nilai->nilai_akhir) ? number_format((float) $nilai->nilai_akhir, 2) : '-' }}
                             </span>
                         </div>
 
@@ -788,7 +802,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-       renderIkonLucide();
+    renderIkonLucide();
 
     // ANTI DOUBLE CLICK SIMPAN PERUBAHAN
     const formEdit = document.getElementById('formEditNilai');

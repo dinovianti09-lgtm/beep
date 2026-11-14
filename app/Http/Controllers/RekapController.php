@@ -123,12 +123,20 @@ class RekapController extends Controller
      * Jika bobot belum diatur, gunakan bobot bawaan 30/30/40.
      */
     private function hitungNilaiAkhir(
-        float $harian,
-        float $uts,
-        float $uas,
+        ?float $harian,
+        ?float $uts,
+        ?float $uas,
         int $idMapel,
         int $idRapor
     ): array {
+        // Jika salah satu komponen kosong, nilai akhir belum dihitung.
+        if ($harian === null || $uts === null || $uas === null) {
+            return [
+                'nilai_akhir' => null,
+                'predikat' => null,
+            ];
+        }
+
         $bobot = BobotNilai::where('id_mapel', $idMapel)
             ->where('id_rapor', $idRapor)
             ->first();
@@ -137,11 +145,10 @@ class RekapController extends Controller
         $bobotUts = (float) ($bobot->bobot_uts ?? 30);
         $bobotUas = (float) ($bobot->bobot_uas ?? 40);
 
-        $nilaiAkhir = (
+        $nilaiAkhir =
             ($harian * $bobotHarian / 100)
             + ($uts * $bobotUts / 100)
-            + ($uas * $bobotUas / 100)
-        );
+            + ($uas * $bobotUas / 100);
 
         if ($nilaiAkhir >= 90) {
             $predikat = 'A';
@@ -359,11 +366,23 @@ class RekapController extends Controller
         $validated = $request->validate([
             'id_siswa' => 'required|integer|exists:siswa,id_siswa',
             'id_rapor' => 'required|integer|exists:rapor,id_rapor',
-            'nilai_harian' => 'required|numeric|min:0|max:100',
-            'nilai_uts' => 'required|numeric|min:0|max:100',
-            'nilai_uas' => 'required|numeric|min:0|max:100',
+            'nilai_harian' => 'nullable|numeric|min:0|max:100',
+            'nilai_uts' => 'nullable|numeric|min:0|max:100',
+            'nilai_uas' => 'nullable|numeric|min:0|max:100',
             'semester' => 'required|integer|in:1,2',
         ]);
+
+        if (
+            $validated['nilai_harian'] === null &&
+            $validated['nilai_uts'] === null &&
+            $validated['nilai_uas'] === null
+        ) {
+            return back()
+                ->withErrors([
+                    'nilai_harian' => 'Minimal satu komponen nilai harus diisi.'
+                ])
+                ->withInput();
+        }
 
         // Pastikan siswa tujuan masih berada di kelas yang diajar Guru.
         $siswaValid = Siswa::where(
@@ -424,9 +443,14 @@ class RekapController extends Controller
                 ->withInput();
         }
 
-        $nilaiHarian = (float) $validated['nilai_harian'];
-        $nilaiUts = (float) $validated['nilai_uts'];
-        $nilaiUas = (float) $validated['nilai_uas'];
+        $nilaiHarian = $validated['nilai_harian'] !== null
+            ? (float) $validated['nilai_harian'] : null;
+
+        $nilaiUts = $validated['nilai_uts'] !== null
+            ? (float) $validated['nilai_uts'] : null;
+
+        $nilaiUas = $validated['nilai_uas'] !== null
+            ? (float) $validated['nilai_uas'] : null;
 
         // Gunakan bobot untuk mapel dan periode rapor yang dipilih.
         $hasilPerhitungan = $this->hitungNilaiAkhir(
