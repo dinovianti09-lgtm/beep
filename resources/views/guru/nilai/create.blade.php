@@ -1,4 +1,4 @@
-﻿@extends('layouts.guru')
+@extends('layouts.guru')
 
 
 
@@ -16,7 +16,7 @@
 
 /* =====================================================
 
-   EDUVIA - INPUT NILAI GURU
+   EDUVIA - INPUT NILAI GURU
 
 \===================================================== */
 
@@ -24,15 +24,15 @@
 
 .input-nilai-page {
 
-    --input-border: #D5E1ED;
+    --input-border: #D5E1ED;
 
-    --input-text: #26374A;
+    --input-text: #26374A;
 
-    --input-muted: #60748B;
+    --input-muted: #60748B;
 
-    --input-card: #FFFFFF;
+    --input-card: #FFFFFF;
 
-    --input-blue: #3478BD;
+    --input-blue: #3478BD;
 
 }
 
@@ -42,7 +42,7 @@
 
 .input-nilai-page .input-enter {
 
-    animation: inputEnter .4s ease-out both;
+    animation: inputEnter .4s ease-out both;
 
 }
 
@@ -58,21 +58,21 @@
 
 @keyframes inputEnter {
 
-    from {
+    from {
 
-        opacity: 0;
+        opacity: 0;
 
-        transform: translateY(8px);
+        transform: translateY(8px);
 
-    }
+    }
 
-    to {
+    to {
 
-        opacity: 1;
+        opacity: 1;
 
-        transform: translateY(0);
+        transform: translateY(0);
 
-    }
+    }
 
 }
 
@@ -82,7 +82,7 @@
 
 .input-nilai-page .input-heading {
 
-    color: #26374A;
+    color: #26374A;
 
 }
 
@@ -90,7 +90,7 @@
 
 .input-nilai-page .input-description {
 
-    color: #60748B;
+    color: #60748B;
 
 }
 
@@ -100,15 +100,15 @@
 
 .input-nilai-page .input-card {
 
-    overflow: hidden;
+    overflow: hidden;
 
-    background: var(--input-card);
+    background: var(--input-card);
 
-    border: 1px solid var(--input-border);
+    border: 1px solid var(--input-border);
 
-    border-radius: 17px;
+    border-radius: 17px;
 
-    box-shadow: 0 3px 10px rgba(39,77,119,.045);
+    box-shadow: 0 3px 10px rgba(39,77,119,.045);
 
 }
 
@@ -116,7 +116,7 @@
 
 .input-nilai-page .card-heading {
 
-    color: #26374A;
+    color: #26374A;
 
 }
 
@@ -124,7 +124,7 @@
 
 .input-nilai-page .card-description {
 
-    color: #60748B;
+    color: #60748B;
 
 }
 
@@ -134,25 +134,25 @@
 
 .input-nilai-page .input-icon {
 
-    display: flex;
+    display: flex;
 
-    align-items: center;
+    align-items: center;
 
-    justify-content: center;
+    justify-content: center;
 
-    width: 46px;
+    width: 46px;
 
-    height: 46px;
+    height: 46px;
 
-    flex-shrink: 0;
+    flex-shrink: 0;
 
-    border: 1px solid #C3D8EB;
+    border: 1px solid #C3D8EB;
 
-    border-radius: 13px;
+    border-radius: 13px;
 
-    background: #E3F0FA;
+    background: #E3F0FA;
 
-    color: #355779;
+    color: #355779;
 
 }
 
@@ -162,17 +162,17 @@
 
 .input-nilai-page .mapel-card {
 
-    position: relative;
+    position: relative;
 
-    overflow: hidden;
+    overflow: hidden;
 
-    border: 1px solid #B8D2EB;
+    border: 1px solid #B8D2EB;
 
-    border-radius: 17px;
+    border-radius: 17px;
 
-    background: linear-gradient(115deg,#EAF4FD 0%,#D9EAFB 55%,#F0F7FD 100%);
+    background: linear-gradient(115deg,#EAF4FD 0%,#D9EAFB 55%,#F0F7FD 100%);
 
-    box-shadow: 0 4px 12px rgba(48,105,166,.06);
+    box-shadow: 0 4px 12px rgba(48,105,166,.06);
 
 }
 
@@ -180,7 +180,7 @@
 
 .input-nilai-page .mapel-label {
 
-    color: #52708F;
+    color: #52708F;
 
 }
 
@@ -188,7 +188,7 @@
 
 .input-nilai-page .mapel-name {
 
-    color: #1C4169;
+    color: #1C4169;
 
 }
 
@@ -196,7 +196,7 @@
 
 .input-nilai-page .mapel-teacher {
 
-    color: #526D89;
+    color: #526D89;
 
 }
 
@@ -206,15 +206,15 @@
 
 .input-nilai-page .field-label {
 
-    display: block;
+    display: block;
 
-    margin-bottom: 9px;
+    margin-bottom: 9px;
 
-    color: #30445B;
+    color: #30445B;
 
-    font-size: 13px;
+    font-size: 13px;
 
-    font-weight: 800;
+    font-weight: 800;
 
 }
 
@@ -222,7 +222,7 @@
 
 .input-nilai-page .required-mark {
 
-    color: #DC5555;
+    color: #DC5555;
 
 }
 
@@ -232,27 +232,27 @@
 
 .input-nilai-page .form-control {
 
-    display: block;
+    display: block;
 
-    width: 100%;
+    width: 100%;
 
-    min-height: 47px;
+    min-height: 47px;
 
-    padding: 11px 14px;
+    padding: 11px 14px;
 
-    border: 1px solid #D5E1ED;
+    border: 1px solid #D5E1ED;
 
-    border-radius: 11px;
+    border-radius: 11px;
 
-    background: #FFFFFF;
+    background: #FFFFFF;
 
-    color: #30445B;
+    color: #30445B;
 
-    font-size: 13px;
+    font-size: 13px;
 
-    outline: none;
+    outline: none;
 
-    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
 
 }
 
@@ -260,9 +260,9 @@
 
 .input-nilai-page .form-control:focus {
 
-    border-color: #6B9FD1;
+    border-color: #6B9FD1;
 
-    box-shadow: 0 0 0 3px rgba(73,137,198,.13);
+    box-shadow: 0 0 0 3px rgba(73,137,198,.13);
 
 }
 
@@ -270,13 +270,13 @@
 
 .input-nilai-page .form-control:disabled {
 
-    cursor: not-allowed;
+    cursor: not-allowed;
 
-    background: #F1F5F9;
+    background: #F1F5F9;
 
-    color: #8795A5;
+    color: #8795A5;
 
-    opacity: 1;
+    opacity: 1;
 
 }
 
@@ -284,9 +284,9 @@
 
 .input-nilai-page .form-control[readonly] {
 
-    background: #F5F8FC;
+    background: #F5F8FC;
 
-    color: #52677E;
+    color: #52677E;
 
 }
 
@@ -294,7 +294,7 @@
 
 .input-nilai-page .form-control::placeholder {
 
-    color: #9AA9B9;
+    color: #9AA9B9;
 
 }
 
@@ -302,13 +302,13 @@
 
 .input-nilai-page .field-hint {
 
-    margin-top: 7px;
+    margin-top: 7px;
 
-    color: #718399;
+    color: #718399;
 
-    font-size: 11px;
+    font-size: 11px;
 
-    line-height: 1.6;
+    line-height: 1.6;
 
 }
 
@@ -318,9 +318,9 @@
 
 .input-nilai-page .form-section {
 
-    padding-top: 22px;
+    padding-top: 22px;
 
-    border-top: 1px solid #E2EAF2;
+    border-top: 1px solid #E2EAF2;
 
 }
 
@@ -328,15 +328,15 @@
 
 .input-nilai-page .section-indicator {
 
-    width: 4px;
+    width: 4px;
 
-    height: 30px;
+    height: 30px;
 
-    flex-shrink: 0;
+    flex-shrink: 0;
 
-    border-radius: 10px;
+    border-radius: 10px;
 
-    background: #527DAE;
+    background: #527DAE;
 
 }
 
@@ -344,7 +344,7 @@
 
 .input-nilai-page .section-title {
 
-    color: #26374A;
+    color: #26374A;
 
 }
 
@@ -354,15 +354,15 @@
 
 .input-nilai-page .score-card {
 
-    padding: 16px;
+    padding: 16px;
 
-    border: 1px solid #D5E1ED;
+    border: 1px solid #D5E1ED;
 
-    border-radius: 13px;
+    border-radius: 13px;
 
-    background: #F9FBFE;
+    background: #F9FBFE;
 
-    transition: border-color .2s ease, box-shadow .2s ease;
+    transition: border-color .2s ease, box-shadow .2s ease;
 
 }
 
@@ -370,9 +370,9 @@
 
 .input-nilai-page .score-card:focus-within {
 
-    border-color: #8DB4DC;
+    border-color: #8DB4DC;
 
-    box-shadow: 0 3px 10px rgba(52,120,189,.07);
+    box-shadow: 0 3px 10px rgba(52,120,189,.07);
 
 }
 
@@ -380,23 +380,23 @@
 
 .input-nilai-page .score-icon {
 
-    display: flex;
+    display: flex;
 
-    align-items: center;
+    align-items: center;
 
-    justify-content: center;
+    justify-content: center;
 
-    width: 34px;
+    width: 34px;
 
-    height: 34px;
+    height: 34px;
 
-    border: 1px solid #C3D8EB;
+    border: 1px solid #C3D8EB;
 
-    border-radius: 10px;
+    border-radius: 10px;
 
-    background: #E3F0FA;
+    background: #E3F0FA;
 
-    color: #355779;
+    color: #355779;
 
 }
 
@@ -404,7 +404,7 @@
 
 .input-nilai-page .score-title {
 
-    color: #30445B;
+    color: #30445B;
 
 }
 
@@ -414,25 +414,25 @@
 
 .input-nilai-page .weight-info {
 
-    display: flex;
+    display: flex;
 
-    align-items: flex-start;
+    align-items: flex-start;
 
-    gap: 10px;
+    gap: 10px;
 
-    padding: 13px 15px;
+    padding: 13px 15px;
 
-    border: 1px solid #C9DFF5;
+    border: 1px solid #C9DFF5;
 
-    border-radius: 11px;
+    border-radius: 11px;
 
-    background: #F0F7FE;
+    background: #F0F7FE;
 
-    color: #41658A;
+    color: #41658A;
 
-    font-size: 12px;
+    font-size: 12px;
 
-    line-height: 1.7;
+    line-height: 1.7;
 
 }
 
@@ -442,11 +442,11 @@
 
 .input-nilai-page .alert-box {
 
-    padding: 15px 17px;
+    padding: 15px 17px;
 
-    border-radius: 12px;
+    border-radius: 12px;
 
-    font-size: 13px;
+    font-size: 13px;
 
 }
 
@@ -454,11 +454,11 @@
 
 .input-nilai-page .alert-error {
 
-    border: 1px solid #F2C4C4;
+    border: 1px solid #F2C4C4;
 
-    background: #FFF4F4;
+    background: #FFF4F4;
 
-    color: #A53E3E;
+    color: #A53E3E;
 
 }
 
@@ -466,11 +466,11 @@
 
 .input-nilai-page .alert-success {
 
-    border: 1px solid #B9E2CB;
+    border: 1px solid #B9E2CB;
 
-    background: #F0FAF4;
+    background: #F0FAF4;
 
-    color: #267448;
+    color: #267448;
 
 }
 
@@ -482,27 +482,27 @@
 
 .input-nilai-page .btn-primary {
 
-    display: inline-flex;
+    display: inline-flex;
 
-    align-items: center;
+    align-items: center;
 
-    justify-content: center;
+    justify-content: center;
 
-    gap: 8px;
+    gap: 8px;
 
-    min-height: 44px;
+    min-height: 44px;
 
-    padding: 11px 19px;
+    padding: 11px 19px;
 
-    border-radius: 11px;
+    border-radius: 11px;
 
-    font-size: 13px;
+    font-size: 13px;
 
-    font-weight: 800;
+    font-weight: 800;
 
-    text-decoration: none;
+    text-decoration: none;
 
-    transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+    transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
 
 }
 
@@ -510,11 +510,11 @@
 
 .input-nilai-page .btn-secondary {
 
-    border: 1px solid #D5E1ED;
+    border: 1px solid #D5E1ED;
 
-    background: #FFFFFF;
+    background: #FFFFFF;
 
-    color: #40556D;
+    color: #40556D;
 
 }
 
@@ -522,7 +522,7 @@
 
 .input-nilai-page .btn-secondary:hover {
 
-    background: #F1F6FB;
+    background: #F1F6FB;
 
 }
 
@@ -530,13 +530,13 @@
 
 .input-nilai-page .btn-primary {
 
-    border: 1px solid #3478BD;
+    border: 1px solid #3478BD;
 
-    background: linear-gradient(110deg,#3478BD,#477FC0);
+    background: linear-gradient(110deg,#3478BD,#477FC0);
 
-    color: #FFFFFF;
+    color: #FFFFFF;
 
-    box-shadow: 0 3px 8px rgba(52,120,189,.17);
+    box-shadow: 0 3px 8px rgba(52,120,189,.17);
 
 }
 
@@ -544,11 +544,11 @@
 
 .input-nilai-page .btn-primary:hover {
 
-    background: linear-gradient(110deg,#2867A7,#386FAF);
+    background: linear-gradient(110deg,#2867A7,#386FAF);
 
-    transform: translateY(-1px);
+    transform: translateY(-1px);
 
-    box-shadow: 0 5px 12px rgba(52,120,189,.2);
+    box-shadow: 0 5px 12px rgba(52,120,189,.2);
 
 }
 
@@ -558,9 +558,9 @@
 
 .input-nilai-page .btn-secondary:focus {
 
-    outline: 2px solid #8DB4DC;
+    outline: 2px solid #8DB4DC;
 
-    outline-offset: 2px;
+    outline-offset: 2px;
 
 }
 
@@ -570,47 +570,47 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .input-heading,
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .card-heading,
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .section-title {
 
-    color: #F1F6FC !important;
+    color: #F1F6FC !important;
 
 }
 
@@ -618,33 +618,33 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .input-description,
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .card-description {
 
-    color: #AFC0D4 !important;
+    color: #AFC0D4 !important;
 
 }
 
@@ -652,21 +652,21 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-theme="dark"],
+    html[data-admin-theme="dark"], body[data-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .input-card {
 
-    background: #192438 !important;
+    background: #192438 !important;
 
-    border-color: #34465F !important;
+    border-color: #34465F !important;
 
 }
 
@@ -674,21 +674,21 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-theme="dark"],
+    html[data-admin-theme="dark"], body[data-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .mapel-card {
 
-    background: linear-gradient(115deg,#17283D,#243E59) !important;
+    background: linear-gradient(115deg,#17283D,#243E59) !important;
 
-    border-color: #3B5878 !important;
+    border-color: #3B5878 !important;
 
 }
 
@@ -696,33 +696,33 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-theme="dark"],
+    html[data-admin-theme="dark"], body[data-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .mapel-label,
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-theme="dark"],
+    html[data-admin-theme="dark"], body[data-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .mapel-teacher {
 
-    color: #B7CBE2 !important;
+    color: #B7CBE2 !important;
 
 }
 
@@ -730,19 +730,19 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-theme="dark"],
+    html[data-admin-theme="dark"], body[data-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .mapel-name {
 
-    color: #F1F6FC !important;
+    color: #F1F6FC !important;
 
 }
 
@@ -750,37 +750,37 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-theme="dark"],
+    html[data-admin-theme="dark"], body[data-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .input-icon,
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-theme="dark"],
+    html[data-admin-theme="dark"], body[data-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .score-icon {
 
-    background: #263E59 !important;
+    background: #263E59 !important;
 
-    border-color: #405B78 !important;
+    border-color: #405B78 !important;
 
-    color: #D8E9FC !important;
+    color: #D8E9FC !important;
 
 }
 
@@ -788,33 +788,33 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .field-label,
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .score-title {
 
-    color: #E1EAF5 !important;
+    color: #E1EAF5 !important;
 
 }
 
@@ -822,23 +822,23 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .form-control {
 
-    background: #111D30 !important;
+    background: #111D30 !important;
 
-    border-color: #40516A !important;
+    border-color: #40516A !important;
 
-    color: #E1EAF5 !important;
+    color: #E1EAF5 !important;
 
 }
 
@@ -846,21 +846,21 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .form-control:disabled {
 
-    background: #202D41 !important;
+    background: #202D41 !important;
 
-    color: #AFC0D4 !important;
+    color: #AFC0D4 !important;
 
 }
 
@@ -868,21 +868,21 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .form-control[readonly] {
 
-    background: #202D41 !important;
+    background: #202D41 !important;
 
-    color: #C2D0E0 !important;
+    color: #C2D0E0 !important;
 
 }
 
@@ -890,21 +890,21 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .form-control:focus {
 
-    border-color: #78A9D9 !important;
+    border-color: #78A9D9 !important;
 
-    box-shadow: 0 0 0 3px rgba(120,169,217,.13) !important;
+    box-shadow: 0 0 0 3px rgba(120,169,217,.13) !important;
 
 }
 
@@ -912,19 +912,19 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-theme="dark"],
+    html[data-admin-theme="dark"], body[data-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .field-hint {
 
-    color: #AFC0D4 !important;
+    color: #AFC0D4 !important;
 
 }
 
@@ -932,21 +932,21 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-theme="dark"],
+    html[data-admin-theme="dark"], body[data-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .score-card {
 
-    background: #1C2B3E !important;
+    background: #1C2B3E !important;
 
-    border-color: #354A62 !important;
+    border-color: #354A62 !important;
 
 }
 
@@ -954,23 +954,23 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-theme="dark"],
+    html[data-admin-theme="dark"], body[data-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .weight-info {
 
-    background: #1D344D !important;
+    background: #1D344D !important;
 
-    border-color: #3B5878 !important;
+    border-color: #3B5878 !important;
 
-    color: #C7DCF2 !important;
+    color: #C7DCF2 !important;
 
 }
 
@@ -978,21 +978,21 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .form-section {
 
-    border-color: #34465F !important;
+    border-color: #34465F !important;
 
 }
 
@@ -1000,23 +1000,23 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .btn-secondary {
 
-    background: #202D41 !important;
+    background: #202D41 !important;
 
-    border-color: #40516A !important;
+    border-color: #40516A !important;
 
-    color: #E1EAF5 !important;
+    color: #E1EAF5 !important;
 
 }
 
@@ -1024,19 +1024,19 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .btn-secondary:hover {
 
-    background: #293A52 !important;
+    background: #293A52 !important;
 
 }
 
@@ -1044,23 +1044,23 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-theme="dark"],
+    html[data-admin-theme="dark"], body[data-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .alert-error {
 
-    background: #3B2029 !important;
+    background: #3B2029 !important;
 
-    border-color: #75404C !important;
+    border-color: #75404C !important;
 
-    color: #FFC4CB !important;
+    color: #FFC4CB !important;
 
 }
 
@@ -1068,25 +1068,25 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .alert-success {
 
-    background: #17392D !important;
+    background: #17392D !important;
 
-    border-color: #326B50 !important;
+    border-color: #326B50 !important;
 
-    color: #B8EBCB !important;
+    color: #B8EBCB !important;
 
 }
 
@@ -1096,21 +1096,21 @@
 
 :is(
 
-    html.dark, body.dark,
+    html.dark, body.dark,
 
-    html.dark-mode, body.dark-mode,
+    html.dark-mode, body.dark-mode,
 
-    html[data-theme="dark"], body[data-theme="dark"],
+    html[data-theme="dark"], body[data-theme="dark"],
 
-    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
+    html[data-admin-theme="dark"], body[data-admin-theme="dark"],
 
-    .dark, .dark-mode, [data-theme="dark"]
+    .dark, .dark-mode, [data-theme="dark"]
 
 ) .input-nilai-page .input-page-header {
 
-    background: linear-gradient(110deg,#1D344D,#263E59) !important;
+    background: linear-gradient(110deg,#1D344D,#263E59) !important;
 
-    border-color: #405B78 !important;
+    border-color: #405B78 !important;
 
 }
 
@@ -1120,29 +1120,29 @@
 
 @media (max-width: 640px) {
 
-    .input-nilai-page .input-card {
+    .input-nilai-page .input-card {
 
-        border-radius: 14px;
+        border-radius: 14px;
 
-    }
-
-
-
-    .input-nilai-page .btn-primary,
-
-    .input-nilai-page .btn-secondary {
-
-        width: 100%;
-
-    }
+    }
 
 
 
-    .input-nilai-page .score-card {
+    .input-nilai-page .btn-primary,
 
-        padding: 14px;
+    .input-nilai-page .btn-secondary {
 
-    }
+        width: 100%;
+
+    }
+
+
+
+    .input-nilai-page .score-card {
+
+        padding: 14px;
+
+    }
 
 }
 
@@ -1150,17 +1150,17 @@
 
 @media (prefers-reduced-motion: reduce) {
 
-    .input-nilai-page *,
+    .input-nilai-page *,
 
-    .input-nilai-page *::before,
+    .input-nilai-page *::before,
 
-    .input-nilai-page *::after {
+    .input-nilai-page *::after {
 
-        animation: none !important;
+        animation: none !important;
 
-        transition: none !important;
+        transition: none !important;
 
-    }
+    }
 
 }
 
@@ -1178,820 +1178,820 @@
 
 
 
-    {{-- HEADER --}}
+    {{-- HEADER --}}
 
-    <div class="input-page-header input-enter flex flex-col gap-4 rounded-2xl border border-[#C3DDF3] bg-gradient-to-r from-[#E3F0FA] via-[#DCEBFA] to-[#EEF6FD] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+    <div class="input-page-header input-enter flex flex-col gap-4 rounded-2xl border border-[#C3DDF3] bg-gradient-to-r from-[#E3F0FA] via-[#DCEBFA] to-[#EEF6FD] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
 
-        <div>
+        <div>
 
-            <h2 class="input-heading text-2xl font-extrabold tracking-tight">
+            <h2 class="input-heading text-2xl font-extrabold tracking-tight">
 
-                Input Nilai Siswa
+                Input Nilai Siswa
 
-            </h2>
+            </h2>
 
-            <p class="input-description mt-2 text-sm">
+            <p class="input-description mt-2 text-sm">
 
-                Isi nilai harian, UTS, dan UAS siswa.
+                Isi nilai harian, UTS, dan UAS siswa.
 
-            </p>
+            </p>
 
-        </div>
+        </div>
 
 
 
-        <a href="{{ route('guru.rekap.index') }}"
+        <a href="{{ route('guru.rekap.index') }}"
 
-           class="btn-secondary">
+           class="btn-secondary">
 
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 12H5m7 7-7-7 7-7"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 12H5m7 7-7-7 7-7"/>
 
-            </svg>
+            </svg>
 
-            Kembali ke Rekap
+            Kembali ke Rekap
 
-        </a>
+        </a>
 
-    </div>
+    </div>
 
 
 
-    {{-- PESAN ERROR --}}
+    {{-- PESAN ERROR --}}
 
-    @if ($errors->any())
+    @if ($errors->any())
 
-        <div class="alert-box alert-error input-enter" role="alert">
+        <div class="alert-box alert-error input-enter" role="alert">
 
-            <div class="flex items-start gap-3">
+            <div class="flex items-start gap-3">
 
-                <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 
-                    <circle cx="12" cy="12" r="9"/>
+                    <circle cx="12" cy="12" r="9"/>
 
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/>
 
-                </svg>
+                </svg>
 
 
 
-                <div>
+                <div>
 
-                    <p class="mb-2 font-extrabold">Periksa kembali data berikut:</p>
+                    <p class="mb-2 font-extrabold">Periksa kembali data berikut:</p>
 
-                    <ul class="list-inside list-disc space-y-1">
+                    <ul class="list-inside list-disc space-y-1">
 
-                        @foreach ($errors->all() as $error)
+                        @foreach ($errors->all() as $error)
 
-                            <li>{{ $error }}</li>
+                            <li>{{ $error }}</li>
 
-                        @endforeach
+                        @endforeach
 
-                    </ul>
+                    </ul>
 
-                </div>
+                </div>
 
-            </div>
+            </div>
 
-        </div>
+        </div>
 
-    @endif
+    @endif
 
 
 
-    {{-- PESAN BERHASIL --}}
+    {{-- PESAN BERHASIL --}}
 
-    @if (session('success'))
+    @if (session('success'))
 
-        <div class="alert-box alert-success input-enter" role="status">
+        <div class="alert-box alert-success input-enter" role="status">
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3">
 
-                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/>
 
-                    <circle cx="12" cy="12" r="9"/>
+                    <circle cx="12" cy="12" r="9"/>
 
-                </svg>
+                </svg>
 
-                <p class="font-semibold">{{ session('success') }}</p>
+                <p class="font-semibold">{{ session('success') }}</p>
 
-            </div>
+            </div>
 
-        </div>
+        </div>
 
-    @endif
+    @endif
 
 
 
-    {{-- INFORMASI MAPEL --}}
+    {{-- INFORMASI MAPEL --}}
 
-    <div class="mapel-card input-enter input-delay-1 p-5 sm:p-6">
+    <div class="mapel-card input-enter input-delay-1 p-5 sm:p-6">
 
-        <div class="relative z-10 flex items-center gap-4">
+        <div class="relative z-10 flex items-center gap-4">
 
-            <div class="input-icon !w-14 !h-14 !bg-white/70 !border-white/80">
+            <div class="input-icon !w-14 !h-14 !bg-white/70 !border-white/80">
 
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
 
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
 
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
 
-                </svg>
+                </svg>
 
-            </div>
+            </div>
 
 
 
-            <div class="min-w-0">
+            <div class="min-w-0">
 
-                <p class="mapel-label text-xs font-bold uppercase tracking-wider">
+                <p class="mapel-label text-xs font-bold uppercase tracking-wider">
 
-                    Mata Pelajaran yang Diampu
+                    Mata Pelajaran yang Diampu
 
-                </p>
+                </p>
 
 
 
-                <h3 class="mapel-name mt-1 text-xl font-extrabold">
+                <h3 class="mapel-name mt-1 text-xl font-extrabold">
 
-                    {{ $mapel->nama_mapel }}
+                    {{ $mapel->nama_mapel }}
 
-                </h3>
+                </h3>
 
 
 
-                <p class="mapel-teacher mt-1 text-sm">
+                <p class="mapel-teacher mt-1 text-sm">
 
-                    Guru: {{ $guru->nama_guru ?? auth()->user()->username }}
+                    Guru: {{ $guru->nama_guru ?? auth()->user()->username }}
 
-                </p>
+                </p>
 
-            </div>
+            </div>
 
-        </div>
+        </div>
 
-    </div>
+    </div>
 
 
 
-    {{-- FORM INPUT --}}
+    {{-- FORM INPUT --}}
 
-    <div class="input-card input-enter input-delay-2">
+    <div class="input-card input-enter input-delay-2">
 
 
 
-        <div class="flex items-center gap-3 border-b border-slate-100 px-5 py-5 sm:px-6 dark:border-slate-700">
+        <div class="flex items-center gap-3 border-b border-slate-100 px-5 py-5 sm:px-6 dark:border-slate-700">
 
-            <div class="input-icon">
+            <div class="input-icon">
 
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
 
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
 
-                </svg>
+                </svg>
 
-            </div>
+            </div>
 
 
 
-            <div>
+            <div>
 
-                <h3 class="card-heading text-base font-extrabold">Form Input Nilai</h3>
+                <h3 class="card-heading text-base font-extrabold">Form Input Nilai</h3>
 
-                <p class="card-description mt-1 text-xs">
+                <p class="card-description mt-1 text-xs">
 
-                    Lengkapi informasi siswa dan komponen penilaian.
+                    Lengkapi informasi siswa dan komponen penilaian.
 
-                </p>
+                </p>
 
-            </div>
+            </div>
 
-        </div>
+        </div>
 
 
 
-        <form action="{{ route('guru.nilai.store') }}" method="POST" class="space-y-6 p-5 sm:p-6">
+        <form action="{{ route('guru.nilai.store') }}" method="POST" class="space-y-6 p-5 sm:p-6">
 
-            @csrf
+            @csrf
 
 
 
-            {{-- INFORMASI SISWA --}}
+            {{-- INFORMASI SISWA --}}
 
-            <div>
+            <div>
 
-                <div class="mb-5 flex items-center gap-3">
+                <div class="mb-5 flex items-center gap-3">
 
-                    <span class="section-indicator"></span>
+                    <span class="section-indicator"></span>
 
-                    <div>
+                    <div>
 
-                        <h4 class="section-title text-sm font-extrabold">Informasi Siswa</h4>
+                        <h4 class="section-title text-sm font-extrabold">Informasi Siswa</h4>
 
-                        <p class="card-description mt-1 text-xs">
+                        <p class="card-description mt-1 text-xs">
 
-                            Pilih kelas, siswa, dan periode penilaian.
+                            Pilih kelas, siswa, dan periode penilaian.
 
-                        </p>
+                        </p>
 
-                    </div>
+                    </div>
 
-                </div>
+                </div>
 
 
 
-                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
 
 
 
-                    {{-- KELAS --}}
+                    {{-- KELAS --}}
 
-                    <div>
+                    <div>
 
-                        <label for="id_kelas" class="field-label">
+                        <label for="id_kelas" class="field-label">
 
-                            Kelas <span class="required-mark">*</span>
+                            Kelas <span class="required-mark">*</span>
 
-                        </label>
+                        </label>
 
 
 
-                        <select id="id_kelas" name="id_kelas" required class="form-control">
+                        <select id="id_kelas" name="id_kelas" required class="form-control">
 
-                            <option value="">Pilih kelas terlebih dahulu</option>
+                            <option value="">Pilih kelas terlebih dahulu</option>
 
 
 
-                            @foreach ($kelasDiajar as $kelas)
+                            @foreach ($kelasDiajar as $kelas)
 
-                                <option value="{{ $kelas->id }}"
+                                <option value="{{ $kelas->id }}"
 
-                                    {{ (string) old('id_kelas', $kelasTerpilih) === (string) $kelas->id ? 'selected' : '' }}>
+                                    {{ (string) old('id_kelas', $kelasTerpilih) === (string) $kelas->id ? 'selected' : '' }}>
 
-                                    {{ $kelas->nama_kelas }}
+                                    {{ $kelas->nama_kelas }}
 
-                                </option>
+                                </option>
 
-                            @endforeach
+                            @endforeach
 
-                        </select>
+                        </select>
 
 
 
-                        <p class="field-hint">
+                        <p class="field-hint">
 
-                            Pilih kelas terlebih dahulu sebelum memilih siswa.
+                            Pilih kelas terlebih dahulu sebelum memilih siswa.
 
-                        </p>
+                        </p>
 
 
 
-                        @error('id_kelas')
+                        @error('id_kelas')
 
-                            <p class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</p>
+                            <p class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</p>
 
-                        @enderror
+                        @enderror
 
-                    </div>
+                    </div>
 
 
 
-                    {{-- SISWA --}}
+                    {{-- SISWA --}}
 
-                    <div>
+                    <div>
 
-                        <label for="id_siswa" class="field-label">
+                        <label for="id_siswa" class="field-label">
 
-                            Nama Siswa <span class="required-mark">*</span>
+                            Nama Siswa <span class="required-mark">*</span>
 
-                        </label>
+                        </label>
 
 
 
-                        <select id="id_siswa" name="id_siswa" required disabled class="form-control">
+                        <select id="id_siswa" name="id_siswa" required disabled class="form-control">
 
-                            <option value="">Pilih kelas terlebih dahulu</option>
+                            <option value="">Pilih kelas terlebih dahulu</option>
 
 
 
-                            @foreach ($siswaList as $siswa)
+                            @foreach ($siswaList as $siswa)
 
-                                @php
+                                @php
 
-                                    $kelasSiswa = str_replace('-', ' ', trim((string) $siswa->kelas));
+                                    $kelasSiswa = str_replace('-', ' ', trim((string) $siswa->kelas));
 
 
 
-                                    $idKelasSiswa = $kelasDiajar->first(function ($item) use ($kelasSiswa) {
+                                    $idKelasSiswa = $kelasDiajar->first(function ($item) use ($kelasSiswa) {
 
-                                        return str_replace('-', ' ', trim((string) $item->nama_kelas)) === $kelasSiswa;
+                                        return str_replace('-', ' ', trim((string) $item->nama_kelas)) === $kelasSiswa;
 
-                                    });
+                                    });
 
-                                @endphp
+                                @endphp
 
 
 
-                                <option value="{{ $siswa->id_siswa }}"
+                                <option value="{{ $siswa->id_siswa }}"
 
-                                        data-kelas="{{ $idKelasSiswa->id ?? '' }}"
+                                        data-kelas="{{ $idKelasSiswa->id ?? '' }}"
 
-                                    {{ (string) old('id_siswa') === (string) $siswa->id_siswa ? 'selected' : '' }}>
+                                    {{ (string) old('id_siswa') === (string) $siswa->id_siswa ? 'selected' : '' }}>
 
-                                    {{ $siswa->nama_siswa }} — {{ $siswa->kelas }}
+                                    {{ $siswa->nama_siswa }} — {{ $siswa->kelas }}
 
-                                </option>
+                                </option>
 
-                            @endforeach
+                            @endforeach
 
-                        </select>
+                        </select>
 
 
 
-                        <p id="pesan-siswa" class="field-hint" aria-live="polite">
+                        <p id="pesan-siswa" class="field-hint" aria-live="polite">
 
-                            Pilih kelas terlebih dahulu untuk membuka daftar siswa.
+                            Pilih kelas terlebih dahulu untuk membuka daftar siswa.
 
-                        </p>
+                        </p>
 
 
 
-                        @error('id_siswa')
+                        @error('id_siswa')
 
-                            <p class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</p>
+                            <p class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</p>
 
-                        @enderror
+                        @enderror
 
 
 
-                        @if ($siswaList->isEmpty())
+                        @if ($siswaList->isEmpty())
 
-                            <p class="mt-1 text-xs font-semibold text-amber-600 dark:text-amber-400">
+                            <p class="mt-1 text-xs font-semibold text-amber-600 dark:text-amber-400">
 
-                                Belum ada siswa di kelas yang diajar.
+                                Belum ada siswa di kelas yang diajar.
 
-                            </p>
+                            </p>
 
-                        @endif
+                        @endif
 
-                    </div>
+                    </div>
 
 
 
-                    {{-- MAPEL --}}
+                    {{-- MAPEL --}}
 
-                    <div>
+                    <div>
 
-                        <label class="field-label">Mata Pelajaran</label>
+                        <label class="field-label">Mata Pelajaran</label>
 
 
 
-                        <input type="text"
+                        <input type="text"
 
-                               value="{{ $mapel->nama_mapel }}"
+                               value="{{ $mapel->nama_mapel }}"
 
-                               readonly
+                               readonly
 
-                               class="form-control">
+                               class="form-control">
 
-                        <p class="field-hint">
+                        <p class="field-hint">
 
-                            Mata pelajaran mengikuti penugasan guru.
+                            Mata pelajaran mengikuti penugasan guru.
 
-                        </p>
+                        </p>
 
-                    </div>
+                    </div>
 
 
 
-                    {{-- SEMESTER --}}
+                    {{-- SEMESTER --}}
 
-                    <div>
+                    <div>
 
-                        <label for="semester" class="field-label">
+                        <label for="semester" class="field-label">
 
-                            Semester <span class="required-mark">*</span>
+                            Semester <span class="required-mark">*</span>
 
-                        </label>
+                        </label>
 
 
 
-                        <select id="semester" name="semester" required class="form-control">
+                        <select id="semester" name="semester" required class="form-control">
 
-                            <option value="">Pilih semester terlebih dahulu</option>
+                            <option value="">Pilih semester terlebih dahulu</option>
 
 
 
-                            <option value="1" {{ old('semester') === '1' ? 'selected' : '' }}>
+                            <option value="1" {{ old('semester') === '1' ? 'selected' : '' }}>
 
-                                Semester 1 — Ganjil
+                                Semester 1 — Ganjil
 
-                            </option>
+                            </option>
 
 
 
-                            <option value="2" {{ old('semester') === '2' ? 'selected' : '' }}>
+                            <option value="2" {{ old('semester') === '2' ? 'selected' : '' }}>
 
-                                Semester 2 — Genap
+                                Semester 2 — Genap
 
-                            </option>
+                            </option>
 
-                        </select>
+                        </select>
 
 
 
-                        <p class="field-hint">
+                        <p class="field-hint">
 
-                            Pilih semester untuk membuka periode rapor yang sesuai.
+                            Pilih semester untuk membuka periode rapor yang sesuai.
 
-                        </p>
+                        </p>
 
 
 
-                        @error('semester')
+                        @error('semester')
 
-                            <p class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</p>
+                            <p class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</p>
 
-                        @enderror
+                        @enderror
 
-                    </div>
+                    </div>
 
 
 
-                    {{-- RAPOR --}}
+                    {{-- RAPOR --}}
 
-                    <div class="md:col-span-2">
+                    <div class="md:col-span-2">
 
-                        <label for="id_rapor" class="field-label">
+                        <label for="id_rapor" class="field-label">
 
-                            Periode Rapor <span class="required-mark">*</span>
+                            Periode Rapor <span class="required-mark">*</span>
 
-                        </label>
+                        </label>
 
 
 
-                        <select id="id_rapor" name="id_rapor" required disabled class="form-control">
+                        <select id="id_rapor" name="id_rapor" required disabled class="form-control">
 
-                            <option value="">Pilih semester terlebih dahulu</option>
+                            <option value="">Pilih semester terlebih dahulu</option>
 
 
 
-                            @foreach ($raporList as $rapor)
+                            @foreach ($raporList as $rapor)
 
-                                @php
+                                @php
 
-                                    $semesterRapor = strtolower(trim((string) $rapor->semester));
+                                    $semesterRapor = strtolower(trim((string) $rapor->semester));
 
 
 
-                                    $nomorSemester = in_array($semesterRapor, ['ganjil', '1'], true)
+                                    $nomorSemester = in_array($semesterRapor, ['ganjil', '1'], true)
 
-                                        ? '1'
+                                        ? '1'
 
-                                        : (in_array($semesterRapor, ['genap', '2'], true) ? '2' : '');
+                                        : (in_array($semesterRapor, ['genap', '2'], true) ? '2' : '');
 
 
 
-                                    // Bobot berdasarkan mapel guru dan periode rapor.
+                                    // Bobot berdasarkan mapel guru dan periode rapor.
 
-                                    $bobot = $bobotList->get($rapor->id_rapor);
+                                    $bobot = $bobotList->get($rapor->id_rapor);
 
 
 
-                                    $bobotHarian = $bobot->bobot_harian ?? 30;
+                                    $bobotHarian = $bobot->bobot_harian ?? 30;
 
-                                    $bobotUts = $bobot->bobot_uts ?? 30;
+                                    $bobotUts = $bobot->bobot_uts ?? 30;
 
-                                    $bobotUas = $bobot->bobot_uas ?? 40;
+                                    $bobotUas = $bobot->bobot_uas ?? 40;
 
-                                @endphp
+                                @endphp
 
 
 
-                                <option value="{{ $rapor->id_rapor }}"
+                                <option value="{{ $rapor->id_rapor }}"
 
-                                        data-semester="{{ $nomorSemester }}"
+                                        data-semester="{{ $nomorSemester }}"
 
-                                        data-bobot-harian="{{ $bobotHarian }}"
+                                        data-bobot-harian="{{ $bobotHarian }}"
 
-                                        data-bobot-uts="{{ $bobotUts }}"
+                                        data-bobot-uts="{{ $bobotUts }}"
 
-                                        data-bobot-uas="{{ $bobotUas }}"
+                                        data-bobot-uas="{{ $bobotUas }}"
 
-                                    {{ (string) old('id_rapor') === (string) $rapor->id_rapor ? 'selected' : '' }}>
+                                    {{ (string) old('id_rapor') === (string) $rapor->id_rapor ? 'selected' : '' }}>
 
-                                    {{ $rapor->semester }} — {{ $rapor->tahun_ajaran }}
+                                    {{ $rapor->semester }} — {{ $rapor->tahun_ajaran }}
 
-                                </option>
+                                </option>
 
-                            @endforeach
+                            @endforeach
 
-                        </select>
+                        </select>
 
 
 
-                        <p id="pesan-rapor" class="field-hint" aria-live="polite">
+                        <p id="pesan-rapor" class="field-hint" aria-live="polite">
 
-                            Pilih semester terlebih dahulu untuk membuka periode rapor.
+                            Pilih semester terlebih dahulu untuk membuka periode rapor.
 
-                        </p>
+                        </p>
 
 
 
-                        @error('id_rapor')
+                        @error('id_rapor')
 
-                            <p class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</p>
+                            <p class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</p>
 
-                        @enderror
+                        @enderror
 
-                    </div>
+                    </div>
 
-                </div>
+                </div>
 
-            </div>
+            </div>
 
 
 
-            {{-- KOMPONEN NILAI --}}
+            {{-- KOMPONEN NILAI --}}
 
-            <div class="form-section">
+            <div class="form-section">
 
 
 
-                <div class="mb-5 flex items-center gap-3">
+                <div class="mb-5 flex items-center gap-3">
 
-                    <span class="section-indicator"></span>
+                    <span class="section-indicator"></span>
 
-                    <div>
+                    <div>
 
-                        <h4 class="section-title text-sm font-extrabold">Komponen Nilai</h4>
+                        <h4 class="section-title text-sm font-extrabold">Komponen Nilai</h4>
 
-                        <p class="card-description mt-1 text-xs">
+                        <p class="card-description mt-1 text-xs">
 
-                            Masukkan nilai setiap komponen dengan rentang 0 sampai 100.
+                            Masukkan nilai setiap komponen dengan rentang 0 sampai 100.
 
-                        </p>
+                        </p>
 
-                    </div>
+                    </div>
 
-                </div>
+                </div>
 
 
 
-                <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 
 
 
-                    {{-- NILAI HARIAN --}}
+                    {{-- NILAI HARIAN --}}
 
-                    <div class="score-card">
+                    <div class="score-card">
 
-                        <div class="mb-4 flex items-center gap-3">
+                        <div class="mb-4 flex items-center gap-3">
 
-                            <div class="score-icon">
+                            <div class="score-icon">
 
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
 
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
 
-                                </svg>
+                                </svg>
 
-                            </div>
+                            </div>
 
 
 
-                            <label for="nilai_harian" class="score-title text-sm font-extrabold">
+                            <label for="nilai_harian" class="score-title text-sm font-extrabold">
 
-                                Nilai Harian
+                                Nilai Harian
 
-                            </label>
+                            </label>
 
-                        </div>
+                        </div>
 
 
 
-                        <input type="number"
+                        <input type="number"
 
-                               id="nilai_harian"
+                               id="nilai_harian"
 
-                               name="nilai_harian"
+                               name="nilai_harian"
 
-                               min="0"
+                               min="0"
 
-                               max="100"
+                               max="100"
 
-                               step="0.01"
+                               step="0.01"
 
 
-                               value="{{ old('nilai_harian') }}"
+                               value="{{ old('nilai_harian') }}"
 
-                               placeholder="0–100"
+                               placeholder="0–100"
 
-                               class="form-control">
+                               class="form-control">
 
 
 
-                        @error('nilai_harian')
+                        @error('nilai_harian')
 
-                            <p class="mt-2 text-xs font-semibold text-red-500">{{ $message }}</p>
+                            <p class="mt-2 text-xs font-semibold text-red-500">{{ $message }}</p>
 
-                        @enderror
+                        @enderror
 
-                    </div>
+                    </div>
 
 
 
-                    {{-- NILAI UTS --}}
+                    {{-- NILAI UTS --}}
 
-                    <div class="score-card">
+                    <div class="score-card">
 
-                        <div class="mb-4 flex items-center gap-3">
+                        <div class="mb-4 flex items-center gap-3">
 
-                            <div class="score-icon">
+                            <div class="score-icon">
 
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
 
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5h6M9 9h6M9 13h6M9 17h6M5 3h14v18H5z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5h6M9 9h6M9 13h6M9 17h6M5 3h14v18H5z"/>
 
-                                </svg>
+                                </svg>
 
-                            </div>
+                            </div>
 
 
 
-                            <label for="nilai_uts" class="score-title text-sm font-extrabold">
+                            <label for="nilai_uts" class="score-title text-sm font-extrabold">
 
-                                Nilai UTS
+                                Nilai UTS
 
-                            </label>
+                            </label>
 
-                        </div>
+                        </div>
 
 
 
-                        <input type="number"
+                        <input type="number"
 
-                               id="nilai_uts"
+                               id="nilai_uts"
 
-                               name="nilai_uts"
+                               name="nilai_uts"
 
-                               min="0"
+                               min="0"
 
-                               max="100"
+                               max="100"
 
-                               step="0.01"
+                               step="0.01"
 
 
-                               value="{{ old('nilai_uts') }}"
+                               value="{{ old('nilai_uts') }}"
 
-                               placeholder="0–100"
+                               placeholder="0–100"
 
-                               class="form-control">
+                               class="form-control">
 
 
 
-                        @error('nilai_uts')
+                        @error('nilai_uts')
 
-                            <p class="mt-2 text-xs font-semibold text-red-500">{{ $message }}</p>
+                            <p class="mt-2 text-xs font-semibold text-red-500">{{ $message }}</p>
 
-                        @enderror
+                        @enderror
 
-                    </div>
+                    </div>
 
 
 
-                    {{-- NILAI UAS --}}
+                    {{-- NILAI UAS --}}
 
-                    <div class="score-card">
+                    <div class="score-card">
 
-                        <div class="mb-4 flex items-center gap-3">
+                        <div class="mb-4 flex items-center gap-3">
 
-                            <div class="score-icon">
+                            <div class="score-icon">
 
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
 
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
 
-                                </svg>
+                                </svg>
 
-                            </div>
+                            </div>
 
 
 
-                            <label for="nilai_uas" class="score-title text-sm font-extrabold">
+                            <label for="nilai_uas" class="score-title text-sm font-extrabold">
 
-                                Nilai UAS
+                                Nilai UAS
 
-                            </label>
+                            </label>
 
-                        </div>
+                        </div>
 
 
 
-                        <input type="number"
+                        <input type="number"
 
-                               id="nilai_uas"
+                               id="nilai_uas"
 
-                               name="nilai_uas"
+                               name="nilai_uas"
 
-                               min="0"
+                               min="0"
 
-                               max="100"
+                               max="100"
 
-                               step="0.01"
+                               step="0.01"
 
 
-                               value="{{ old('nilai_uas') }}"
+                               value="{{ old('nilai_uas') }}"
 
-                               placeholder="0–100"
+                               placeholder="0–100"
 
-                               class="form-control">
+                               class="form-control">
 
 
 
-                        @error('nilai_uas')
+                        @error('nilai_uas')
 
-                            <p class="mt-2 text-xs font-semibold text-red-500">{{ $message }}</p>
+                            <p class="mt-2 text-xs font-semibold text-red-500">{{ $message }}</p>
 
-                        @enderror
+                        @enderror
 
-                    </div>
+                    </div>
 
 
 
-                </div>
+                </div>
 
 
 
-                {{-- INFORMASI BOBOT --}}
+                {{-- INFORMASI BOBOT --}}
 
-                <div class="weight-info mt-5">
+                <div class="weight-info mt-5">
 
-                    <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
 
-                        <circle cx="12" cy="12" r="9"/>
+                        <circle cx="12" cy="12" r="9"/>
 
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 11v5m0-8h.01"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 11v5m0-8h.01"/>
 
-                    </svg>
+                    </svg>
 
 
 
-                    <p id="info-bobot" aria-live="polite">
+                    <p id="info-bobot" aria-live="polite">
 
-                        Pilih periode rapor untuk melihat bobot perhitungan nilai akhir.
+                        Pilih periode rapor untuk melihat bobot perhitungan nilai akhir.
 
-                    </p>
+                    </p>
 
-                </div>
+                </div>
 
-            </div>
+            </div>
 
 
 
-            {{-- TOMBOL --}}
+            {{-- TOMBOL --}}
 
-            <div class="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end dark:border-slate-700">
+            <div class="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end dark:border-slate-700">
 
 
 
-                <a href="{{ route('guru.rekap.index') }}" class="btn-secondary">
+                <a href="{{ route('guru.rekap.index') }}" class="btn-secondary">
 
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
 
-                    </svg>
+                    </svg>
 
-                    Batal
+                    Batal
 
-                </a>
+                </a>
 
 
 
-                <button type="submit" class="btn-primary">
+                <button type="submit" class="btn-primary">
 
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/>
 
-                    </svg>
+                    </svg>
 
-                    Simpan Nilai
+                    Simpan Nilai
 
-                </button>
+                </button>
 
 
 
-            </div>
+            </div>
 
-        </form>
+        </form>
 
-    </div>
+    </div>
 
 
 
@@ -2003,409 +2003,409 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    const kelasSelect = document.getElementById('id_kelas');
+    const kelasSelect = document.getElementById('id_kelas');
 
-    const siswaSelect = document.getElementById('id_siswa');
+    const siswaSelect = document.getElementById('id_siswa');
 
-    const pesanSiswa = document.getElementById('pesan-siswa');
+    const pesanSiswa = document.getElementById('pesan-siswa');
 
 
 
-    const semesterSelect = document.getElementById('semester');
+    const semesterSelect = document.getElementById('semester');
 
-    const raporSelect = document.getElementById('id_rapor');
+    const raporSelect = document.getElementById('id_rapor');
 
-    const pesanRapor = document.getElementById('pesan-rapor');
+    const pesanRapor = document.getElementById('pesan-rapor');
 
-    const infoBobot = document.getElementById('info-bobot');
+    const infoBobot = document.getElementById('info-bobot');
 
 
 
-    if (!kelasSelect || !siswaSelect || !semesterSelect || !raporSelect) {
+    if (!kelasSelect || !siswaSelect || !semesterSelect || !raporSelect) {
 
-        return;
+        return;
 
-    }
+    }
 
 
 
-    const siswaOptions = Array.from(siswaSelect.options).slice(1);
+    const siswaOptions = Array.from(siswaSelect.options).slice(1);
 
-    const raporOptions = Array.from(raporSelect.options).slice(1);
+    const raporOptions = Array.from(raporSelect.options).slice(1);
 
 
 
-    function formatBobot(nilai) {
+    function formatBobot(nilai) {
 
-        const angka = Number(nilai);
+        const angka = Number(nilai);
 
 
 
-        if (!Number.isFinite(angka)) {
+        if (!Number.isFinite(angka)) {
 
-            return '0';
+            return '0';
 
-        }
+        }
 
 
 
-        return angka.toLocaleString('id-ID', {
+        return angka.toLocaleString('id-ID', {
 
-            maximumFractionDigits: 2
+            maximumFractionDigits: 2
 
-        });
+        });
 
-    }
+    }
 
 
 
-    function updateInfoBobot() {
+    function updateInfoBobot() {
 
-        const optionTerpilih = raporSelect.options[raporSelect.selectedIndex];
+        const optionTerpilih = raporSelect.options[raporSelect.selectedIndex];
 
 
 
-        if (
+        if (
 
-            !optionTerpilih ||
+            !optionTerpilih ||
 
-            !optionTerpilih.value ||
+            !optionTerpilih.value ||
 
-            raporSelect.disabled
+            raporSelect.disabled
 
-        ) {
+        ) {
 
-            infoBobot.textContent =
+            infoBobot.textContent =
 
-                'Pilih periode rapor untuk melihat bobot perhitungan nilai akhir.';
+                'Pilih periode rapor untuk melihat bobot perhitungan nilai akhir.';
 
-            return;
+            return;
 
-        }
+        }
 
 
 
-        const harian = optionTerpilih.dataset.bobotHarian ?? '30';
+        const harian = optionTerpilih.dataset.bobotHarian ?? '30';
 
-        const uts = optionTerpilih.dataset.bobotUts ?? '30';
+        const uts = optionTerpilih.dataset.bobotUts ?? '30';
 
-        const uas = optionTerpilih.dataset.bobotUas ?? '40';
+        const uas = optionTerpilih.dataset.bobotUas ?? '40';
 
 
 
-        infoBobot.textContent =
+        infoBobot.textContent =
 
-            'Nilai akhir dihitung otomatis: Harian ' +
+            'Nilai akhir dihitung otomatis: Harian ' +
 
-            formatBobot(harian) +
+            formatBobot(harian) +
 
-            '%, UTS ' +
+            '%, UTS ' +
 
-            formatBobot(uts) +
+            formatBobot(uts) +
 
-            '%, dan UAS ' +
+            '%, dan UAS ' +
 
-            formatBobot(uas) +
+            formatBobot(uas) +
 
-            '%.';
+            '%.';
 
-    }
+    }
 
 
 
-    function filterSiswa() {
+    function filterSiswa() {
 
-        const kelasId = kelasSelect.value;
+        const kelasId = kelasSelect.value;
 
-        const siswaSebelumnya = siswaSelect.value;
+        const siswaSebelumnya = siswaSelect.value;
 
 
 
-        siswaOptions.forEach(function (option) {
+        siswaOptions.forEach(function (option) {
 
-            const cocok = kelasId !== '' && option.dataset.kelas === kelasId;
+            const cocok = kelasId !== '' && option.dataset.kelas === kelasId;
 
-            option.hidden = !cocok;
+            option.hidden = !cocok;
 
-            option.disabled = !cocok;
+            option.disabled = !cocok;
 
-        });
+        });
 
 
 
-        siswaSelect.disabled = kelasId === '';
+        siswaSelect.disabled = kelasId === '';
 
 
 
-        if (kelasId === '') {
+        if (kelasId === '') {
 
-            siswaSelect.value = '';
+            siswaSelect.value = '';
 
-            siswaSelect.options[0].textContent = 'Pilih kelas terlebih dahulu';
+            siswaSelect.options[0].textContent = 'Pilih kelas terlebih dahulu';
 
-            pesanSiswa.textContent = 'Pilih kelas terlebih dahulu untuk membuka daftar siswa.';
+            pesanSiswa.textContent = 'Pilih kelas terlebih dahulu untuk membuka daftar siswa.';
 
-            return;
+            return;
 
-        }
+        }
 
 
 
-        siswaSelect.options[0].textContent = 'Pilih siswa';
+        siswaSelect.options[0].textContent = 'Pilih siswa';
 
 
 
-        const adaSiswa = siswaOptions.some(function (option) {
+        const adaSiswa = siswaOptions.some(function (option) {
 
-            return !option.disabled;
+            return !option.disabled;
 
-        });
+        });
 
 
 
-        if (!adaSiswa) {
+        if (!adaSiswa) {
 
-            siswaSelect.value = '';
+            siswaSelect.value = '';
 
-            siswaSelect.options[0].textContent = 'Belum ada siswa di kelas ini';
+            siswaSelect.options[0].textContent = 'Belum ada siswa di kelas ini';
 
-            pesanSiswa.textContent = 'Belum ada siswa yang terdaftar di kelas ini.';
+            pesanSiswa.textContent = 'Belum ada siswa yang terdaftar di kelas ini.';
 
-            return;
+            return;
 
-        }
+        }
 
 
 
-        const pilihanMasihValid = siswaOptions.some(function (option) {
+        const pilihanMasihValid = siswaOptions.some(function (option) {
 
-            return option.value === siswaSebelumnya && !option.disabled;
+            return option.value === siswaSebelumnya && !option.disabled;
 
-        });
+        });
 
 
 
-        if (!pilihanMasihValid) {
+        if (!pilihanMasihValid) {
 
-            siswaSelect.value = '';
+            siswaSelect.value = '';
 
-        }
+        }
 
 
 
-        pesanSiswa.textContent = 'Pilih siswa dari kelas yang sudah dipilih.';
+        pesanSiswa.textContent = 'Pilih siswa dari kelas yang sudah dipilih.';
 
-    }
+    }
 
 
 
-    function filterRapor() {
+    function filterRapor() {
 
-        const semester = semesterSelect.value;
+        const semester = semesterSelect.value;
 
-        const raporSebelumnya = raporSelect.value;
+        const raporSebelumnya = raporSelect.value;
 
 
 
-        raporOptions.forEach(function (option) {
+        raporOptions.forEach(function (option) {
 
-            const cocok = semester !== '' && option.dataset.semester === semester;
+            const cocok = semester !== '' && option.dataset.semester === semester;
 
-            option.hidden = !cocok;
+            option.hidden = !cocok;
 
-            option.disabled = !cocok;
+            option.disabled = !cocok;
 
-        });
+        });
 
 
 
-        raporSelect.disabled = semester === '';
+        raporSelect.disabled = semester === '';
 
 
 
-        if (semester === '') {
+        if (semester === '') {
 
-            raporSelect.value = '';
+            raporSelect.value = '';
 
-            raporSelect.options[0].textContent = 'Pilih semester terlebih dahulu';
+            raporSelect.options[0].textContent = 'Pilih semester terlebih dahulu';
 
-            pesanRapor.textContent = 'Pilih semester terlebih dahulu untuk membuka periode rapor.';
+            pesanRapor.textContent = 'Pilih semester terlebih dahulu untuk membuka periode rapor.';
 
-            updateInfoBobot();
+            updateInfoBobot();
 
-            return;
+            return;
 
-        }
+        }
 
 
 
-        raporSelect.options[0].textContent = 'Pilih periode rapor';
+        raporSelect.options[0].textContent = 'Pilih periode rapor';
 
 
 
-        const adaRapor = raporOptions.some(function (option) {
+        const adaRapor = raporOptions.some(function (option) {
 
-            return !option.disabled;
+            return !option.disabled;
 
-        });
+        });
 
 
 
-        if (!adaRapor) {
+        if (!adaRapor) {
 
-            raporSelect.value = '';
+            raporSelect.value = '';
 
-            raporSelect.options[0].textContent = 'Periode rapor belum tersedia';
+            raporSelect.options[0].textContent = 'Periode rapor belum tersedia';
 
-            pesanRapor.textContent = 'Belum ada periode rapor untuk semester ini. Hubungi Admin.';
+            pesanRapor.textContent = 'Belum ada periode rapor untuk semester ini. Hubungi Admin.';
 
-            updateInfoBobot();
+            updateInfoBobot();
 
-            return;
+            return;
 
-        }
+        }
 
 
 
-        const pilihanMasihValid = raporOptions.some(function (option) {
+        const pilihanMasihValid = raporOptions.some(function (option) {
 
-            return option.value === raporSebelumnya && !option.disabled;
+            return option.value === raporSebelumnya && !option.disabled;
 
-        });
+        });
 
 
 
-        if (!pilihanMasihValid) {
+        if (!pilihanMasihValid) {
 
-            raporSelect.value = '';
+            raporSelect.value = '';
 
-        }
+        }
 
 
 
-        pesanRapor.textContent = 'Pilih periode rapor yang sesuai dengan semester.';
+        pesanRapor.textContent = 'Pilih periode rapor yang sesuai dengan semester.';
 
-        updateInfoBobot();
+        updateInfoBobot();
 
-    }
+    }
 
 
 
-    siswaSelect.addEventListener('mousedown', function (event) {
+    siswaSelect.addEventListener('mousedown', function (event) {
 
-        if (kelasSelect.value === '') {
+        if (kelasSelect.value === '') {
 
-            event.preventDefault();
+            event.preventDefault();
 
-            alert('Pilih kelas terlebih dahulu sebelum memilih siswa.');
+            alert('Pilih kelas terlebih dahulu sebelum memilih siswa.');
 
-            kelasSelect.focus();
+            kelasSelect.focus();
 
-        }
+        }
 
-    });
+    });
 
 
 
-    siswaSelect.addEventListener('focus', function () {
+    siswaSelect.addEventListener('focus', function () {
 
-        if (kelasSelect.value === '') {
+        if (kelasSelect.value === '') {
 
-            alert('Pilih kelas terlebih dahulu sebelum memilih siswa.');
+            alert('Pilih kelas terlebih dahulu sebelum memilih siswa.');
 
-            kelasSelect.focus();
+            kelasSelect.focus();
 
-        }
+        }
 
-    });
+    });
 
 
 
-    raporSelect.addEventListener('mousedown', function (event) {
+    raporSelect.addEventListener('mousedown', function (event) {
 
-        if (semesterSelect.value === '') {
+        if (semesterSelect.value === '') {
 
-            event.preventDefault();
+            event.preventDefault();
 
-            alert('Pilih semester terlebih dahulu sebelum memilih periode rapor.');
+            alert('Pilih semester terlebih dahulu sebelum memilih periode rapor.');
 
-            semesterSelect.focus();
+            semesterSelect.focus();
 
-        }
+        }
 
-    });
+    });
 
 
 
-    raporSelect.addEventListener('focus', function () {
+    raporSelect.addEventListener('focus', function () {
 
-        if (semesterSelect.value === '') {
+        if (semesterSelect.value === '') {
 
-            alert('Pilih semester terlebih dahulu sebelum memilih periode rapor.');
+            alert('Pilih semester terlebih dahulu sebelum memilih periode rapor.');
 
-            semesterSelect.focus();
+            semesterSelect.focus();
 
-        }
+        }
 
-    });
+    });
 
 
 
-    kelasSelect.addEventListener('change', filterSiswa);
+    kelasSelect.addEventListener('change', filterSiswa);
 
-    semesterSelect.addEventListener('change', filterRapor);
+    semesterSelect.addEventListener('change', filterRapor);
 
-    raporSelect.addEventListener('change', updateInfoBobot);
+    raporSelect.addEventListener('change', updateInfoBobot);
 
 
 
-    filterSiswa();
+    filterSiswa();
 
-    filterRapor();
+    filterRapor();
 
 
 
-    // Pulihkan pilihan periode setelah validasi gagal jika masih cocok.
+    // Pulihkan pilihan periode setelah validasi gagal jika masih cocok.
 
-    const raporLama = @json((string) old('id_rapor', ''));
+    const raporLama = @json((string) old('id_rapor', ''));
 
-    const semesterLama = @json((string) old('semester', ''));
+    const semesterLama = @json((string) old('semester', ''));
 
 
 
-    if (semesterLama !== '') {
+    if (semesterLama !== '') {
 
-        semesterSelect.value = semesterLama;
+        semesterSelect.value = semesterLama;
 
-        filterRapor();
+        filterRapor();
 
 
 
-        if (raporLama !== '') {
+        if (raporLama !== '') {
 
-            const raporCocok = raporOptions.find(function (option) {
+            const raporCocok = raporOptions.find(function (option) {
 
-                return option.value === raporLama &&
+                return option.value === raporLama &&
 
-                    option.dataset.semester === semesterLama;
+                    option.dataset.semester === semesterLama;
 
-            });
+            });
 
 
 
-            if (raporCocok) {
+            if (raporCocok) {
 
-                raporSelect.value = raporLama;
+                raporSelect.value = raporLama;
 
-            }
+            }
 
-        }
+        }
 
 
 
-        updateInfoBobot();
+        updateInfoBobot();
 
-    }
+    }
 
 });
 
@@ -2415,59 +2415,59 @@ document.addEventListener('DOMContentLoaded', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    const form = document.querySelector(
+    const form = document.querySelector(
 
-        'form[action="{{ route('guru.nilai.store') }}"]'
+        'form[action="{{ route('guru.nilai.store') }}"]'
 
-    );
-
-
-
-    if (!form) return;
+    );
 
 
 
-    const tombol = form.querySelector('button[type="submit"]');
+    if (!form) return;
 
 
 
-    if (!tombol) return;
+    const tombol = form.querySelector('button[type="submit"]');
 
 
 
-    let sedangMemproses = false;
+    if (!tombol) return;
 
 
 
-    form.addEventListener('submit', function (event) {
-
-        if (sedangMemproses) {
-
-            event.preventDefault();
-
-            return;
-
-        }
+    let sedangMemproses = false;
 
 
 
-        if (!form.checkValidity()) {
+    form.addEventListener('submit', function (event) {
 
-            return;
+        if (sedangMemproses) {
 
-        }
+            event.preventDefault();
+
+            return;
+
+        }
 
 
 
-        sedangMemproses = true;
+        if (!form.checkValidity()) {
+
+            return;
+
+        }
 
 
 
-        tombol.disabled = true;
+        sedangMemproses = true;
 
-        tombol.innerHTML = 'Memproses...';
 
-    });
+
+        tombol.disabled = true;
+
+        tombol.innerHTML = 'Memproses...';
+
+    });
 
 });
 
