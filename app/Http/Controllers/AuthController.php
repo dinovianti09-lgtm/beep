@@ -45,12 +45,21 @@ class AuthController extends Controller
         }
 
         if (in_array($user->role, ['guru', 'siswa'], true)) {
-            // Perbaikan syntax error pada pemeriksaan status akun
-            if (strtolower((string) $user->status) !== 'aktif') {
+            $status = strtolower(trim((string) $user->status));
+
+            if ($status === 'dihapus') {
                 return back()
                     ->withInput($request->only('username', 'role'))
                     ->withErrors([
-                        'username' => 'Akun kamu sedang nonaktif. Hubungi Admin.',
+                        'username' => 'Akun Anda telah dihapus oleh Admin. Silakan hubungi Admin sekolah.',
+                    ]);
+            }
+
+            if ($status !== 'aktif') {
+                return back()
+                    ->withInput($request->only('username', 'role'))
+                    ->withErrors([
+                        'username' => 'Akun Anda sedang nonaktif. Hubungi Admin.',
                     ]);
             }
 

@@ -29,6 +29,13 @@ class GuruController extends Controller
         $search = trim($request->get('search', ''));
 
         $guruQuery = Guru::with(['kelasDiajar', 'user'])
+            ->where(function ($query) {
+                $query->whereDoesntHave('user')
+                    ->orWhereHas('user', function ($userQuery) {
+                        $userQuery->where('status', '!=', 'dihapus')
+                            ->orWhereNull('status');
+                    });
+            })
             ->orderBy('id_guru', 'desc');
 
         if ($search !== '') {
@@ -88,6 +95,13 @@ class GuruController extends Controller
         $search = trim($request->get('search', ''));
 
         $guruQuery = Guru::with('kelasDiajar')
+            ->where(function ($query) {
+                $query->whereDoesntHave('user')
+                    ->orWhereHas('user', function ($userQuery) {
+                        $userQuery->where('status', '!=', 'dihapus')
+                            ->orWhereNull('status');
+                    });
+            })
             ->orderBy('id_guru', 'desc');
 
         if ($search !== '') {
@@ -266,7 +280,6 @@ class GuruController extends Controller
 
             $sheet = $spreadsheet->getActiveSheet();
 
-            // Periksa jumlah baris sebelum membaca seluruh isi file.
             $jumlahBarisData = max(
                 0,
                 $sheet->getHighestDataRow() - 1
@@ -596,9 +609,7 @@ class GuruController extends Controller
         $guru = Guru::where('id_guru', $id)->firstOrFail();
 
         if (!$guru->user_id) {
-            return redirect()
-                ->route('admin.guru.index')
-                ->with('error', 'Data Guru ini belum terhubung dengan akun pengguna.');
+            return back()->with('error', 'Akun guru tidak ditemukan.');
         }
 
         $user = User::where('id', $guru->user_id)
@@ -606,12 +617,17 @@ class GuruController extends Controller
             ->first();
 
         if (!$user) {
-            return redirect()
-                ->route('admin.guru.index')
-                ->with('error', 'Akun pengguna Guru tidak ditemukan.');
+            return back()->with('error', 'Akun guru tidak ditemukan.');
         }
 
-        $statusSaatIni = strtolower(trim($user->status ?? 'aktif'));
+        $statusSaatIni = strtolower(trim((string) $user->status));
+
+        if ($statusSaatIni === 'dihapus') {
+            return back()->with(
+                'error',
+                'Akun yang sudah dihapus tidak dapat diaktifkan kembali.'
+            );
+        }
 
         $statusBaru = $statusSaatIni === 'aktif'
             ? 'nonaktif'
@@ -621,19 +637,19 @@ class GuruController extends Controller
             $user->status = $statusBaru;
             $user->save();
 
-            // Cabut seluruh token API jika akun dinonaktifkan.
             if ($statusBaru === 'nonaktif') {
                 $user->tokens()->delete();
             }
         });
 
-        $pesan = $statusBaru === 'aktif'
-            ? 'Akun Guru berhasil diaktifkan kembali.'
-            : 'Akun Guru berhasil dinonaktifkan. Data Guru dan data akademiknya tetap disimpan.';
-
         return redirect()
             ->route('admin.guru.index')
-            ->with('success', $pesan);
+            ->with(
+                'success',
+                $statusBaru === 'aktif'
+                    ? 'Akun guru berhasil diaktifkan kembali.'
+                    : 'Akun guru berhasil dinonaktifkan.'
+            );
     }
 
     // ========================================
@@ -669,7 +685,6 @@ class GuruController extends Controller
             $user->must_change_password = true;
             $user->save();
 
-            // Cabut seluruh token API lama setelah reset password.
             $user->tokens()->delete();
         });
 
@@ -688,38 +703,69 @@ class GuruController extends Controller
 
     public function destroy($id)
     {
-        $guru = Guru::where('id_guru', $id)->firstOrFail();
+        try {
+            DB::transaction(function () use ($id) {
+                $guru = Guru::where('id_guru', $id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-        DB::transaction(function () use ($guru) {
-            $userId = $guru->user_id;
-            $namaGuru = $guru->nama_guru;
+                if (!$guru->user_id) {
+                    throw new \DomainException(
+                        'Akun login guru tidak ditemukan. Data guru tetap dipertahankan.'
+                    );
+                }
 
-            $guru->kelasDiajar()->detach();
-
-            Kelas::where('wali_kelas', $namaGuru)
-                ->update(['wali_kelas' => null]);
-
-            $guru->delete();
-
-            if ($userId) {
-                $user = User::where('id', $userId)
+                $user = User::where('id', $guru->user_id)
                     ->where('role', 'guru')
+                    ->lockForUpdate()
                     ->first();
 
-                if ($user) {
-                    // Cabut seluruh token API sebelum akun dihapus.
-                    $user->tokens()->delete();
-
-                    $user->delete();
+                if (!$user) {
+                    throw new \DomainException(
+                        'Akun guru tidak ditemukan. Data akademik tetap dipertahankan.'
+                    );
                 }
-            }
-        });
 
-        return redirect()
-            ->route('admin.guru.index')
-            ->with(
-                'success',
-                'Data Guru dan akun login berhasil dihapus.'
-            );
+                // Bersihkan penugasan guru.
+                // Bisa dijalankan ulang untuk data lama
+                // yang akunnya sudah berstatus dihapus.
+                $guru->kelasDiajar()->detach();
+
+                // Lepaskan guru dari wali kelas aktif.
+                Kelas::where('wali_kelas', $guru->nama_guru)
+                    ->update([
+                        'wali_kelas' => null,
+                    ]);
+
+                // Hapus akun secara logis.
+                $user->status = 'dihapus';
+                $user->save();
+
+                // Cabut semua token login.
+                $user->tokens()->delete();
+            });
+
+            return redirect()
+                ->route('admin.guru.index')
+                ->with(
+                    'success',
+                    'Akun guru berhasil dihapus. Penugasan dan wali kelas aktif dilepaskan.'
+                );
+
+        } catch (\DomainException $e) {
+            return redirect()
+                ->route('admin.guru.index')
+                ->with('error', $e->getMessage());
+
+        } catch (Throwable $e) {
+            report($e);
+
+            return redirect()
+                ->route('admin.guru.index')
+                ->with(
+                    'error',
+                    'Penghapusan guru gagal diproses. Silakan periksa log aplikasi.'
+                );
+        }
     }
 }

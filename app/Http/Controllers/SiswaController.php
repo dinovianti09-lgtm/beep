@@ -539,6 +539,12 @@ class SiswaController extends Controller
 
         $statusSaatIni = strtolower(trim($user->status ?? 'aktif'));
 
+        if ($statusSaatIni === 'dihapus') {
+            return redirect()
+                ->route('admin.siswa.index')
+                ->with('error', 'Akun siswa sudah dihapus dan tidak dapat diaktifkan kembali.');
+        }
+
         $statusBaru = $statusSaatIni === 'aktif'
             ? 'nonaktif'
             : 'aktif';
@@ -619,56 +625,35 @@ class SiswaController extends Controller
     {
         $siswa = Siswa::findOrFail($id);
 
-        if (Nilai::where('id_siswa', $siswa->id_siswa)->exists()) {
+        if (!$siswa->user_id) {
             return redirect()
                 ->route('admin.siswa.index')
-                ->with(
-                    'error',
-                    'Data siswa tidak dapat dihapus karena masih memiliki data nilai.'
-                );
+                ->with('error', 'Akun login siswa tidak ditemukan. Data siswa tetap dipertahankan.');
         }
 
-        if (RaporSiswa::where('id_siswa', $siswa->id_siswa)->exists()) {
+        $user = User::where('id', $siswa->user_id)
+            ->where('role', 'siswa')
+            ->first();
+
+        if (!$user) {
             return redirect()
                 ->route('admin.siswa.index')
-                ->with(
-                    'error',
-                    'Data siswa tidak dapat dihapus karena masih memiliki data rapor.'
-                );
+                ->with('error', 'Akun siswa tidak ditemukan. Data akademik tetap dipertahankan.');
         }
 
-        try {
-            DB::transaction(function () use ($siswa) {
-                // Cari akun siswa yang masih terhubung.
-                $user = null;
+        DB::transaction(function () use ($user) {
+            $user->status = 'dihapus';
+            $user->save();
 
-                if ($siswa->user_id) {
-                    $user = User::where('id', $siswa->user_id)
-                        ->where('role', 'siswa')
-                        ->first();
-                }
+            // Cabut seluruh token API.
+            $user->tokens()->delete();
+        });
 
-                // Cabut token sebelum hubungan profil siswa diputus.
-                if ($user) {
-                    $user->tokens()->delete();
-                }
-
-                // Tetap pertahankan akun User seperti perilaku sebelumnya.
-                $siswa->user_id = null;
-                $siswa->save();
-
-                $siswa->delete();
-            });
-
-            return redirect()
-                ->route('admin.siswa.index')
-                ->with('success', 'Data siswa berhasil dihapus.');
-        } catch (Throwable $e) {
-            report($e);
-
-            return redirect()
-                ->route('admin.siswa.index')
-                ->with('error', 'Data siswa gagal dihapus.');
-        }
+        return redirect()
+            ->route('admin.siswa.index')
+            ->with(
+                'success',
+                'Akun siswa berhasil dihapus. Data siswa dan riwayat akademik tetap tersimpan.'
+            );
     }
 }

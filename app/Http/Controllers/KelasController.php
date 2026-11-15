@@ -17,7 +17,6 @@ class KelasController extends Controller
     public function index(Request $request)
     {
         $search = trim((string) $request->query('search', ''));
-
         $query = Kelas::query();
 
         if ($search !== '') {
@@ -29,8 +28,6 @@ class KelasController extends Controller
             });
         }
 
-        // Pagination: maksimal 10 kelas per halaman.
-        // Kata kunci pencarian tetap dibawa saat berpindah halaman.
         $kelasList = $query
             ->orderBy('tingkat')
             ->orderBy('jurusan')
@@ -38,10 +35,7 @@ class KelasController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('admin.kelas.index', compact(
-            'kelasList',
-            'search'
-        ));
+        return view('admin.kelas.index', compact('kelasList', 'search'));
     }
 
     /**
@@ -148,7 +142,6 @@ class KelasController extends Controller
     public function edit($id)
     {
         $kelas = Kelas::findOrFail($id);
-
         $nomorKelas = 1;
 
         if (preg_match('/[- ](\d+)$/', $kelas->nama_kelas, $matches)) {
@@ -275,30 +268,77 @@ class KelasController extends Controller
     }
 
     /**
-     * Menghapus kelas jika tidak memiliki siswa.
+     * Menghapus kelas dengan perlindungan data akademik.
      */
     public function destroy($id)
     {
-        $kelas = Kelas::findOrFail($id);
+        try {
+            DB::transaction(function () use ($id) {
+                $kelas = Kelas::where('id', $id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-        $jumlahSiswa = Siswa::where('kelas', $kelas->nama_kelas)->count();
+                // Semua data siswa dihitung, termasuk siswa
+                // dengan akun berstatus "dihapus".
+                $jumlahSiswa = Siswa::where(
+                    'kelas',
+                    $kelas->nama_kelas
+                )->count();
 
-        if ($jumlahSiswa > 0) {
+                if ($jumlahSiswa > 0) {
+                    throw new \DomainException(
+                        'Kelas ' . $kelas->nama_kelas
+                        . ' tidak dapat dihapus karena masih memiliki '
+                        . $jumlahSiswa
+                        . ' data siswa, termasuk riwayat siswa yang sudah dihapus.'
+                    );
+                }
+
+                // Kelas yang masih mempunyai penugasan guru
+                // tidak boleh dihapus.
+                $jumlahGuru = $kelas->guruDiajar()->count();
+
+                if ($jumlahGuru > 0) {
+                    throw new \DomainException(
+                        'Kelas tidak dapat dihapus karena masih memiliki '
+                        . $jumlahGuru
+                        . ' penugasan guru. Hapus penugasan terlebih dahulu.'
+                    );
+                }
+
+                // Wali kelas harus kosong.
+                if (!empty($kelas->wali_kelas)) {
+                    throw new \DomainException(
+                        'Kelas tidak dapat dihapus karena masih memiliki wali kelas. '
+                        . 'Kosongkan wali kelas terlebih dahulu.'
+                    );
+                }
+
+                // Tidak menghapus siswa, guru, nilai, atau rapor.
+                $kelas->delete();
+            });
+
+            return redirect()
+                ->route('admin.kelas.index')
+                ->with(
+                    'success',
+                    'Data kelas berhasil dihapus.'
+                );
+
+        } catch (\DomainException $e) {
+            return redirect()
+                ->route('admin.kelas.index')
+                ->with('error', $e->getMessage());
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            report($e);
+
             return redirect()
                 ->route('admin.kelas.index')
                 ->with(
                     'error',
-                    'Kelas ' . $kelas->nama_kelas
-                    . ' tidak dapat dihapus karena masih memiliki '
-                    . $jumlahSiswa
-                    . ' siswa. Pindahkan siswa ke kelas lain terlebih dahulu.'
+                    'Kelas tidak dapat dihapus karena masih memiliki keterkaitan data.'
                 );
         }
-
-        $kelas->delete();
-
-        return redirect()
-            ->route('admin.kelas.index')
-            ->with('success', 'Data kelas berhasil dihapus.');
     }
 }

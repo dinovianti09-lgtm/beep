@@ -1095,6 +1095,36 @@
     text-align: center;
 }
 
+/* =====================================================
+   TOMBOL HAPUS DINONAKTIFKAN (LOCKED)
+===================================================== */
+
+.guru-action-locked {
+    border-color: #DBE3EC;
+    background: #F1F5F9;
+    color: #7A8A9C;
+    cursor: not-allowed;
+    opacity: .85;
+}
+
+.guru-action-locked:hover {
+    transform: none;
+    box-shadow: none;
+    background: #F1F5F9;
+    color: #7A8A9C;
+}
+
+.dark .guru-action-locked {
+    border-color: #354962;
+    background: #1E2B3D;
+    color: #8FA3BA;
+}
+
+.dark .guru-action-locked:hover {
+    background: #1E2B3D;
+    color: #8FA3BA;
+}
+
 .dark .guru-action-edit,
 .dark .guru-action-reset {
     border-color: #3A5674;
@@ -2369,43 +2399,22 @@
                                     @endif
 
 
-                                    {{-- HAPUS --}}
-                                    <form
-                                        action="{{ route('admin.guru.destroy', $guru->id_guru) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Yakin ingin menghapus data Guru {{ addslashes($guru->nama_guru) }}? Jika akun sudah terhubung, akun login Guru tersebut juga akan dihapus.')"
-                                    >
+                                    {{-- HAPUS GURU --}}
+<form
+    action="{{ route('admin.guru.destroy', $guru->id_guru) }}"
+    method="POST"
+    onsubmit="return confirm('Yakin ingin menghapus data guru {{ addslashes($guru->nama_guru) }} beserta akun loginnya?')"
+>
+    @csrf
+    @method('DELETE')
 
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button
-                                            type="submit"
-                                            class="guru-action guru-action-delete"
-                                        >
-
-                                            <svg
-                                                width="16"
-                                                height="16"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                stroke-width="1.8"
-                                                viewBox="0 0 24 24"
-                                                aria-hidden="true"
-                                            >
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3"
-                                                />
-                                            </svg>
-
-                                            Hapus
-
-                                        </button>
-
-                                    </form>
-
+    <button
+        type="submit"
+        class="guru-action guru-action-delete"
+    >
+        Hapus
+    </button>
+</form>
                                 </div>
 
                             </td>
