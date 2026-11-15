@@ -930,104 +930,67 @@
                 <div class="border-t border-slate-200 dark:border-slate-700"></div>
 
 
-                {{-- PILIH JURUSAN --}}
-                <section>
+                
+{{-- PILIH KOMBINASI KELAS DAN JURUSAN --}}
+<section>
+    <div class="mb-4">
+        <h3 class="mc-label mb-1">
+            Pilih Kelas dan Jurusan
+            <span class="mc-required">*</span>
+        </h3>
+        <p class="mc-help">
+            Centang kelas dan jurusan yang menggunakan mata pelajaran ini.
+        </p>
+    </div>
 
-                    <div class="mb-4">
-
-                        <h3 class="mc-label mb-1">
-                            Pilih Jurusan
-                            <span class="mc-required">*</span>
-                        </h3>
-
-                        <p class="mc-help">
-                            Pilih satu atau beberapa jurusan yang menggunakan mata pelajaran ini.
-                        </p>
-
-                    </div>
-
-                    <div class="mc-choice-grid">
+    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+        <table class="w-full text-sm">
+            <thead class="bg-blue-50 dark:bg-slate-800">
+                <tr>
+                    <th class="p-4 text-left">Tingkat Kelas</th>
+                    @foreach($jurusanList as $jurusan)
+                        <th class="p-4 text-center">{{ $jurusan }}</th>
+                    @endforeach
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($tingkatList as $tingkat)
+                    <tr class="border-t border-slate-200 dark:border-slate-700">
+                        <th class="p-4 text-left">
+                            Kelas {{ $tingkat }}
+                        </th>
 
                         @foreach($jurusanList as $jurusan)
+                            @php
+                                $kode = $tingkat . '|' . $jurusan;
+                            @endphp
 
-                            <label class="mc-choice">
-
-                                <input
-                                    type="checkbox"
-                                    name="jurusan[]"
-                                    value="{{ $jurusan }}"
-                                    {{ in_array($jurusan, (array) old('jurusan', []), true) ? 'checked' : '' }}
-                                >
-
-                                <span class="mc-choice-text">
-                                    {{ $jurusan }}
-                                </span>
-
-                            </label>
-
+                            <td class="p-4 text-center">
+                                <label class="cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        name="kombinasi[]"
+                                        value="{{ $kode }}"
+                                        @checked(in_array($kode, old('kombinasi', [])))
+                                        class="w-5 h-5 accent-blue-600"
+                                    >
+                                </label>
+                            </td>
                         @endforeach
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 
-                    </div>
+    @error('kombinasi')
+        <p class="mc-field-error">{{ $message }}</p>
+    @enderror
 
-                    @error('jurusan')
-                        <p class="mc-field-error">{{ $message }}</p>
-                    @enderror
-
-                    @error('jurusan.*')
-                        <p class="mc-field-error">{{ $message }}</p>
-                    @enderror
-
-                </section>
-
-
-                {{-- PILIH TINGKAT KELAS --}}
-                <section>
-
-                    <div class="mb-4">
-
-                        <h3 class="mc-label mb-1">
-                            Pilih Tingkat Kelas
-                            <span class="mc-required">*</span>
-                        </h3>
-
-                        <p class="mc-help">
-                            Pilih tingkat kelas yang menggunakan mata pelajaran ini.
-                        </p>
-
-                    </div>
-
-                    <div class="mc-choice-grid">
-
-                        @foreach($tingkatList as $tingkat)
-
-                            <label class="mc-choice">
-
-                                <input
-                                    type="checkbox"
-                                    name="tingkat[]"
-                                    value="{{ $tingkat }}"
-                                    {{ in_array($tingkat, (array) old('tingkat', []), true) ? 'checked' : '' }}
-                                >
-
-                                <span class="mc-choice-text">
-                                    Kelas {{ $tingkat }}
-                                </span>
-
-                            </label>
-
-                        @endforeach
-
-                    </div>
-
-                    @error('tingkat')
-                        <p class="mc-field-error">{{ $message }}</p>
-                    @enderror
-
-                    @error('tingkat.*')
-                        <p class="mc-field-error">{{ $message }}</p>
-                    @enderror
-
-                </section>
+    @error('kombinasi.*')
+        <p class="mc-field-error">{{ $message }}</p>
+    @enderror
+</section>
 
 
                 {{-- INFORMASI PENGATURAN --}}
