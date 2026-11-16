@@ -302,14 +302,19 @@ Pengujian aplikasi dilakukan untuk memeriksa fungsi-fungsi utama, antara lain:
 - Perlindungan integritas data yang saling berelasi.
 - Pemeriksaan aplikasi setelah deployment.
 
+
 ## Tim Pengembang
 
 | Nama | Peran |
 |---|---|
-| Dina Novianti | Tim Pengembang |
-| Sopi Pitriani | Tim Pengembang |
+| Dina Novianti | Backend Developer |
+| Sopi Pitriani | Frontend Developer |
 
-Proyek ini dikembangkan sebagai bagian dari kegiatan pembelajaran dan pengembangan aplikasi Sistem Akademik Mini.
+Proyek Sistem Akademik Mini dikembangkan oleh Tim EDUVIA sebagai bagian dari kegiatan pembelajaran dan pengembangan aplikasi berbasis web.
+
+Dina Novianti bertanggung jawab pada pengembangan backend, meliputi logika aplikasi, pengelolaan database, controller, dan pemrosesan data.
+
+Sopi Pitriani bertanggung jawab pada pengembangan frontend, meliputi perancangan antarmuka pengguna, tampilan halaman, dan interaksi pengguna pada aplikasi.
 
 ## Status Proyek
 
