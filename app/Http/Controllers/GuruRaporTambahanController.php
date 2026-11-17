@@ -171,6 +171,30 @@ class GuruRaporTambahanController extends Controller
                 ]);
         }
 
+        // Validasi anti-duplikat nama ekstrakurikuler.
+        // Abaikan perbedaan huruf besar/kecil dan spasi.
+        $namaEkstrakurikuler = $daftar->map(function ($item) {
+            return mb_strtolower(
+                preg_replace(
+                    '/\s+/u',
+                    ' ',
+                    trim($item['nama_ekstrakurikuler'])
+                ),
+                'UTF-8'
+            );
+        });
+
+        if ($namaEkstrakurikuler->count() !==
+            $namaEkstrakurikuler->unique()->count()) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'ekstrakurikuler' =>
+                        'Nama ekstrakurikuler tidak boleh sama atau duplikat.',
+                ]);
+        }
+
+
         DB::transaction(function () use ($validated, $daftar) {
             EkstrakurikulerSiswa::where(
                 'id_siswa',
