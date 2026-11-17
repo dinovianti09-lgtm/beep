@@ -28,6 +28,12 @@ class SiswaController extends Controller
     public function index(Request $request)
     {
         $kelasList = Kelas::orderBy('nama_kelas')->get();
+        // SKKNI 4 - Rekap jumlah siswa berdasarkan kelas
+$rekapSiswaPerKelas = Siswa::select('kelas')
+    ->selectRaw('COUNT(*) as jumlah_siswa')
+    ->groupBy('kelas')
+    ->orderBy('kelas')
+    ->get();
 
         $search = trim((string) $request->query('search', ''));
         $kelasTerpilih = trim((string) $request->query('kelas', ''));
@@ -65,7 +71,7 @@ class SiswaController extends Controller
             }
         }
 
-        return view('admin.siswa.index', [
+        return view('admin.siswa.index', ['rekapSiswaPerKelas' => $rekapSiswaPerKelas,
             'siswaList' => $siswaList,
             'kelasList' => $kelasList,
             'kelasTerpilih' => $kelasTerpilih,
