@@ -301,13 +301,15 @@ class SiswaController extends Controller
             $berhasil = 0;
             $dilewati = 0;
             $importErrors = [];
+            $nisDalamFile = [];
 
             DB::transaction(function () use (
                 $rows,
                 $headers,
                 &$berhasil,
                 &$dilewati,
-                &$importErrors
+                &$importErrors,
+                &$nisDalamFile
             ) {
                 foreach ($rows as $index => $row) {
                     $nomorBaris = $index + 2;
@@ -360,18 +362,25 @@ class SiswaController extends Controller
                         continue;
                     }
 
-                    $siswa = Siswa::where('nis', $nis)->first();
+                    // Cek NIS duplikat dalam file Excel
+if (isset($nisDalamFile[$nis])) {
+    $dilewati++;
 
-                    if ($siswa) {
-                        $siswa->update([
-                            'nama_siswa' => $nama,
-                            'kelas' => $kelas,
-                            'jenis_kelamin' => $jenisKelamin,
-                        ]);
+    $importErrors[] = "Baris {$nomorBaris}: NIS {$nis} duplikat dalam file Excel.";
 
-                        $berhasil++;
-                        continue;
-                    }
+    continue;
+}
+
+$nisDalamFile[$nis] = true;
+
+// Cek NIS yang sudah terdaftar di database
+if (Siswa::where('nis', $nis)->exists()) {
+    $dilewati++;
+
+    $importErrors[] = "Baris {$nomorBaris}: NIS {$nis} sudah terdaftar.";
+
+    continue;
+}
 
                     Siswa::create([
                         'nis' => $nis,
@@ -384,8 +393,7 @@ class SiswaController extends Controller
                 }
             });
 
-            $message = "Import selesai. {$berhasil} data berhasil diproses (ditambahkan / diperbarui).";
-
+            $message = "Import selesai. {$berhasil} siswa berhasil ditambahkan.";
             if ($dilewati > 0) {
                 $message .= " {$dilewati} baris dilewati.";
             }
