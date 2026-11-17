@@ -1566,7 +1566,68 @@
         </div>
 
     </section>
+    {{-- SKKNI 5 - REKAP JUMLAH SISWA PER KELAS --}}
+<section class="dashboard-card dashboard-table-card dash-enter dash-delay-2">
 
+    <div class="dashboard-section-head">
+        <div class="flex items-center gap-3 min-w-0">
+            <span class="section-indicator"></span>
+
+            <div class="min-w-0">
+                <h3 class="section-title text-base font-extrabold">
+                    Rekap Jumlah Siswa per Kelas
+                </h3>
+
+                <p class="section-description text-xs mt-1">
+                    Statistik jumlah siswa berdasarkan kelas
+                </p>
+            </div>
+        </div>
+
+        <span class="table-badge badge-blue">
+            {{ $rekapSiswaPerKelas->sum('jumlah_siswa') }} Siswa
+        </span>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Kelas</th>
+                    <th>Jumlah Siswa</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @forelse($rekapSiswaPerKelas as $rekap)
+                    <tr>
+                        <td class="table-text font-semibold">
+                            {{ $loop->iteration }}
+                        </td>
+
+                        <td>
+                            <span class="table-badge badge-blue">
+                                {{ $rekap->kelas ?: 'Belum Ada Kelas' }}
+                            </span>
+                        </td>
+
+                        <td class="table-text font-bold">
+                            {{ $rekap->jumlah_siswa }} Siswa
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3" class="dashboard-empty">
+                            Belum ada data siswa untuk direkap.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+</section>
 
     {{-- GURU TERBARU --}}
     <section class="dashboard-card dashboard-table-card dash-enter dash-delay-2">

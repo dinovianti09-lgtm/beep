@@ -23,6 +23,12 @@ class DashboardController extends Controller
         $jumlahSiswa = Siswa::count();
         $jumlahKelas = Kelas::count();
         $jumlahMapel = Mapel::count();
+        // SKKNI 5 - Rekap jumlah siswa per kelas untuk Dashboard Admin
+        $rekapSiswaPerKelas = Siswa::select('kelas')
+            ->selectRaw('COUNT(*) as jumlah_siswa')
+            ->groupBy('kelas')
+            ->orderBy('kelas')
+            ->get();
 
         $guruList = Guru::orderBy('id_guru', 'desc')
             ->take(5)
@@ -56,18 +62,19 @@ class DashboardController extends Controller
             ->get();
 
         return view('admin.dashboard', compact(
-            'jumlahGuru',
-            'jumlahSiswa',
-            'jumlahKelas',
-            'jumlahMapel',
-            'guruList',
-            'siswaList',
-            'namaSiswa',
-            'inisial',
-            'avgNilai',
-            'totalMapelDinilai',
-            'nilaiTerbaru'
-        ));
+    'jumlahGuru',
+    'jumlahSiswa',
+    'jumlahKelas',
+    'jumlahMapel',
+    'rekapSiswaPerKelas', // SKKNI 5
+    'guruList',
+    'siswaList',
+    'namaSiswa',
+    'inisial',
+    'avgNilai',
+    'totalMapelDinilai',
+    'nilaiTerbaru'
+));
     }
 
 
