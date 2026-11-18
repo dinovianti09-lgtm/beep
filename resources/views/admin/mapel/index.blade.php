@@ -1250,13 +1250,12 @@
                     </div>
 
 
-                    {{-- DROPDOWN RIWAYAT PENCARIAN --}}
-                    <div
-                        id="mapelSearchSuggestions"
-                        class="mapel-suggestion-box hidden"
-                        role="listbox"
-                        aria-label="Riwayat pencarian"
-                    ></div>
+                    {{-- Riwayat pencarian dinonaktifkan --}}
+               <div
+                 id="mapelSearchSuggestions"
+                 class="mapel-suggestion-box hidden"
+                 style="display: none !important;"
+               ></div>
 
                 </div>
 

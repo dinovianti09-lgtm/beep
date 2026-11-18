@@ -1087,6 +1087,26 @@
         transition: none !important;
     }
 }
+/* JUMLAH SISWA PER KELAS */
+.kp-student-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 11px;
+    border: 1px solid #C8DFF7;
+    border-radius: 8px;
+    background: #EAF4FF;
+    color: #2C6399;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.dark .kp-student-badge {
+    border-color: #405773;
+    background: #263E59;
+    color: #D5E5F8;
+}
 </style>
 @endpush
 
@@ -1497,6 +1517,7 @@
                         <th>Tingkat</th>
                         <th>Jurusan</th>
                         <th>Wali Kelas</th>
+                        <th class="text-center">Jumlah Siswa</th>
                         <th class="text-center">Aksi</th>
 
                     </tr>
@@ -1618,6 +1639,12 @@
                                 @endif
 
                             </td>
+                            {{-- JUMLAH SISWA --}}
+<td class="text-center">
+    <span class="kp-student-badge">
+        {{ $kelas->jumlah_siswa ?? 0 }} Siswa
+    </span>
+</td>
 
 
                             {{-- AKSI --}}
@@ -1699,8 +1726,7 @@
 
                         <tr>
 
-                            <td colspan="6" class="kp-empty">
-
+                            <td colspan="7" class="kp-empty">
                                 <div class="kp-empty-icon">
 
                                     <svg fill="none"

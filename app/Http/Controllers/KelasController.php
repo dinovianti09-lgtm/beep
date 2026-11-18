@@ -35,6 +35,18 @@ class KelasController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        // REKAP JUMLAH SISWA PER KELAS
+        $jumlahSiswaPerKelas = Siswa::select('kelas')
+            ->selectRaw('COUNT(*) as total')
+            ->groupBy('kelas')
+            ->pluck('total', 'kelas');
+
+        foreach ($kelasList as $kelas) {
+            $kelas->jumlah_siswa = (int) (
+                $jumlahSiswaPerKelas->get($kelas->nama_kelas, 0)
+            );
+        }
+
         return view('admin.kelas.index', compact('kelasList', 'search'));
     }
 
@@ -211,7 +223,7 @@ class KelasController extends Controller
             'tingkat.required' => 'Tingkat kelas wajib dipilih.',
             'tingkat.in' => 'Tingkat kelas tidak valid.',
             'jurusan.required' => 'Jurusan wajib dipilih.',
-            'jurusan.in' => 'Jurusan tidak valid. Pilih RPL, DKV, atau BR.',
+            'jurusan.in' => 'Jurusan tidak valid.',
             'nomor_kelas.required' => 'Nomor kelas wajib diisi.',
             'nomor_kelas.integer' => 'Nomor kelas harus berupa angka.',
             'nomor_kelas.min' => 'Nomor kelas minimal 1.',

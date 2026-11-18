@@ -2087,80 +2087,47 @@
     </section>
 
 
-    {{-- LAPORAN IMPORT --}}
-    @if(session('import_errors'))
+    
+{{-- LAPORAN IMPORT --}}
+@if(session('import_errors') && count(session('import_errors')) > 0)
 
-        <section class="sp-table-shell">
+    <div
+        class="sp-alert border border-red-200 bg-red-50 text-red-800 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300"
+        role="alert"
+    >
 
-            <div class="p-5 sm:p-6">
+        <div class="sp-alert-icon text-red-700 dark:text-red-300">
+            !
+        </div>
 
-                <div class="flex items-start gap-3">
+        <div class="min-w-0 flex-1">
 
-                    <div class="sp-section-icon">
+            <p class="font-extrabold">
+                Data Belum Bisa Disimpan
+            </p>
 
-                        <svg fill="none"
-                             stroke="currentColor"
-                             stroke-width="1.8"
-                             viewBox="0 0 24 24"
-                             aria-hidden="true">
+            <p class="mt-1">
+                {{ count(session('import_errors')) }} baris data siswa dilewati saat import.
+            </p>
 
-                            <circle cx="12" cy="12" r="9"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/>
+            <ul class="mt-3 list-disc space-y-1 pl-5">
+                @foreach(session('import_errors') as $error)
+                    <li>
+                        @if(is_array($error))
+                            Baris {{ $error['baris'] ?? '-' }}:
+                            {{ $error['pesan'] ?? 'Data tidak valid.' }}
+                        @else
+                            {{ $error }}
+                        @endif
+                    </li>
+                @endforeach
+            </ul>
 
-                        </svg>
+        </div>
 
-                    </div>
+    </div>
 
-                    <div class="min-w-0 flex-1">
-
-                        <h3 class="text-sm font-extrabold text-slate-800 dark:text-slate-100">
-                            Periksa Data yang Belum Berhasil Diimport
-                        </h3>
-
-                        <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                            Sebagian data mungkin dilewati karena NIS sudah terdaftar atau datanya tidak sesuai.
-                        </p>
-
-
-                        <div class="mt-4 space-y-3">
-
-                            @foreach(session('import_errors') as $error)
-
-                                <div class="sp-import-error dark:border-slate-700 dark:bg-slate-900">
-
-                                    @if(is_array($error))
-
-                                        <p class="font-extrabold text-slate-800 dark:text-white">
-                                            Baris {{ $error['baris'] ?? '-' }}
-                                        </p>
-
-                                        <p class="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                                            {{ $error['pesan'] ?? json_encode($error) }}
-                                        </p>
-
-                                    @else
-
-                                        <p class="text-sm leading-6 text-slate-600 dark:text-slate-300">
-                                            {{ $error }}
-                                        </p>
-
-                                    @endif
-
-                                </div>
-
-                            @endforeach
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-    @endif
+@endif
 
 
     {{-- PENCARIAN DAN FILTER --}}
@@ -2922,94 +2889,7 @@
     </section>
 
 
-    {{-- =========================================
-     SKKNI 4 - REKAP JUMLAH SISWA PER KELAS
-========================================= --}}
-<section class="sp-table-shell sp-enter">
-
-    <div class="sp-table-header">
-        <div class="flex items-center gap-3">
-            <div class="sp-section-icon">
-                <svg fill="none"
-                     stroke="currentColor"
-                     stroke-width="1.8"
-                     viewBox="0 0 24 24"
-                     aria-hidden="true">
-                    <path stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M4 19V5m0 14h16M8 15v-5m5 5V7m5 8v-9"/>
-                </svg>
-            </div>
-
-            <div>
-                <h3 class="sp-panel-title">
-                    Rekap Jumlah Siswa per Kelas
-                </h3>
-
-                <p class="sp-panel-description">
-                    Ringkasan jumlah siswa berdasarkan kelas.
-                </p>
-            </div>
-        </div>
-
-        <span class="sp-total">
-            {{ $rekapSiswaPerKelas->sum('jumlah_siswa') }} Siswa
-        </span>
-    </div>
-
-    <div class="overflow-x-auto">
-        <table class="sp-table" style="min-width: 500px;">
-            <thead>
-                <tr>
-                    <th>No.</th>
-                    <th>Kelas</th>
-                    <th>Jumlah Siswa</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @forelse($rekapSiswaPerKelas as $rekap)
-                    <tr>
-                        <td>
-                            <span class="sp-number">
-                                {{ $loop->iteration }}
-                            </span>
-                        </td>
-
-                        <td>
-                            <span class="sp-class-badge">
-                                {{ $rekap->kelas ?: 'Belum Ada Kelas' }}
-                            </span>
-                        </td>
-
-                        <td>
-                            <strong>{{ $rekap->jumlah_siswa }} Siswa</strong>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="3" class="sp-empty">
-                            Belum ada data siswa untuk direkap.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-
-            <tfoot>
-                <tr class="bg-blue-50 dark:bg-slate-800">
-                    <th colspan="2" class="p-4 text-left text-sm font-extrabold text-blue-900 dark:text-blue-100">
-                        Total Seluruh Siswa
-                    </th>
-
-                    <th class="p-4 text-left text-sm font-extrabold text-blue-900 dark:text-blue-100">
-                        {{ $rekapSiswaPerKelas->sum('jumlah_siswa') }} Siswa
-                    </th>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
-
-</section>
+    
     {{-- FOOTER --}}
     <footer class="text-center pt-2 pb-3">
 

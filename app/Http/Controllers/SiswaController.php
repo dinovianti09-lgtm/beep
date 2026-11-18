@@ -28,12 +28,13 @@ class SiswaController extends Controller
     public function index(Request $request)
     {
         $kelasList = Kelas::orderBy('nama_kelas')->get();
+
         // SKKNI 4 - Rekap jumlah siswa berdasarkan kelas
-$rekapSiswaPerKelas = Siswa::select('kelas')
-    ->selectRaw('COUNT(*) as jumlah_siswa')
-    ->groupBy('kelas')
-    ->orderBy('kelas')
-    ->get();
+        $rekapSiswaPerKelas = Siswa::select('kelas')
+            ->selectRaw('COUNT(*) as jumlah_siswa')
+            ->groupBy('kelas')
+            ->orderBy('kelas')
+            ->get();
 
         $search = trim((string) $request->query('search', ''));
         $kelasTerpilih = trim((string) $request->query('kelas', ''));
@@ -71,7 +72,8 @@ $rekapSiswaPerKelas = Siswa::select('kelas')
             }
         }
 
-        return view('admin.siswa.index', ['rekapSiswaPerKelas' => $rekapSiswaPerKelas,
+        return view('admin.siswa.index', [
+            'rekapSiswaPerKelas' => $rekapSiswaPerKelas,
             'siswaList' => $siswaList,
             'kelasList' => $kelasList,
             'kelasTerpilih' => $kelasTerpilih,
@@ -220,7 +222,8 @@ $rekapSiswaPerKelas = Siswa::select('kelas')
     }
 
     // ========================================
-    // IMPORT SISWA DARI EXCEL (UPDATE IF EXISTS)
+    // IMPORT SISWA DARI EXCEL
+    // SKKNI 3 - VALIDASI ANTI-DUPLIKASI
     // ========================================
 
     public function import(Request $request)
@@ -245,7 +248,6 @@ $rekapSiswaPerKelas = Siswa::select('kelas')
             $file = $request->file('file');
 
             $spreadsheet = IOFactory::load($file->getRealPath());
-
             $sheet = $spreadsheet->getActiveSheet();
 
             $jumlahBarisData = max(
@@ -269,11 +271,19 @@ $rekapSiswaPerKelas = Siswa::select('kelas')
                 );
             }
 
+            // ========================================
+            // NORMALISASI HEADER EXCEL
+            // ========================================
+
             $headerRow = array_shift($rows);
             $headers = [];
 
             foreach ($headerRow as $column => $header) {
                 $key = strtolower(trim((string) $header));
+
+                // Hapus BOM, spasi berlebih, dan samakan format
+                $key = str_replace("\xEF\xBB\xBF", '', $key);
+                $key = preg_replace('/\s+/', '_', $key);
 
                 if ($key !== '') {
                     if (array_key_exists($key, $headers)) {
@@ -299,10 +309,14 @@ $rekapSiswaPerKelas = Siswa::select('kelas')
                     return back()->with(
                         'error',
                         'Kolom ' . $requiredHeader .
-                        ' tidak ditemukan. Gunakan file template siswa.'
+                        ' tidak ditemukan. Gunakan template siswa atau file hasil export EDUVIA.'
                     );
                 }
             }
+
+            // ========================================
+            // PROSES IMPORT
+            // ========================================
 
             $berhasil = 0;
             $dilewati = 0;
@@ -338,6 +352,7 @@ $rekapSiswaPerKelas = Siswa::select('kelas')
                         )
                     );
 
+                    // Lewati baris kosong
                     if (
                         $nis === '' &&
                         $nama === '' &&
@@ -346,6 +361,10 @@ $rekapSiswaPerKelas = Siswa::select('kelas')
                     ) {
                         continue;
                     }
+
+                    // ========================================
+                    // VALIDASI DATA BARIS
+                    // ========================================
 
                     $rowValidator = Validator::make([
                         'nis' => $nis,
@@ -357,6 +376,12 @@ $rekapSiswaPerKelas = Siswa::select('kelas')
                         'nama_siswa' => 'required|string|max:255',
                         'kelas' => 'required|string|max:100',
                         'jenis_kelamin' => 'required|in:L,P',
+                    ], [
+                        'nis.required' => 'NIS wajib diisi.',
+                        'nama_siswa.required' => 'Nama siswa wajib diisi.',
+                        'kelas.required' => 'Kelas wajib diisi.',
+                        'jenis_kelamin.required' => 'Jenis kelamin wajib diisi.',
+                        'jenis_kelamin.in' => 'Jenis kelamin harus L atau P.',
                     ]);
 
                     if ($rowValidator->fails()) {
@@ -368,25 +393,37 @@ $rekapSiswaPerKelas = Siswa::select('kelas')
                         continue;
                     }
 
-                    // Cek NIS duplikat dalam file Excel
-if (isset($nisDalamFile[$nis])) {
-    $dilewati++;
+                    // ========================================
+                    // CEK NIS DUPLIKAT DALAM FILE
+                    // ========================================
 
-    $importErrors[] = "Baris {$nomorBaris}: NIS {$nis} duplikat dalam file Excel.";
+                    if (isset($nisDalamFile[$nis])) {
+                        $dilewati++;
 
-    continue;
-}
+                        $importErrors[] =
+                            "Baris {$nomorBaris}: NIS {$nis} duplikat dalam file Excel.";
 
-$nisDalamFile[$nis] = true;
+                        continue;
+                    }
 
-// Cek NIS yang sudah terdaftar di database
-if (Siswa::where('nis', $nis)->exists()) {
-    $dilewati++;
+                    $nisDalamFile[$nis] = true;
 
-    $importErrors[] = "Baris {$nomorBaris}: NIS {$nis} sudah terdaftar.";
+                    // ========================================
+                    // CEK NIS SUDAH ADA DI DATABASE
+                    // ========================================
 
-    continue;
-}
+                    if (Siswa::where('nis', $nis)->exists()) {
+                        $dilewati++;
+
+                        $importErrors[] =
+                            "Baris {$nomorBaris}: NIS {$nis} sudah terdaftar.";
+
+                        continue;
+                    }
+
+                    // ========================================
+                    // SIMPAN DATA SISWA BARU
+                    // ========================================
 
                     Siswa::create([
                         'nis' => $nis,
@@ -399,21 +436,46 @@ if (Siswa::where('nis', $nis)->exists()) {
                 }
             });
 
-            $message = "Import selesai. {$berhasil} siswa berhasil ditambahkan.";
-            if ($dilewati > 0) {
-                $message .= " {$dilewati} baris dilewati.";
+            // ========================================
+            // HASIL IMPORT
+            // ========================================
+
+            $redirect = redirect()->route('admin.siswa.index');
+
+            // Tampilkan notifikasi hijau hanya jika ada siswa berhasil ditambahkan
+            if ($berhasil > 0) {
+                $redirect->with(
+                    'success',
+                    "{$berhasil} siswa berhasil ditambahkan ke sistem."
+                );
             }
 
-            return redirect()
-                ->route('admin.siswa.index')
-                ->with('success', $message)
-                ->with('import_errors', $importErrors);
+            // Tampilkan notifikasi merah jika ada data yang dilewati
+            if ($dilewati > 0) {
+                $redirect->with(
+                    'import_errors',
+                    $importErrors
+                );
+            }
+
+            // Jika tidak ada data yang diproses
+            if ($berhasil === 0 && $dilewati === 0) {
+                $redirect->with(
+                    'error',
+                    'Tidak ada data siswa yang dapat diimport. Periksa kembali isi file Excel.'
+                );
+            }
+
+            return $redirect;
+
         } catch (Throwable $e) {
+            // Simpan detail kesalahan ke log Laravel
             report($e);
 
             return back()->with(
                 'error',
-                'Import gagal. Periksa format file Excel dan pastikan kolomnya sesuai template.'
+                'Import gagal karena terjadi kesalahan saat membaca atau menyimpan data. '
+                . 'Periksa log Laravel di storage/logs/laravel.log.'
             );
         } finally {
             if ($spreadsheet !== null) {
@@ -567,7 +629,6 @@ if (Siswa::where('nis', $nis)->exists()) {
             $user->status = $statusBaru;
             $user->save();
 
-            // Cabut semua token API jika akun dinonaktifkan.
             if ($statusBaru === 'nonaktif') {
                 $user->tokens()->delete();
             }
@@ -618,7 +679,6 @@ if (Siswa::where('nis', $nis)->exists()) {
             $user->must_change_password = true;
             $user->save();
 
-            // Cabut semua token API lama setelah password direset.
             $user->tokens()->delete();
         });
 
@@ -659,7 +719,6 @@ if (Siswa::where('nis', $nis)->exists()) {
             $user->status = 'dihapus';
             $user->save();
 
-            // Cabut seluruh token API.
             $user->tokens()->delete();
         });
 
