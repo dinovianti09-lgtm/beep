@@ -1006,19 +1006,6 @@
                 <span class="text-sm font-semibold">Nilai Saya</span>
             </a>
 
-            {{-- RAPOR SAYA --}}
-            <a
-                href="{{ route('siswa.rapor.index') }}"
-                class="{{ request()->routeIs('siswa.rapor.*') ? 'sidebar-active' : 'sidebar-link' }} mb-1"
-            >
-                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 3v5h5M9 13h6M9 17h6"/>
-                </svg>
-
-                <span class="text-sm font-semibold">Rapor Saya</span>
-            </a>
-
             {{-- AKUN --}}
             <p class="sidebar-heading px-3 mt-6 mb-2 text-[10px] font-extrabold tracking-[.16em] uppercase">
                 Akun

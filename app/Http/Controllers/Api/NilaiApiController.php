@@ -59,14 +59,24 @@ class NilaiApiController extends Controller
             return null;
         }
 
-        // Siswa hanya dapat mengakses nilai miliknya.
+        
+        // Siswa hanya dapat mengakses nilai remedial
+        // miliknya yang sudah disetujui wali kelas.
         if ($role === 'siswa') {
             $query->whereHas('siswa', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
 
+            $query->where('status_persetujuan', 'published')
+                ->whereNotNull('nilai_akhir')
+                ->whereHas('mapel', function ($q) {
+                    $q->whereNotNull('kkm')
+                        ->whereRaw('nilai.nilai_akhir < mapel.kkm');
+                });
+
             return null;
         }
+
 
         // Guru hanya dapat mengakses mapel dan kelas yang ditugaskan.
         if ($role === 'guru') {

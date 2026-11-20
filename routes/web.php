@@ -18,6 +18,7 @@ use App\Http\Controllers\GuruSiswaController;
 use App\Http\Controllers\GuruRaporController;
 use App\Http\Controllers\GuruRaporTambahanController;
 use App\Http\Controllers\BobotNilaiController;
+use App\Http\Controllers\PersetujuanNilaiController;
 use App\Http\Controllers\PengaturanSekolahController;
 
 
@@ -339,6 +340,17 @@ Route::middleware(['auth', 'role:guru'])
             'destroy',
         ])->name('rekap.destroy');
 
+        // PERSETUJUAN NILAI OLEH WALI KELAS
+
+Route::get('/persetujuan-nilai', [
+    PersetujuanNilaiController::class,
+    'index',
+])->name('persetujuan-nilai.index');
+
+Route::post('/persetujuan-nilai/{id}/setujui', [
+    PersetujuanNilaiController::class,
+    'setujui',
+])->name('persetujuan-nilai.setujui');
 
         // RAPOR KHUSUS GURU WALI KELAS
 
@@ -392,13 +404,6 @@ Route::middleware(['auth', 'role:siswa'])
             'index',
         ])->name('nilai.index');
 
-
-        // TRANSKRIP / RAPOR SISWA
-
-        Route::get('/transkrip', [
-            SiswaNilaiController::class,
-            'transkrip',
-        ])->name('rapor.index');
 
 
         // PROFIL

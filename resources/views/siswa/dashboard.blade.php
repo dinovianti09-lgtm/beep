@@ -571,7 +571,7 @@
             <article class="dashboard-card stat-card p-5">
                 <div class="relative z-10 flex items-start justify-between gap-3">
                     <div>
-                        <p class="text-sm font-bold card-muted">Rata-rata Nilai</p>
+                        <p class="text-sm font-bold card-muted">Rata-rata Nilai Remedial</p>
                         <p class="stat-number text-3xl font-extrabold mt-3">
                             {{ number_format((float) ($avgNilai ?? 0), 2) }}
                         </p>
@@ -591,7 +591,7 @@
             <article class="dashboard-card stat-card p-5 sm:col-span-2 xl:col-span-1">
                 <div class="relative z-10 flex items-start justify-between gap-3">
                     <div>
-                        <p class="text-sm font-bold card-muted">Mata Pelajaran Dinilai</p>
+                        <p class="text-sm font-bold card-muted">Mata Pelajaran Remedial</p>
                         <p class="stat-number text-3xl font-extrabold mt-3">
                             {{ $totalMapelDinilai ?? 0 }}
                         </p>
@@ -617,7 +617,7 @@
             <div class="flex items-center gap-3 min-w-0">
                 <span class="section-indicator"></span>
                 <div class="min-w-0">
-                    <h3 class="section-title text-base font-extrabold">Nilai Terbaru</h3>
+                    <h3 class="section-title text-base font-extrabold">Nilai Remedial Terbaru</h3>
                     <p class="section-description text-xs mt-1">
                         Daftar nilai akademik yang sudah kamu peroleh
                     </p>
@@ -703,9 +703,9 @@
                                               d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
                                     </svg>
                                 </div>
-                                <p class="font-bold table-text">Belum ada nilai</p>
+                                <p class="font-bold table-text">Tidak Ada Nilai Remedial</p>
                                 <p class="text-xs card-muted mt-2">
-                                    Nilai kamu akan muncul setelah guru menginput nilai.
+                                    Tidak ada nilai remedial yang telah disetujui wali kelas.
                                 </p>
                             </td>
                         </tr>
@@ -752,28 +752,7 @@
                 </svg>
             </a>
 
-            {{-- RAPOR SAYA --}}
-            <a href="{{ route('siswa.rapor.index') }}"
-               class="dashboard-card quick-card group">
-                <div class="quick-icon">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor"
-                         stroke-width="1.8" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M6 3h9l3 3v15H6V3z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M9 11h6M9 15h6M9 7h3"/>
-                    </svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <h4 class="font-extrabold card-title">Rapor Saya</h4>
-                    <p class="text-xs card-muted mt-1">Lihat rapor dan hasil belajar</p>
-                </div>
-                <svg class="quick-arrow w-5 h-5 shrink-0" fill="none"
-                     stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M5 12h14m-7-7l7 7-7 7"/>
-                </svg>
-            </a>
+
         </div>
     </section>
 

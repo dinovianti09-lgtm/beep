@@ -169,42 +169,53 @@ class SiswaNilaiController extends Controller
             $infoKelas['jurusan']
         );
 
-        // Ambil nilai siswa sesuai periode yang dipilih.
-        $nilaiPeriode = collect();
+        
+// Ambil hanya nilai remedial yang sudah disetujui wali kelas.
+$nilaiPeriode = collect();
 
-        if ($periodeAktif) {
-            $nilaiPeriode = Nilai::with(['mapel', 'rapor'])
-                ->where('id_siswa', $siswa->id_siswa)
-                ->where('id_rapor', $periodeAktif->id_rapor)
-                ->get()
-                ->keyBy('id_mapel');
-        }
+if ($periodeAktif) {
+    $nilaiPeriode = Nilai::with(['mapel', 'rapor'])
+        ->where('id_siswa', $siswa->id_siswa)
+        ->where('id_rapor', $periodeAktif->id_rapor)
+        ->where('status_persetujuan', 'published')
+        ->whereNotNull('nilai_akhir')
+        ->whereHas('mapel', function ($query) {
+            $query->whereNotNull('kkm');
+        })
+        ->whereHas('mapel', function ($query) {
+            $query->whereRaw(
+                'nilai.nilai_akhir < mapel.kkm'
+            );
+        })
+        ->get()
+        ->keyBy('id_mapel');
+}
 
-        // Gabungkan mapel wajib dengan nilai yang tersedia.
-        $nilais = $pengaturanMapel->map(
-            function ($mapel) use ($nilaiPeriode, $periodeAktif) {
-                $nilai = $nilaiPeriode->get($mapel->id_mapel);
 
-                if (!$nilai) {
-                    $statusNilai = 'Belum diinput';
-                } elseif (!$this->nilaiLengkap($nilai)) {
-                    $statusNilai = 'Belum lengkap';
-                } else {
-                    $statusNilai = 'Lengkap';
-                }
+        
+// Tampilkan hanya nilai remedial yang sudah disetujui.
+$nilais = $nilaiPeriode
+    ->filter(function ($nilai) {
+        return $this->nilaiLengkap($nilai)
+            && $nilai->mapel !== null
+            && is_numeric($nilai->mapel->kkm)
+            && (float) $nilai->nilai_akhir
+                < (float) $nilai->mapel->kkm;
+    })
+    ->map(function ($nilai) {
+        return (object) [
+            'mapel' => $nilai->mapel,
+            'rapor' => $nilai->rapor,
+            'nilai_harian' => $nilai->nilai_harian,
+            'nilai_uts' => $nilai->nilai_uts,
+            'nilai_uas' => $nilai->nilai_uas,
+            'nilai_akhir' => $nilai->nilai_akhir,
+            'predikat' => $nilai->predikat,
+            'status_nilai' => 'Remedial',
+        ];
+    })
+    ->values();
 
-                return (object) [
-                    'mapel' => $mapel,
-                    'rapor' => $periodeAktif,
-                    'nilai_harian' => $nilai?->nilai_harian,
-                    'nilai_uts' => $nilai?->nilai_uts,
-                    'nilai_uas' => $nilai?->nilai_uas,
-                    'nilai_akhir' => $nilai?->nilai_akhir,
-                    'predikat' => $nilai?->predikat,
-                    'status_nilai' => $statusNilai,
-                ];
-            }
-        );
 
         // Statistik dihitung dari seluruh mata pelajaran.
         $totalMapel = $nilais->count();

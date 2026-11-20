@@ -473,6 +473,32 @@ class RekapController extends Controller
             'predikat' => $hasilPerhitungan['predikat'],
             'semester' => (int) $validated['semester'],
         ]);
+        // Siapkan data nilai terbaru.
+$dataNilai = [
+    'id_siswa' => $validated['id_siswa'],
+    'id_rapor' => $validated['id_rapor'],
+    'id_mapel' => $mapel->id_mapel,
+    'nilai_harian' => $nilaiHarian,
+    'nilai_uts' => $nilaiUts,
+    'nilai_uas' => $nilaiUas,
+    'nilai_akhir' => $hasilPerhitungan['nilai_akhir'],
+    'predikat' => $hasilPerhitungan['predikat'],
+    'semester' => (int) $validated['semester'],
+];
+
+// Periksa apakah data penilaian berubah.
+$nilai->fill($dataNilai);
+$nilaiBerubah = $nilai->isDirty();
+
+// Jika berubah, batalkan persetujuan sebelumnya.
+if ($nilaiBerubah) {
+    $nilai->status_persetujuan = 'pending';
+    $nilai->disetujui_oleh = null;
+    $nilai->disetujui_pada = null;
+}
+
+// Simpan perubahan nilai.
+$nilai->save();
 
         return redirect()
             ->route('guru.rekap.index')

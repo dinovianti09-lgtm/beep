@@ -119,7 +119,7 @@
                 </div>
                 <div>
                     <p class="text-sm text-[#587A9B] dark:text-[#A9C4DF]">
-                        Total Mata Pelajaran
+                        Mata Pelajaran Remedial
                     </p>
                     <p class="text-2xl font-bold text-[#355779] dark:text-[#D8E9FC] mt-1">
                         {{ $totalMapel }}
@@ -219,9 +219,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9h8M8 13h5"/>
                     </svg>
                 </div>
-                <h3 class="font-bold card-title">Belum Ada Mata Pelajaran</h3>
+                <h3 class="font-bold card-title">Tidak Ada Nilai Remedial</h3>
                 <p class="text-sm card-muted mt-2">
-                    Belum ada mata pelajaran untuk periode yang dipilih.
+                    Tidak ada nilai remedial yang telah disetujui wali kelas pada semester ini.
                 </p>
             </div>
 

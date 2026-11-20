@@ -371,11 +371,16 @@ $nilaiTerbaru = $queryNilaiTerbaru
             ]);
         }
 
-        $queryNilai = Nilai::with('mapel')
-            ->where(
-                'id_siswa',
-                $siswa->id_siswa
-            );
+        
+$queryNilai = Nilai::with('mapel')
+    ->where('id_siswa', $siswa->id_siswa)
+    ->where('status_persetujuan', 'published')
+    ->whereNotNull('nilai_akhir')
+    ->whereHas('mapel', function ($query) {
+        $query->whereNotNull('kkm')
+            ->whereRaw('nilai.nilai_akhir < mapel.kkm');
+    });
+
 
         if (in_array($semesterTerpilih, ['1', '2'])) {
             $queryNilai->where(

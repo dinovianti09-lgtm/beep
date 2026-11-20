@@ -142,9 +142,10 @@ class RaporSiswaController extends Controller
             */
 
             $nilaiBySiswaPeriode = Nilai::whereIn(
-                'id_rapor',
-                $periodeIds
-            )
+    'id_rapor',
+    $periodeIds
+)
+    ->where('status_persetujuan', 'published')
                 ->get()
                 ->groupBy(function ($nilai) {
                     return $nilai->id_siswa . '_' . $nilai->id_rapor;
@@ -431,10 +432,11 @@ class RaporSiswaController extends Controller
 
         // Ambil nilai berdasarkan siswa dan periode.
         $nilais = Nilai::with('mapel')
-            ->where('id_siswa', $raporSiswa->id_siswa)
-            ->where('id_rapor', $raporSiswa->id_rapor)
-            ->orderByDesc('id_nilai')
-            ->get();
+    ->where('id_siswa', $raporSiswa->id_siswa)
+    ->where('id_rapor', $raporSiswa->id_rapor)
+    ->where('status_persetujuan', 'published')
+    ->orderByDesc('id_nilai')
+    ->get();
 
         // Ambil data kehadiran.
         $kehadiran = DB::table('kehadiran_siswa')
@@ -616,9 +618,9 @@ class RaporSiswaController extends Controller
 
         // Ambil nilai siswa.
         $nilaiSiswa = Nilai::where('id_siswa', $raporSiswa->id_siswa)
-            ->where('id_rapor', $raporSiswa->id_rapor)
-            ->get();
-
+    ->where('id_rapor', $raporSiswa->id_rapor)
+    ->where('status_persetujuan', 'published')
+    ->get();
         // Periksa kelengkapan seluruh nilai.
         foreach ($mapelWajib as $idMapel) {
 

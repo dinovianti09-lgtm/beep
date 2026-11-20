@@ -1037,8 +1037,33 @@
                 <span class="text-sm font-semibold">Pengaturan Bobot</span>
             </a>
 
-            {{-- RAPOR KHUSUS WALI KELAS --}}
-            @if($isWaliKelas)
+            
+             {{-- PERSETUJUAN NILAI KHUSUS WALI KELAS --}}
+             @if($isWaliKelas)
+        <a
+        href="{{ route('guru.persetujuan-nilai.index') }}"
+        class="{{ request()->routeIs('guru.persetujuan-nilai.*') ? 'sidebar-active' : 'sidebar-link' }} mb-1"
+    >
+        <svg class="w-5 h-5 flex-shrink-0"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="1.8"
+             viewBox="0 0 24 24"
+             aria-hidden="true">
+            <rect x="4" y="3" width="16" height="18" rx="2"/>
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M8 8h8M8 12h4M9 16l2 2 4-4"/>
+        </svg>
+
+        <span class="text-sm font-semibold">
+            Persetujuan Nilai
+        </span>
+    </a>
+@endif
+
+{{-- RAPOR KHUSUS WALI KELAS --}}
+@if($isWaliKelas)
                 <a
                     href="{{ route('guru.rapor.index') }}"
                     class="{{ request()->routeIs('guru.rapor.*') ? 'sidebar-active' : 'sidebar-link' }} mb-1"
@@ -1205,6 +1230,7 @@
                     'nilai' => 'Nilai',
                     'rekap' => 'Rekap Nilai',
                     'bobot-nilai' => 'Bobot Nilai',
+                    'persetujuan-nilai' => 'Persetujuan Nilai',
                     'rapor' => 'Rapor',
                     'profil' => 'Profil',
                 ];

@@ -164,8 +164,22 @@ class BobotNilaiController extends Controller
                     $predikat = 'D';
                 }
 
+                                // Periksa apakah nilai akhir atau predikat berubah.
+                $nilaiBerubah =
+                    abs((float) $nilai->nilai_akhir - $nilaiAkhir) > 0.00001
+                    || $nilai->predikat !== $predikat;
+
+                // Simpan hasil perhitungan terbaru.
                 $nilai->nilai_akhir = $nilaiAkhir;
                 $nilai->predikat = $predikat;
+
+                // Jika nilai berubah, wajib disetujui ulang wali kelas.
+                if ($nilaiBerubah) {
+                    $nilai->status_persetujuan = 'pending';
+                    $nilai->disetujui_oleh = null;
+                    $nilai->disetujui_pada = null;
+                }
+
                 $nilai->save();
             }
         });

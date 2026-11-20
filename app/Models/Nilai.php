@@ -26,6 +26,10 @@ class Nilai extends Model
         'semester',
     ];
 
+    protected $casts = [
+        'disetujui_pada' => 'datetime',
+    ];
+
     public function siswa()
     {
         return $this->belongsTo(
@@ -50,6 +54,15 @@ class Nilai extends Model
             Rapor::class,
             'id_rapor',
             'id_rapor'
+        );
+    }
+
+    public function penyetuju()
+    {
+        return $this->belongsTo(
+            Guru::class,
+            'disetujui_oleh',
+            'id_guru'
         );
     }
 }
